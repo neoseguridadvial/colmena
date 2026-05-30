@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movilidad Laboral - Taller Aguamarina</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --aqua-main: #20B2AA;
+            --aqua-dark: #1A1A1A;
+        }
+        
+        body { font-family: 'Inter', sans-serif; background-color: #F3F4F6; }
+        
+        .flip-card { perspective: 1000px; height: 200px; cursor: pointer; }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+        .flip-card-front { background: white; border: 2px solid var(--aqua-main); }
+        .flip-card-back { background: var(--aqua-dark); color: white; transform: rotateY(180deg); }
+
+        .btn-nav-active { background-color: var(--aqua-dark); color: white; }
+        .btn-nav-inactive { background-color: white; color: var(--aqua-dark); border: 2px solid var(--aqua-dark); }
+    </style>
+</head>
+<body class="min-h-screen pb-10">
+
+    <header class="bg-[#20B2AA] p-8 text-center shadow-lg sticky top-0 z-50">
+        <h1 class="text-3xl font-extrabold uppercase tracking-tighter text-white">Movilidad Laboral</h1>
+        <p class="text-sm font-semibold opacity-90 mt-2 italic text-white">Mapa de riesgos de mi operación</p>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        
+        <div class="flex justify-center mb-10 gap-4">
+            <button onclick="showSection('concepts')" id="btn-concepts" class="px-8 py-3 rounded-full font-bold transition-all transform hover:scale-105 btn-nav-active shadow-md">Conceptos Clave</button>
+            <button onclick="showSection('workshop')" id="btn-workshop" class="px-8 py-3 rounded-full font-bold transition-all transform hover:scale-105 btn-nav-inactive shadow-md">Mi Mapa de Riesgos</button>
+        </div>
+
+        <section id="concepts" class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front border-l-8 border-[#20B2AA]">
+                        <h3 class="text-xl font-bold mb-2">Movilidad</h3>
+                        <p class="text-sm text-gray-500">Haz clic para ver definición</p>
+                    </div>
+                    <div class="flip-card-back">
+                        <p class="text-sm font-light">Desplazamiento de personas, equipos o recursos para cumplir una finalidad.</p>
+                        <span class="mt-4 text-xs font-bold uppercase bg-[#20B2AA] text-white px-3 py-1 rounded">Ej: Cuadrilla rural</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front border-l-8 border-[#20B2AA]">
+                        <h3 class="text-xl font-bold mb-2">Tránsito</h3>
+                        <p class="text-sm text-gray-500">Haz clic para ver definición</p>
+                    </div>
+                    <div class="flip-card-back">
+                        <p class="text-sm font-light">Circulación de actores viales en una vía bajo reglas definidas.</p>
+                        <span class="mt-4 text-xs font-bold uppercase bg-[#20B2AA] text-white px-3 py-1 rounded">Ej: Interacción con peatones</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front border-l-8 border-[#20B2AA]">
+                        <h3 class="text-xl font-bold mb-2">Desplazamiento Laboral</h3>
+                        <p class="text-sm text-gray-500">Haz clic para ver definición</p>
+                    </div>
+                    <div class="flip-card-back">
+                        <p class="text-sm font-light">Trayecto realizado por causa o con ocasión del trabajo.</p>
+                        <span class="mt-4 text-xs font-bold uppercase bg-[#20B2AA] text-white px-3 py-1 rounded">Ej: Supervisor en ruta</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front border-l-8 border-[#20B2AA]">
+                        <h3 class="text-xl font-bold mb-2">Exposición Vial</h3>
+                        <p class="text-sm text-gray-500">Haz clic para ver definición</p>
+                    </div>
+                    <div class="flip-card-back">
+                        <p class="text-sm font-light">Contacto repetido o significativo con situaciones del sistema vial.</p>
+                        <span class="mt-4 text-xs font-bold uppercase bg-[#20B2AA] text-white px-3 py-1 rounded">Ej: Conducción rural</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="workshop" class="hidden max-w-4xl mx-auto">
+            <div class="bg-white p-8 rounded-2xl shadow-2xl border-t-8 border-[#20B2AA]">
+                <h2 class="text-2xl font-bold mb-2">Mapa de Movilidad: Tu Operación</h2>
+                <p class="text-gray-500 mb-6">Completa los campos para identificar tus riesgos.</p>
+                
+                <form id="mobilityForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="rol" placeholder="Rol / Proceso" class="p-3 border rounded-lg focus:ring-2 focus:ring-[#20B2AA] outline-none" required>
+                    <input type="text" id="motivo" placeholder="¿Por qué se desplaza?" class="p-3 border rounded-lg focus:ring-2 focus:ring-[#20B2AA] outline-none" required>
+                    <input type="text" id="medio" placeholder="Vehículo / Medio" class="p-3 border rounded-lg focus:ring-2 focus:ring-[#20B2AA] outline-none" required>
+                    <input type="text" id="ruta" placeholder="Tipo de ruta" class="p-3 border rounded-lg focus:ring-2 focus:ring-[#20B2AA] outline-none" required>
+                    <input type="text" id="riesgo" placeholder="Condición que aumenta el riesgo" class="p-3 border rounded-lg md:col-span-2 focus:ring-2 focus:ring-[#20B2AA] outline-none" required>
+                    <button type="submit" class="md:col-span-2 bg-[#1A1A1A] text-[#20B2AA] font-bold p-4 rounded-lg hover:bg-black transition-all">AGREGAR ACTIVIDAD AL MAPA</button>
+                </form>
+            </div>
+
+            <div class="mt-8 overflow-x-auto bg-white rounded-xl shadow-lg border">
+                <table class="w-full text-left">
+                    <thead class="bg-[#20B2AA] uppercase text-xs font-bold text-white">
+                        <tr>
+                            <th class="p-4">Rol</th>
+                            <th class="p-4">Motivo</th>
+                            <th class="p-4">Medio</th>
+                            <th class="p-4">Ruta</th>
+                            <th class="p-4">Riesgo</th>
+                            <th class="p-4">X</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mobilityTable"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function showSection(id) {
+            document.getElementById('concepts').classList.add('hidden');
+            document.getElementById('workshop').classList.add('hidden');
+            document.getElementById(id).classList.remove('hidden');
+
+            document.getElementById('btn-concepts').className = (id === 'concepts' ? 'btn-nav-active' : 'btn-nav-inactive') + ' px-8 py-3 rounded-full font-bold transition-all transform hover:scale-105 shadow-md';
+            document.getElementById('btn-workshop').className = (id === 'workshop' ? 'btn-nav-active' : 'btn-nav-inactive') + ' px-8 py-3 rounded-full font-bold transition-all transform hover:scale-105 shadow-md';
+        }
+
+        const form = document.getElementById('mobilityForm');
+        const table = document.getElementById('mobilityTable');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const row = document.createElement('tr');
+            row.className = "border-b hover:bg-teal-50 transition-colors";
+            row.innerHTML = `
+                <td class="p-4 font-bold text-sm">${document.getElementById('rol').value}</td>
+                <td class="p-4 text-xs text-gray-600">${document.getElementById('motivo').value}</td>
+                <td class="p-4 text-xs">${document.getElementById('medio').value}</td>
+                <td class="p-4 text-xs">${document.getElementById('ruta').value}</td>
+                <td class="p-4 text-xs font-bold text-[#20B2AA]">${document.getElementById('riesgo').value}</td>
+                <td class="p-4"><button onclick="this.parentElement.parentElement.remove()" class="text-red-500 font-bold hover:bg-red-100 px-2 rounded">x</button></td>
+            `;
+            table.appendChild(row);
+            form.reset();
+        });
+    </script>
+</body>
+</html>
