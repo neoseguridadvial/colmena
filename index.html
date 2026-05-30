@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Sistémico | ARL Colmena</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .bg-colmena-aguamarina { background-color: #7FFFD4; }
+        .text-colmena-amarillo { color: #CC7722; }
+        .bg-colmena-amarillo { background-color: #CC7722; }
+        .border-colmena-amarillo { border-color: #CC7722; }
+        .gradient-modern { background: linear-gradient(135deg, #CC7722 0%, #8b5417 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen pb-20">
+
+    <header class="gradient-modern text-white p-10 shadow-xl">
+        <div class="max-w-4xl mx-auto text-center md:text-left">
+            <h1 class="text-4xl font-bold tracking-tight">Laboratorio Sistémico</h1>
+            <p class="mt-2 text-white/80 font-light">Transformando conductas en aprendizajes organizacionales.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-6 -mt-8">
+        
+        <!-- Registro de Nombre -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 border-l-4 border-colmena-aguamarina">
+            <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-widest">Identificación del participante</label>
+            <input type="text" id="userName" placeholder="Escribe tu nombre completo" class="w-full p-4 border-2 border-slate-200 rounded-xl focus:border-colmena-amarillo outline-none transition-all">
+        </div>
+
+        <!-- Barra de progreso -->
+        <div class="bg-white rounded-xl p-4 shadow-sm mb-8 border-l-4 border-colmena-amarillo flex items-center justify-between">
+            <span class="text-sm font-bold text-slate-500 uppercase tracking-wider">Progreso del taller</span>
+            <div id="progress-bar" class="w-full max-w-[200px] bg-slate-200 rounded-full h-2.5 ml-4">
+                <div class="bg-colmena-amarillo h-2.5 rounded-full" style="width: 0%" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- Área de Trabajo -->
+        <div id="worksheet" class="space-y-6">
+            <!-- Inyectado por JS -->
+        </div>
+
+        <!-- Botón de Envío -->
+        <div class="mt-10">
+            <button onclick="enviarResultados()" id="sendBtn" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-bold text-xl hover:bg-slate-800 transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-2">
+                <span>Enviar Reporte a Base de Datos</span>
+            </button>
+        </div>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="hidden fixed bottom-5 right-5 bg-colmena-aguamarina text-slate-900 px-6 py-4 rounded-xl shadow-2xl font-bold z-50">
+            ¡Reporte enviado correctamente!
+        </div>
+    </main>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzAHouTncKKXA5u3wUcYEw_bZBS2gCvOw0YbOh629tDGPivmx9jbBuV4MZa37bhyccM/exec";
+
+        const items = [
+            { id: "res1", frase: "Iba rápido.", tip: "La velocidad es una respuesta a la presión, no la causa raíz." },
+            { id: "res2", frase: "Se distrajo con el celular.", tip: "Analiza si el proceso obliga a usar el celular mientras se está en ruta." },
+            { id: "res3", frase: "No descansó bien.", tip: "La fatiga es consecuencia de una planificación de turnos inadecuada." },
+            { id: "res4", frase: "No revisó la ruta.", tip: "La omisión es un síntoma de falta de protocolos de soporte pre-viaje." },
+            { id: "res5", frase: "La vía estaba en mal estado.", tip: "El estado de la vía es un factor latente de riesgo del entorno." }
+        ];
+
+        const container = document.getElementById('worksheet');
+
+        items.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = "glass-card p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all fade-in";
+            card.innerHTML = `
+                <div class="flex items-start justify-between">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">${item.frase}</h3>
+                    <span class="text-xs font-bold text-colmena-amarillo bg-orange-50 px-3 py-1 rounded-full">#${index + 1}</span>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <select id="type-${item.id}" onchange="updateProgress()" class="border-2 border-slate-200 rounded-xl p-4 w-full focus:border-colmena-amarillo outline-none transition-all">
+                        <option value="">¿Es conducta o sistema?</option>
+                        <option value="conducta">Describe conducta (Error Activo)</option>
+                        <option value="sistema">Explica sistema (Causa Latente)</option>
+                    </select>
+                    <textarea id="${item.id}" oninput="updateProgress()" class="border-2 border-slate-200 rounded-xl p-4 w-full h-32 focus:border-colmena-amarillo outline-none transition-all" placeholder="Reformule sistémicamente..."></textarea>
+                </div>
+                <div class="mt-4 flex gap-2">
+                    <button onclick="evaluar('${item.id}')" class="bg-colmena-amarillo text-white px-4 py-2 rounded-lg text-sm font-bold hover:opacity-90">Evaluar reformulación</button>
+                </div>
+                <div id="feedback-${item.id}" class="mt-4 hidden p-4 rounded-xl text-sm italic border-l-4"></div>
+                <p class="mt-4 text-sm text-slate-500 italic flex items-center gap-2">
+                    <span class="text-colmena-amarillo">💡</span> ${item.tip}
+                </p>
+            `;
+            container.appendChild(card);
+        });
+
+        function evaluar(id) {
+            const texto = document.getElementById(id).value.toLowerCase();
+            const feedbackDiv = document.getElementById(`feedback-${id}`);
+            const keywords = ['proceso', 'sistema', 'planificación', 'diseño', 'protocolo', 'organización', 'fatiga', 'gestión'];
+            
+            feedbackDiv.classList.remove('hidden', 'bg-red-50', 'border-red-500', 'bg-green-50', 'border-green-500');
+            
+            const isSystemic = keywords.some(word => texto.includes(word));
+            
+            if (texto.length < 15) {
+                feedbackDiv.className += " bg-red-50 border-red-500";
+                feedbackDiv.innerHTML = "<strong>Recomendación:</strong> Tu respuesta es muy corta. Intenta explicar <em>por qué</em> sucedió el evento considerando aspectos de la gestión o el diseño del trabajo.";
+            } else if (isSystemic) {
+                feedbackDiv.className += " bg-green-50 border-green-500";
+                feedbackDiv.innerHTML = "<strong>¡Excelente enfoque sistémico!</strong> Has identificado factores que van más allá del individuo. Considera si esta causa latente afecta otros procesos.";
+            } else {
+                feedbackDiv.className += " bg-red-50 border-red-500";
+                feedbackDiv.innerHTML = "<strong>Recomendación:</strong> Tu análisis parece enfocarse mucho en la persona. Trata de usar palabras como: <em>planificación, proceso, diseño, cultura o gestión</em> para reformular sistémicamente.";
+            }
+        }
+
+        function updateProgress() {
+            const inputs = document.querySelectorAll('textarea, select');
+            let filled = 0;
+            inputs.forEach(i => { if(i.value.length > 0) filled++; });
+            const progress = (filled / inputs.length) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+        }
+
+        async function enviarResultados() {
+            const nombre = document.getElementById('userName').value;
+            if(!nombre) {
+                alert("Por favor ingresa tu nombre antes de enviar.");
+                return;
+            }
+
+            const data = {
+                usuario: nombre,
+                res1: document.getElementById('res1').value,
+                res2: document.getElementById('res2').value,
+                res3: document.getElementById('res3').value,
+                res4: document.getElementById('res4').value,
+                res5: document.getElementById('res5').value
+            };
+
+            const btn = document.getElementById('sendBtn');
+            btn.innerHTML = "Enviando...";
+            btn.disabled = true;
+
+            const toast = document.getElementById('toast');
+            
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(data)
+                });
+                toast.classList.remove('hidden');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                    btn.innerHTML = "Enviar Reporte a Base de Datos";
+                    btn.disabled = false;
+                }, 3000);
+            } catch (e) {
+                console.error("Error al enviar", e);
+                btn.innerHTML = "Error, intenta de nuevo";
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
