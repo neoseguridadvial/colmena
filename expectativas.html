@@ -1,897 +1,926 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Sliders, 
-  Activity, 
-  BookOpen, 
-  ShieldCheck, 
-  AlertTriangle, 
-  Brain, 
-  Car, 
-  Clock, 
-  HelpCircle, 
-  CheckCircle, 
-  RefreshCw,
-  TrendingUp,
-  Award,
-  AlertOctagon
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroSafety: Simulador de Expectativas vs. Demandas</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col">
 
-export default function App() {
-  // --- STATE ---
-  const [activeTab, setActiveTab] = useState('simulator');
-  const [scenario, setScenario] = useState('commute'); // commute, delivery, nightShift
-  
-  // Work-As-Imagined (Expectativas / Gestión Organizacional)
-  const [bufferTime, setBufferTime] = useState(30); // Margen de tiempo (%)
-  const [procedures, setProcedures] = useState(70); // Claridad de políticas y capacitación (%)
-  const [vehicleMaintenance, setVehicleMaintenance] = useState(80); // Estado del vehículo (%)
-  const [companyPressure, setCompanyPressure] = useState(40); // Presión de KPIs / Tiempos (%)
+    <!-- HEADER PRINCIPAL -->
+    <header class="bg-slate-950 border-b border-slate-800 py-5 px-6 shadow-xl">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-3 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-500/20">
+                    <i data-lucide="brain" class="w-8 h-8 animate-pulse text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                        NeuroSafety: Simulador de Expectativas vs. Demandas
+                    </h1>
+                    <p class="text-sm text-slate-400 font-medium">
+                        Marcos Integrados: Rasmussen • Hollnagel • Procesamiento Predictivo • Sistema Seguro
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Tabs de Navegación -->
+            <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800">
+                <button id="btn-tab-simulator" onclick="switchTab('simulator')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-indigo-600 text-white shadow-md">
+                    <i data-lucide="sliders" class="w-4 h-4"></i>
+                    Simulador Dinámico
+                </button>
+                <button id="btn-tab-theory" onclick="switchTab('theory')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-400 hover:text-white">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                    Fundamentos Teóricos
+                </button>
+                <button id="btn-tab-audit" onclick="switchTab('audit')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-400 hover:text-white">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                    Autoevaluación Vial
+                </button>
+            </div>
+        </div>
+    </header>
 
-  // Work-As-Done (Demanda Real / Entorno Operacional)
-  const [trafficSeverity, setTrafficSeverity] = useState(50); // Congestión / Clima (%)
-  const [driverFatigue, setDriverFatigue] = useState(30); // Cansancio acumulado / Distracción (%)
-  const [predictiveMismatch, setPredictiveMismatch] = useState(40); // Errores de predicción (sorpresas en vía) (%)
-  const [roadForgiveness, setRoadForgiveness] = useState(60); // Tolerancia de la infraestructura (Sistema Seguro) (%)
-
-  // Simulation run state
-  const [isSimulating, setIsSimulating] = useState(false);
-  const [simStep, setSimStep] = useState(0);
-  const [simLog, setSimLog] = useState([]);
-  const [currentRisk, setCurrentRisk] = useState(0);
-  const [operatingPoint, setOperatingPoint] = useState({ x: 50, y: 50 });
-
-  // Quiz / Auditoría State
-  const [auditAnswers, setAuditAnswers] = useState({});
-  const [auditScore, setAuditScore] = useState(null);
-
-  // --- PRESETS DE ESCENARIOS ---
-  const applyScenarioPreset = (type) => {
-    setScenario(type);
-    if (type === 'commute') {
-      // Desplazamiento rutinario "In Itinere" - Alta presión de tiempo autoproducida, fatiga media
-      setBufferTime(15);
-      setProcedures(40);
-      setVehicleMaintenance(70);
-      setCompanyPressure(50);
-      setTrafficSeverity(75);
-      setDriverFatigue(45);
-      setPredictiveMismatch(50);
-      setRoadForgiveness(50);
-    } else if (type === 'delivery') {
-      // Conducción "En Misión" de reparto de última milla - Altísima presión de KPI, alta fatiga
-      setBufferTime(5);
-      setProcedures(85);
-      setVehicleMaintenance(90);
-      setCompanyPressure(90);
-      setTrafficSeverity(80);
-      setDriverFatigue(70);
-      setPredictiveMismatch(65);
-      setRoadForgiveness(40);
-    } else if (type === 'nightShift') {
-      // Retorno de turno nocturno - Fatiga extrema, baja presión de tiempo directo, baja visibilidad
-      setBufferTime(40);
-      setProcedures(60);
-      setVehicleMaintenance(80);
-      setCompanyPressure(20);
-      setTrafficSeverity(30);
-      setDriverFatigue(90);
-      setPredictiveMismatch(75);
-      setRoadForgiveness(70);
-    }
-  };
-
-  // --- CÁLCULOS DE RIESGO (Fórmulas integradoras de Marcos Teóricos) ---
-  useEffect(() => {
-    // 1. Rasmussen Boundary Space (Punto de Operación)
-    // El eje X representa el Esfuerzo/Carga de Trabajo cognitiva y física
-    const xEffort = (driverFatigue * 0.45) + (trafficSeverity * 0.35) + (predictiveMismatch * 0.2);
-    // El eje Y representa la Presión de Eficiencia / Económica (ETTO - Efficiency Thoroughness Trade-Off)
-    const yEfficiency = (companyPressure * 0.6) + ((100 - bufferTime) * 0.4);
-    
-    setOperatingPoint({ x: xEffort, y: yEfficiency });
-
-    // 2. Brecha Trabajo Imaginado (WAI) vs Trabajo Realizado (WAD) de Hollnagel
-    const waiScore = (bufferTime * 0.3) + (procedures * 0.4) + (vehicleMaintenance * 0.3);
-    const wadScore = (trafficSeverity * 0.3) + (driverFatigue * 0.4) + (predictiveMismatch * 0.3);
-    const waiWadGap = Math.abs(waiScore - wadScore);
-
-    // 3. Sistema Seguro (Atenuación por diseño de infraestructura y gobernanza de flota)
-    // El "Perdón de la vía" y la "Mantención" reducen directamente la probabilidad de que una desviación sea catastrófica.
-    const safeSystemMitigation = (roadForgiveness * 0.6) + (procedures * 0.4);
-
-    // 4. Procesamiento Predictivo (La sorpresa cognitiva aumenta exponencialmente el riesgo ante fatiga)
-    // Fatiga alta debilita la actualización de "Priors" (modelos internos), amplificando el "Prediction Error" (sorpresas).
-    const cognitiveRiskMultiplier = 1 + (driverFatigue / 100) * (predictiveMismatch / 50);
-
-    // 5. Cálculo Final de Riesgo de Siniestro (%)
-    // Base de riesgo impulsada por la carga del sistema y la brecha WAI/WAD, multiplicada por desajustes cognitivos y mitigada por Sistema Seguro.
-    let baseRisk = (xEffort * 0.5) + (yEfficiency * 0.5) + (waiWadGap * 0.3);
-    
-    // Penalización por baja mantención del vehículo
-    const maintenancePenalty = (100 - vehicleMaintenance) * 0.25;
-    baseRisk += maintenancePenalty;
-
-    // Atenuación del Sistema Seguro
-    const mitigationFactor = (100 - (safeSystemMitigation * 0.55)) / 100;
-    
-    let calculatedRisk = baseRisk * cognitiveRiskMultiplier * mitigationFactor;
-    
-    // Acotar entre 0.5% y 99.9%
-    calculatedRisk = Math.max(0.5, Math.min(99.9, calculatedRisk));
-    setCurrentRisk(Math.round(calculatedRisk * 10) / 10);
-
-  }, [bufferTime, procedures, vehicleMaintenance, companyPressure, trafficSeverity, driverFatigue, predictiveMismatch, roadForgiveness]);
-
-  // --- CORRER SIMULACIÓN DE TRAYECTO ---
-  const runJourneySimulation = () => {
-    setIsSimulating(true);
-    setSimStep(0);
-    setSimLog([]);
-    
-    const steps = [
-      { t: "Inicio del trayecto", desc: "El conductor inicia el viaje con sus modelos mentales (Priors) establecidos sobre la ruta habitual." },
-      { t: "Dinámica del Tránsito", desc: "La densidad del tráfico real empieza a divergir de lo planificado (Brecha WAI vs WAD)." },
-      { t: "Presión del Límite", desc: "El conductor evalúa el tiempo disponible. ¿Aplica el atajo cognitivo ETTO sacrificando seguridad por puntualidad?" },
-      { t: "Foco y Cansancio", desc: "La fatiga reduce la precisión predictiva. Se incrementan los Prediction Errors en las esquinas." },
-      { t: "Incidente Crítico", desc: "Un actor vial (peatón/motociclista) realiza una maniobra imprevista. El sistema evalúa el perdón de la vía." },
-      { t: "Resultado del Trayecto", desc: "Finalización del análisis bajo el marco de gestión moderna del riesgo." }
-    ];
-
-    let currentStep = 0;
-    const interval = setInterval(() => {
-      if (currentStep < steps.length) {
-        let dynamicOutcome = "";
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6">
         
-        // Evaluar condiciones dinámicas en cada paso
-        if (currentStep === 2) {
-          dynamicOutcome = companyPressure > 60 
-            ? "⚠️ Alta presión organizacional detectada. El conductor fuerza velocidades para cumplir con el itinerario teórico."
-            : "✅ Presión organizacional controlada. El conductor acepta un retraso razonable sin aumentar la velocidad.";
-        } else if (currentStep === 3) {
-          dynamicOutcome = driverFatigue > 60
-            ? "⚠️ Cansancio elevado. El cerebro del conductor no actualiza adecuadamente los estímulos visuales; parpadeos largos."
-            : "✅ Nivel de alerta adecuado. Tiempo de reacción óptimo para ajustar predicciones.";
-        } else if (currentStep === 4) {
-          const checkValue = Math.random() * 100;
-          if (checkValue < currentRisk) {
-            dynamicOutcome = roadForgiveness < 50
-              ? "💥 ¡SINIESTRO! La infraestructura rígida y la velocidad inadecuada impidieron rectificar el error predictivo."
-              : "🛡️ Susto en la vía. Hubo desajuste, pero la zona de despeje lateral (Sistema Seguro) absorbió el error de maniobra.";
-          } else {
-            dynamicOutcome = "🟢 Trayecto controlado. A pesar de ligeras alertas, no se traspasó el límite último de pérdida de control.";
-          }
+        <!-- SECCIÓN 1: SIMULADOR (ACTIVA POR DEFECTO) -->
+        <section id="tab-simulator-content" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- COLUMNA IZQUIERDA: CONTROLES DE SLIDERS -->
+            <div class="lg:col-span-5 bg-slate-950 p-6 rounded-2xl border border-slate-800 flex flex-col gap-6 shadow-lg">
+                <div>
+                    <h2 class="text-xl font-bold flex items-center gap-2 text-indigo-400">
+                        <i data-lucide="sliders" class="w-5 h-5 text-indigo-400"></i>
+                        Configuración del Escenario
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">
+                        Ajuste las variables organizativas (expectativas) y del entorno de conducción laboral (demandas reales).
+                    </p>
+                </div>
+
+                <!-- Selectores de Escenario (Presets) -->
+                <div class="grid grid-cols-3 gap-2">
+                    <button id="preset-commute" onclick="applyScenarioPreset('commute')" class="py-2 px-3 rounded-lg text-xs font-bold border transition-all flex flex-col items-center gap-1 bg-indigo-600/20 border-indigo-500 text-indigo-300">
+                        <i data-lucide="car" class="w-4 h-4"></i>
+                        In Itinere (Hogar-Trabajo)
+                    </button>
+                    <button id="preset-delivery" onclick="applyScenarioPreset('delivery')" class="py-2 px-3 rounded-lg text-xs font-bold border transition-all flex flex-col items-center gap-1 bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700">
+                        <i data-lucide="clock" class="w-4 h-4"></i>
+                        En Misión (Logística)
+                    </button>
+                    <button id="preset-nightShift" onclick="applyScenarioPreset('nightShift')" class="py-2 px-3 rounded-lg text-xs font-bold border transition-all flex flex-col items-center gap-1 bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700">
+                        <i data-lucide="brain" class="w-4 h-4"></i>
+                        Turno Nocturno
+                    </button>
+                </div>
+
+                <hr class="border-slate-800" />
+
+                <!-- BLOQUE A: TRABAJO IMAGINADO / EXPECTATIVAS -->
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-2.5 h-2.5 bg-cyan-400 rounded-full"></span>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-cyan-400">
+                            Trabajo Imaginado (WAI) - Gestión Organizacional
+                        </h3>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Slider 1 -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="flex items-center gap-1 text-slate-300">
+                                    Margen de Tiempo Planificado (Buffer)
+                                    <span class="group relative cursor-pointer">
+                                        <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-500"></i>
+                                        <span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 bg-slate-800 text-slate-100 text-[10px] p-2 rounded w-48 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                                            Tiempo extra asignado al viaje para no inducir prisa cognitiva. (Hollnagel / ETTO)
+                                        </span>
+                                    </span>
+                                </span>
+                                <span id="val-bufferTime" class="font-bold text-cyan-400">15%</span>
+                            </div>
+                            <input id="bufferTime" type="range" min="0" max="100" value="15" oninput="updateCalculations()" class="w-full accent-cyan-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer" />
+                        </div>
+
+                        <!-- Slider 2 -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="flex items-center gap-1 text-slate-300">
+                                    Capacitación y Claridad Normativa
+                                    <span class="group relative cursor-pointer">
+                                        <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-500"></i>
+                                        <span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 bg-slate-800 text-slate-100 text-[10px] p-2 rounded w-48 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                                            Políticas claras de seguridad frente a metas operativas (Rasmussen: Reglas bien definidas).
+                                        </span>
+                                    </span>
+                                </span>
+                                <span id="val-procedures" class="font-bold text-cyan-400">40%</span>
+                            </div>
+                            <input id="procedures" type="range" min="0" max="100" value="40" oninput="updateCalculations()" class="w-full accent-cyan-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer" />
+                        </div>
+
+                        <!-- Slider 3 -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="flex items-center gap-1 text-slate-300">
+                                    Mantenimiento del Vehículo
+                                    <span class="group relative cursor-pointer">
+                                        <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-500"></i>
+                                        <span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 bg-slate-800 text-slate-100 text-[10px] p-2 rounded w-48 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                                            Estado preventivo mecánico que reduce la posibilidad de fallas activas inesperadas.
+                                        </span>
+                                    </span>
+                                </span>
+                                <span id="val-vehicleMaintenance" class="font-bold text-cyan-400">70%</span>
+                            </div>
+                            <input id="vehicleMaintenance" type="range" min="0" max="100" value="70" oninput="updateCalculations()" class="w-full accent-cyan-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer" />
+                        </div>
+
+                        <!-- Slider 4 -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="flex items-center gap-1 text-slate-300">
+                                    Presión de Productividad (KPIs)
+                                    <span class="group relative cursor-pointer">
+                                        <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-500"></i>
+                                        <span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 bg-slate-800 text-slate-100 text-[10px] p-2 rounded w-48 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                                            Exigencias organizativas que empujan el punto de operación hacia el límite de peligro económico. (Rasmussen)
+                                        </span>
+                                    </span>
+                                </span>
+                                <span id="val-companyPressure" class="font-bold text-rose-400">50%</span>
+                            </div>
+                            <input id="companyPressure" type="range" min="0" max="100" value="50" oninput="updateCalculations()" class="w-full accent-rose-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer" />
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-slate-800" />
+
+                <!-- BLOQUE B: TRABAJO REALIZADO / DEMANDAS REALES -->
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-2.5 h-2.5 bg-purple-400 rounded-full"></span>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-purple-400">
+                            Trabajo Realizado (WAD) - Demandas Reales en Vía
+                        </h3>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Slider 5 -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="flex items-center gap-1 text-slate-300">
+                                    Gravedad del Entorno (Tráfico / Clima)
+                                    <span class="group relative cursor-pointer">
+                                        <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-500"></i>
+                                        <span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 bg-slate-800 text-slate-100 text-[10px] p-2 rounded w-48 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                                            Factores dinámicos del ambiente vial que aumentan las demandas cognitivas físicas del conductor.
+                                        </span>
+                                    </span>
+                                </span>
+                                <span id="val-trafficSeverity" class="font-bold text-purple-400">75%</span>
+                            </div>
+                            <input id="trafficSeverity" type="range" min="0" max="100" value="75" oninput="updateCalculations()" class="w-full accent-purple-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer" />
+                        </div>
+
+                        <!-- Slider 6 -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="flex items-center gap-1 text-slate-300">
+                                    Fatiga del Conductor / Carga
+                                    <span class="group relative cursor-pointer">
+                                        <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-500"></i>
+                                        <span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 bg-slate-800 text-slate-100 text-[10px] p-2 rounded w-48 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                                            Agotamiento físico, turnos acumulados o distracción. Reduce severamente la capacidad predictiva del cerebro.
+                                        </span>
+                                    </span>
+                                </span>
+                                <span id="val-driverFatigue" class="font-bold text-purple-400">45%</span>
+                            </div>
+                            <input id="driverFatigue" type="range" min="0" max="100" value="45" oninput="updateCalculations()" class="w-full accent-purple-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer" />
+                        </div>
+
+                        <!-- Slider 7 -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="flex items-center gap-1 text-slate-300">
+                                    Desajuste Predictivo (Eventos Sorpresa)
+                                    <span class="group relative cursor-pointer">
+                                        <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-500"></i>
+                                        <span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 bg-slate-800 text-slate-100 text-[10px] p-2 rounded w-48 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                                            Magnitud del 'Prediction Error'. Cuántas anomalías inesperadas ocurren frente al modelo mental del conductor.
+                                        </span>
+                                    </span>
+                                </span>
+                                <span id="val-predictiveMismatch" class="font-bold text-purple-400">50%</span>
+                            </div>
+                            <input id="predictiveMismatch" type="range" min="0" max="100" value="50" oninput="updateCalculations()" class="w-full accent-purple-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer" />
+                        </div>
+
+                        <!-- Slider 8 -->
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="flex items-center gap-1 text-slate-300">
+                                    Tolerancia de la Vía (Sistema Seguro)
+                                    <span class="group relative cursor-pointer">
+                                        <i data-lucide="help-circle" class="w-3.5 h-3.5 text-slate-500"></i>
+                                        <span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 bg-slate-800 text-slate-100 text-[10px] p-2 rounded w-48 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
+                                            Capacidad de la infraestructura para mitigar el error del conductor mediante defensas pasivas y límites tolerables de velocidad.
+                                        </span>
+                                    </span>
+                                </span>
+                                <span id="val-roadForgiveness" class="font-bold text-emerald-400">50%</span>
+                            </div>
+                            <input id="roadForgiveness" type="range" min="0" max="100" value="50" oninput="updateCalculations()" class="w-full accent-emerald-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA: DASHBOARD DE RIESGO -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+                
+                <!-- INDICADOR CLAVE: PROBABILIDAD DE SINIESTRO -->
+                <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 shadow-lg flex flex-col md:flex-row items-center gap-6">
+                    
+                    <!-- Gauge Circular -->
+                    <div class="relative w-40 h-40 flex-shrink-0">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                            <!-- Background Circle -->
+                            <circle cx="50" cy="50" r="42" class="stroke-current text-slate-800" stroke-width="10" fill="none" />
+                            <!-- Foreground Circle -->
+                            <circle id="gauge-circle" cx="50" cy="50" r="42" class="stroke-current text-emerald-500 transition-all duration-500" stroke-width="10" fill="none" stroke-dasharray="263.89" stroke-dashoffset="0" />
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col justify-center items-center">
+                            <span id="risk-value" class="text-3xl font-extrabold tracking-tight">0%</span>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Probabilidad</span>
+                        </div>
+                    </div>
+
+                    <!-- Resumen Ejecutivo del Riesgo -->
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="alert-triangle" class="w-5 h-5 text-emerald-400"></i>
+                            <h3 class="text-lg font-bold">Diagnóstico Dinámico del Riesgo</h3>
+                        </div>
+                        <p id="risk-description" class="text-sm text-slate-300 leading-relaxed mb-3">
+                            -- cargando diagnóstico --
+                        </p>
+                        
+                        <!-- Puntos destacados de Factores Humanos -->
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                          <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-400 block mb-0.5">Límite de Rasmussen:</span>
+                            <span id="limit-label" class="font-bold text-emerald-400">Margen Seguro Existente</span>
+                          </div>
+                          <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                            <span class="text-slate-400 block mb-0.5">Análisis Predictivo:</span>
+                            <span id="cognitive-label" class="font-bold text-cyan-400">Priors OK</span>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRÁFICO DINÁMICO: EL ESPACIO DE RASMUSSEN -->
+                <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 shadow-lg flex-1">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-base font-bold flex items-center gap-2">
+                                <i data-lucide="trending-up" class="text-indigo-400 w-5 h-5"></i>
+                                Fronteras de Operación Segura (Conceptos de Rasmussen)
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-1">
+                                El punto móvil representa las presiones dinámicas del viaje laboral. No permita que cruce el límite de seguridad.
+                            </p>
+                        </div>
+                        <div class="flex gap-2 text-[10px]">
+                            <span class="bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded border border-rose-500/20 font-bold">Límite de Siniestro</span>
+                            <span class="bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/20 font-bold">Límite de Esfuerzo</span>
+                        </div>
+                    </div>
+
+                    <!-- Gráfico SVG -->
+                    <div class="relative w-full h-72 bg-slate-900/50 rounded-xl border border-slate-800 overflow-hidden flex items-center justify-center p-2">
+                        <svg class="w-full h-full" viewBox="0 0 400 240">
+                            <!-- Grilla -->
+                            <line x1="40" y1="20" x2="40" y2="200" stroke="#334155" stroke-width="1" stroke-dasharray="3 3" />
+                            <line x1="40" y1="200" x2="380" y2="200" stroke="#334155" stroke-width="1" stroke-dasharray="3 3" />
+
+                            <!-- Límite de Esfuerzo Humano -->
+                            <path d="M 40 200 Q 200 120 380 40" fill="none" stroke="#22d3ee" stroke-width="2.5" stroke-dasharray="5 5" />
+                            <text x="240" y="70" fill="#22d3ee" class="text-[10px] font-semibold" transform="rotate(-23 240 70)">Límite de Carga / Esfuerzo</text>
+
+                            <!-- Límite de Viabilidad Económica/KPIs -->
+                            <path d="M 40 40 Q 200 140 380 200" fill="none" stroke="#e11d48" stroke-width="2.5" stroke-dasharray="5 5" />
+                            <text x="180" y="160" fill="#e11d48" class="text-[10px] font-semibold" transform="rotate(22 180 160)">Límite de Viabilidad Económica</text>
+
+                            <!-- Límite de Pérdida de Seguridad -->
+                            <line x1="40" y1="60" x2="380" y2="60" stroke="#f43f5e" stroke-width="3" />
+                            <text x="130" y="50" fill="#f43f5e" class="text-[11px] font-bold">FRONTERA DE SEGURIDAD (RIESGO CRÍTICO)</text>
+
+                            <!-- Zona Segura del Sistema -->
+                            <path d="M 40 60 L 380 60 L 380 200 L 40 200 Z" fill="rgba(16, 185, 129, 0.03)" />
+
+                            <!-- Etiquetas de Ejes -->
+                            <text x="310" y="215" fill="#94a3b8" class="text-[10px] font-bold">Carga de Trabajo →</text>
+                            <text x="45" y="30" fill="#94a3b8" class="text-[10px] font-bold" transform="rotate(90 45 30)">← Presión Productiva (KPIs)</text>
+
+                            <!-- Punto de Operación Dinámico de la Simulación -->
+                            <g>
+                                <circle id="svg-halo" cx="200" cy="120" r="8" fill="rgba(99, 102, 241, 0.2)" class="animate-ping" />
+                                <circle id="svg-point" cx="200" cy="120" r="6" fill="#6366f1" />
+                                <text id="svg-point-label" x="210" y="110" fill="#f8fafc" class="text-[11px] font-bold bg-slate-950 p-1">Punto Operativo (50, 50)</text>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- SIMULAR ACCIÓN DINÁMICA DE TRAYECTO -->
+                <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 shadow-lg flex flex-col gap-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-base font-bold flex items-center gap-2">
+                                <i data-lucide="car" class="text-indigo-400 w-5 h-5"></i>
+                                Simulación en Tiempo Real del Recorrido Laboral
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-1">
+                                Ejecute dinámicamente un trayecto típico y observe cómo el sistema responde a la presión de la demanda real.
+                            </p>
+                        </div>
+
+                        <button id="btn-simulate" onclick="runJourneySimulation()" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 text-white font-semibold py-2.5 px-5 rounded-xl shadow-md transition-all text-sm">
+                            <i id="simulate-icon" data-lucide="refresh-cw" class="w-4 h-4"></i>
+                            <span id="simulate-text">Simular Trayecto</span>
+                        </button>
+                    </div>
+
+                    <!-- Log de la Simulación -->
+                    <div id="sim-log-container" class="space-y-3 bg-slate-900/50 p-4 rounded-xl border border-slate-800/80 max-h-60 overflow-y-auto">
+                        <p class="text-xs text-slate-500 italic text-center py-4">
+                            Presione "Simular Trayecto" para iniciar el análisis interactivo de desviaciones.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: FUNDAMENTO TEÓRICO (INACTIVA POR DEFECTO) -->
+        <section id="tab-theory-content" class="hidden bg-slate-950 p-8 rounded-2xl border border-slate-800 shadow-xl max-w-4xl mx-auto space-y-8">
+            <div class="border-b border-slate-800 pb-4">
+                <h2 class="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                    Comprensión Teórica Avanzada del Riesgo Vial
+                </h2>
+                <p class="text-sm text-slate-400 mt-1">
+                    La prevención moderna abandona la culpa individual del conductor para centrarse en los sistemas socio-técnicos complejos.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Bloque 1: Rasmussen -->
+                <div class="bg-slate-900 p-5 rounded-xl border border-slate-800">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i data-lucide="trending-up" class="text-cyan-400 w-5 h-5"></i>
+                        <h3 class="font-bold text-slate-200">Fronteras de Seguridad de Jens Rasmussen</h3>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Las organizaciones están sometidas a dos fuerzas de presión constante: la presión económica (hacer más con menos recursos) y la de esfuerzo del trabajador (ahorrar energía y tiempo). 
+                        <br /><br />
+                        Estas fuerzas empujan sistemáticamente los procesos cotidianos de transporte hacia el <strong>Límite de Pérdida de Seguridad</strong>. El siniestro vial no es un error estático, sino una migración gradual de las operaciones normales que cruzan el umbral de estabilidad del sistema.
+                    </p>
+                </div>
+
+                <!-- Bloque 2: Erik Hollnagel -->
+                <div class="bg-slate-900 p-5 rounded-xl border border-slate-800">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i data-lucide="activity" class="text-purple-400 w-5 h-5"></i>
+                        <h3 class="font-bold text-slate-200">Trabajo Imaginado (WAI) vs. Trabajo Realizado (WAD)</h3>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        <strong>Trabajo Imaginado (Work-As-Imagined):</strong> La visión idealizada desde los gerentes y reguladores sobre cómo fluyen las rutas, plasmado en políticas ideales, cronogramas perfectos y conductores que rinden al 100% todo el tiempo.
+                        <br /><br />
+                        <strong>Trabajo Realizado (Work-As-Done):</strong> La cruda realidad del tráfico, desvíos, fatiga oculta y exigencias reales de entrega. Para compensar, el conductor ejecuta constantes ajustes cognitivos eficientes (ETTO), cruzando fronteras sin advertirlo.
+                    </p>
+                </div>
+
+                <!-- Bloque 3: Procesamiento Predictivo -->
+                <div class="bg-slate-900 p-5 rounded-xl border border-slate-800">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i data-lucide="brain" class="text-pink-400 w-5 h-5"></i>
+                        <h3 class="font-bold text-slate-200">Procesamiento Predictivo de los Factores Humanos</h3>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        El cerebro es un motor de inferencia que no procesa de forma directa toda la información visual de la carretera (insuficiente tiempo de cómputo). En su lugar, el cerebro genera <strong>predicciones ('priors')</strong> sobre lo que hay en el camino y solo procesa activamente los <strong>'prediction errors' (sorpresas)</strong>.
+                        <br /><br />
+                        Bajo condiciones de estrés, cansancio o fuerte carga mental, el cerebro reduce la atención y asume que la carretera se mantendrá vacía o despejada. Una sorpresa (por ejemplo, un cruce imprevisto) crea una descompensación fatal debido al retraso neuronal en corregir el modelo predictivo equivocado.
+                    </p>
+                </div>
+
+                <!-- Bloque 4: Sistema Seguro -->
+                <div class="bg-slate-900 p-5 rounded-xl border border-slate-800">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i data-lucide="shield-check" class="text-emerald-400 w-5 h-5"></i>
+                        <h3 class="font-bold text-slate-200">Enfoque de Sistema Seguro (Safe System)</h3>
+                    </div>
+                    <div class="text-xs text-slate-400 leading-relaxed space-y-2">
+                        <p>
+                            El pilar fundamental de la gestión moderna del riesgo vial acepta que <strong>el ser humano comete errores intrínsecos por sus límites cognitivos</strong>.
+                        </p>
+                        <p>
+                            Por tanto, el sistema vial corporativo debe estar diseñado para absorber dicho error de conducción mediante:
+                        </p>
+                        <ul class="list-disc list-inside mt-2 space-y-1 text-[11px] text-slate-400">
+                            <li>Velocidades seguras adaptadas al entorno real.</li>
+                            <li>Vías que disculpan las fallas (zonas de despeje, barreras deformables).</li>
+                            <li>Vehículos seguros con asistencia avanzada activa.</li>
+                            <li>Cultura organizacional enfocada en resolver las brechas sistémicas.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-indigo-950/40 p-5 rounded-xl border border-indigo-800 text-sm">
+                <h4 class="font-bold text-indigo-300 mb-2 flex items-center gap-2">
+                    <i data-lucide="award" class="w-4 h-4 text-indigo-300"></i>
+                    Lección de Gestión Estratégica:
+                </h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    Para disminuir el riesgo vial corporativo, la gerencia no debe limitarse a exigir "conducir con más cuidado". En su lugar, debe actuar sobre el <strong>Trabajo Imaginado</strong>: expandiendo los márgenes de tiempo permitidos, minimizando las penalizaciones severas por demoras imprevistas, y optimizando los cronogramas según las condiciones biológicas reales de la fatiga.
+                </p>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: AUDITORÍA (INACTIVA POR DEFECTO) -->
+        <section id="tab-audit-content" class="hidden bg-slate-950 p-8 rounded-2xl border border-slate-800 shadow-xl max-w-3xl mx-auto">
+            <div class="border-b border-slate-800 pb-4 mb-6">
+                <h2 class="text-2xl font-bold flex items-center gap-2 text-indigo-400">
+                    <i data-lucide="shield-check" class="w-7 h-7"></i>
+                    Auditoría Organizacional de Riesgo Vial Laboral
+                </h2>
+                <p class="text-sm text-slate-400 mt-1">
+                    Evalúe cómo su empresa gestiona actualmente los desplazamientos (in-itinere y en misión) bajo la perspectiva de Safety-II.
+                </p>
+            </div>
+
+            <!-- Lista de Preguntas del Quiz -->
+            <div class="space-y-6">
+                <!-- Pregunta 1 -->
+                <div class="bg-slate-900 p-5 rounded-xl border border-slate-800/80">
+                    <h4 class="text-sm font-bold text-slate-200 mb-3 flex items-start gap-2">
+                        <span class="bg-indigo-600/30 text-indigo-400 w-5 h-5 rounded-full flex items-center justify-center text-xs flex-shrink-0 mt-0.5">1</span>
+                        ¿Cómo se planifican los tiempos de viaje en su organización?
+                    </h4>
+                    <div class="grid grid-cols-1 gap-2.5">
+                        <button onclick="selectAuditAnswer(1, 25, this)" class="audit-btn text-left p-3 rounded-lg text-xs transition-all border bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-900 hover:border-slate-700">
+                            Con márgenes holgados que absorben congestión severa e imprevistos (Enfoque en WAD)
+                        </button>
+                        <button onclick="selectAuditAnswer(1, 10, this)" class="audit-btn text-left p-3 rounded-lg text-xs transition-all border bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-900 hover:border-slate-700">
+                            Tiempos justos basados en estimaciones de GPS ideal sin tráfico (Enfoque en WAI)
+                        </button>
+                        <button onclick="selectAuditAnswer(1, 0, this)" class="audit-btn text-left p-3 rounded-lg text-xs transition-all border bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-900 hover:border-slate-700">
+                            No hay planificación; el conductor debe llegar 'lo antes posible' (Alta presión / ETTO)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pregunta 2 -->
+                <div class="bg-slate-900 p-5 rounded-xl border border-slate-800/80">
+                    <h4 class="text-sm font-bold text-slate-200 mb-3 flex items-start gap-2">
+                        <span class="bg-indigo-600/30 text-indigo-400 w-5 h-5 rounded-full flex items-center justify-center text-xs flex-shrink-0 mt-0.5">2</span>
+                        ¿Cómo trata la empresa los incidentes y "casi-accidentes" de tráfico?
+                    </h4>
+                    <div class="grid grid-cols-1 gap-2.5">
+                        <button onclick="selectAuditAnswer(2, 25, this)" class="audit-btn text-left p-3 rounded-lg text-xs transition-all border bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-900 hover:border-slate-700">
+                            Se analizan sistemáticamente para rediseñar rutas y capacitar (Safety-II / Hollnagel)
+                        </button>
+                        <button onclick="selectAuditAnswer(2, 5, this)" class="audit-btn text-left p-3 rounded-lg text-xs transition-all border bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-900 hover:border-slate-700">
+                            Se amonesta al conductor argumentando 'distracción o imprudencia' (Visión punitiva clásica)
+                        </button>
+                        <button onclick="selectAuditAnswer(2, 0, this)" class="audit-btn text-left p-3 rounded-lg text-xs transition-all border bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-900 hover:border-slate-700">
+                            No se registran a menos que ocurra un siniestro con daños graves
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pregunta 3 -->
+                <div class="bg-slate-900 p-5 rounded-xl border border-slate-800/80">
+                    <h4 class="text-sm font-bold text-slate-200 mb-3 flex items-start gap-2">
+                        <span class="bg-indigo-600/30 text-indigo-400 w-5 h-5 rounded-full flex items-center justify-center text-xs flex-shrink-0 mt-0.5">3</span>
+                        ¿Qué medidas se adoptan frente a la fatiga laboral en conductores?
+                    </h4>
+                    <div class="grid grid-cols-1 gap-2.5">
+                        <button onclick="selectAuditAnswer(3, 25, this)" class="audit-btn text-left p-3 rounded-lg text-xs transition-all border bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-900 hover:border-slate-700">
+                            Monitoreo activo de turnos, límites de conducción y derecho a detenerse por sueño
+                        </button>
+                        <button onclick="selectAuditAnswer(3, 10, this)" class="audit-btn text-left p-3 rounded-lg text-xs transition-all border bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-900 hover:border-slate-700">
+                            Solo recomendaciones escritas en políticas que rara vez se pueden cumplir
+                        </button>
+                        <button onclick="selectAuditAnswer(3, 0, this)" class="audit-btn text-left p-3 rounded-lg text-xs transition-all border bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-900 hover:border-slate-700">
+                            No existen políticas ni consideración de fatiga en la programación de rutas
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pregunta 4 -->
+                <div class="bg-slate-900 p-5 rounded-xl border border-slate-800/80">
+                    <h4 class="text-sm font-bold text-slate-200 mb-3 flex items-start gap-2">
+                        <span class="bg-indigo-600/30 text-indigo-400 w-5 h-5 rounded-full flex items-center justify-center text-xs flex-shrink-0 mt-0.5">4</span>
+                        ¿Cómo se asume la seguridad de la infraestructura por donde transita la flota?
+                    </h4>
+                    <div class="grid grid-cols-1 gap-2.5">
+                        <button onclick="selectAuditAnswer(4, 25, this)" class="audit-btn text-left p-3 rounded-lg text-xs transition-all border bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-900 hover:border-slate-700">
+                            Se mapean rutas seguras y se rechazan trayectos de alto riesgo (Enfoque de Sistema Seguro)
+                        </button>
+                        <button onclick="selectAuditAnswer(4, 10, this)" class="audit-btn text-left p-3 rounded-lg text-xs transition-all border bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-900 hover:border-slate-700">
+                            Se asume que la vía pública es responsabilidad exclusiva del gobierno
+                        </button>
+                        <button onclick="selectAuditAnswer(4, 0, this)" class="audit-btn text-left p-3 rounded-lg text-xs transition-all border bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-900 hover:border-slate-700">
+                            No se evalúan las condiciones de las vías ni de los puntos críticos
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón de Cálculo -->
+            <div class="mt-8 flex flex-col items-center gap-4">
+                <button id="btn-submit-audit" onclick="calculateAuditScore()" disabled class="bg-slate-800 text-slate-500 font-bold py-3 px-8 rounded-xl shadow-lg transition-all text-sm w-full md:w-auto cursor-not-allowed">
+                    Obtener Calificación Organizacional
+                </button>
+
+                <!-- Panel de Resultados -->
+                <div id="audit-results-panel" class="hidden w-full bg-slate-900 p-6 rounded-xl border border-slate-800 mt-4 text-center">
+                    <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">
+                        Su Puntaje de Gestión de Riesgo
+                    </span>
+                    <div class="text-4xl font-black mb-3">
+                        <span id="audit-score-display" class="text-emerald-400">0 / 100</span>
+                    </div>
+
+                    <!-- Feedback -->
+                    <div id="audit-feedback-text" class="max-w-md mx-auto text-xs text-slate-300 leading-relaxed">
+                        --
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER METODOLÓGICO -->
+    <footer class="bg-slate-950 border-t border-slate-800 py-6 px-6 text-center text-xs text-slate-500 mt-auto">
+        <p class="max-w-2xl mx-auto leading-relaxed">
+            Este modelo simulador es una aproximación conceptual que integra los límites sociotécnicos de Rasmussen, las dinámicas de flexibilidad operativa (WAI vs WAD) de Hollnagel, la teoría del cerebro bayesiano aplicada a la conducción vial y los principios del Marco Global de Sistema Seguro adoptados por las normativas modernas de Seguridad Vial Laboral.
+        </p>
+        <p class="mt-2 text-indigo-400 font-medium">
+            Cultura de Seguridad II - "La seguridad no es la ausencia de accidentes, sino la presencia de capacidades."
+        </p>
+    </footer>
+
+    <!-- LOGICA JAVASCRIPT -->
+    <script>
+        // Inicializar íconos Lucide
+        lucide.createIcons();
+
+        // Variables de estado global
+        let currentScenario = 'commute';
+        let isSimulating = false;
+        let auditAnswers = {};
+
+        // Función para cambiar de pestañas (Tabs)
+        function switchTab(tabId) {
+            const tabs = ['simulator', 'theory', 'audit'];
+            tabs.forEach(t => {
+                const content = document.getElementById(`tab-${t}-content`);
+                const btn = document.getElementById(`btn-tab-${t}`);
+                if (t === tabId) {
+                    content.classList.remove('hidden');
+                    btn.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-indigo-600 text-white shadow-md";
+                } else {
+                    content.classList.add('hidden');
+                    btn.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-400 hover:text-white";
+                }
+            });
         }
 
-        setSimLog(prev => [...prev, {
-          title: steps[currentStep].t,
-          desc: steps[currentStep].desc,
-          outcome: dynamicOutcome
-        }]);
-        setSimStep(currentStep + 1);
-        currentStep++;
-      } else {
-        clearInterval(interval);
-        setIsSimulating(false);
-      }
-    }, 2200);
-  };
+        // Aplicar los ajustes preestablecidos (Presets)
+        function applyScenarioPreset(type) {
+            currentScenario = type;
 
-  // --- QUIZ DE AUTOEVALUACIÓN ORGANIZACIONAL (Auditoría) ---
-  const auditQuestions = [
-    {
-      id: 1,
-      q: "¿Cómo se planifican los tiempos de viaje en su organización?",
-      options: [
-        { text: "Con márgenes holgados que absorben congestión severa e imprevistos (Enfoque en WAD)", points: 25 },
-        { text: "Tiempos justos basados en estimaciones de GPS ideal sin tráfico (Enfoque en WAI)", points: 10 },
-        { text: "No hay planificación; el conductor debe llegar 'lo antes posible' (Alta presión / ETTO)", points: 0 }
-      ]
-    },
-    {
-      id: 2,
-      q: "¿Cómo trata la empresa los incidentes y 'casi-accidentes' de tráfico?",
-      options: [
-        { text: "Se analizan sistemáticamente para rediseñar rutas y capacitar (Safety-II / Hollnagel)", points: 25 },
-        { text: "Se amonesta al conductor argumentando 'distracción o imprudencia' (Visión punitiva clásica)", points: 5 },
-        { text: "No se registran a menos que ocurra un siniestro con daños graves", points: 0 }
-      ]
-    },
-    {
-      id: 3,
-      q: "¿Qué medidas se adoptan frente a la fatiga laboral en conductores?",
-      options: [
-        { text: "Monitoreo activo de turnos, límites de conducción y derecho a detenerse por sueño", points: 25 },
-        { text: "Solo recomendaciones escritas en políticas que rara vez se pueden cumplir", points: 10 },
-        { text: "No existen políticas ni consideración de fatiga en la programación de rutas", points: 0 }
-      ]
-    },
-    {
-      id: 4,
-      q: "¿Cómo se asume la seguridad de la infraestructura por donde transita la flota?",
-      options: [
-        { text: "Se mapean rutas seguras y se rechazan trayectos de alto riesgo (Enfoque de Sistema Seguro)", points: 25 },
-        { text: "Se asume que la vía pública es responsabilidad exclusiva del gobierno", points: 10 },
-        { text: "No se evalúan las condiciones de las vías ni de los puntos críticos", points: 0 }
-      ]
-    }
-  ];
+            const presets = {
+                commute: { buffer: 15, proc: 40, maint: 70, press: 50, traffic: 75, fatigue: 45, mismatch: 50, road: 50 },
+                delivery: { buffer: 5, proc: 85, maint: 90, press: 90, traffic: 80, fatigue: 70, mismatch: 65, road: 40 },
+                nightShift: { buffer: 40, proc: 60, maint: 80, press: 20, traffic: 30, fatigue: 90, mismatch: 75, road: 70 }
+            };
 
-  const handleSelectAudit = (qId, points) => {
-    setAuditAnswers(prev => ({ ...prev, [qId]: points }));
-  };
+            const data = presets[type];
+            if (!data) return;
 
-  const calculateAuditScore = () => {
-    const total = Object.values(auditAnswers).reduce((a, b) => a + b, 0);
-    setAuditScore(total);
-  };
+            document.getElementById('bufferTime').value = data.buffer;
+            document.getElementById('procedures').value = data.proc;
+            document.getElementById('vehicleMaintenance').value = data.maint;
+            document.getElementById('companyPressure').value = data.press;
 
-  return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 font-sans flex flex-col">
-      {/* HEADER PRINCIPAL */}
-      <header className="bg-slate-950 border-b border-slate-800 py-5 px-6 shadow-xl">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-500/20">
-              <Brain className="w-8 h-8 animate-pulse" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                NeuroSafety: Simulador de Expectativas vs. Demandas
-              </h1>
-              <p className="text-sm text-slate-400 font-medium">
-                Marcos Integrados: Rasmussen • Hollnagel • Procesamiento Predictivo • Sistema Seguro
-              </p>
-            </div>
-          </div>
-          
-          {/* Tabs de Navegación */}
-          <div className="flex bg-slate-900 p-1 rounded-xl border border-slate-800">
-            <button 
-              onClick={() => setActiveTab('simulator')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'simulator' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
-            >
-              <Sliders className="w-4 h-4" />
-              Simulador Dinámico
-            </button>
-            <button 
-              onClick={() => setActiveTab('theory')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'theory' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
-            >
-              <BookOpen className="w-4 h-4" />
-              Fundamentos Teóricos
-            </button>
-            <button 
-              onClick={() => setActiveTab('audit')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'audit' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
-            >
-              <ShieldCheck className="w-4 h-4" />
-              Autoevaluación Vial
-            </button>
-          </div>
-        </div>
-      </header>
+            document.getElementById('trafficSeverity').value = data.traffic;
+            document.getElementById('driverFatigue').value = data.fatigue;
+            document.getElementById('predictiveMismatch').value = data.mismatch;
+            document.getElementById('roadForgiveness').value = data.road;
 
-      {/* CONTENIDO PRINCIPAL */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6">
-        
-        {/* TAB 1: SIMULADOR */}
-        {activeTab === 'simulator' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            // Actualizar diseño de botones de preset
+            const presetKeys = ['commute', 'delivery', 'nightShift'];
+            presetKeys.forEach(k => {
+                const btn = document.getElementById(`preset-${k}`);
+                if (k === type) {
+                    btn.className = "py-2 px-3 rounded-lg text-xs font-bold border transition-all flex flex-col items-center gap-1 bg-indigo-600/20 border-indigo-500 text-indigo-300";
+                } else {
+                    btn.className = "py-2 px-3 rounded-lg text-xs font-bold border transition-all flex flex-col items-center gap-1 bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700";
+                }
+            });
+
+            updateCalculations();
+        }
+
+        // Obtener la probabilidad calculada del riesgo actual
+        let calculatedRiskGlobal = 0;
+        let xEffortGlobal = 50;
+        let yEfficiencyGlobal = 50;
+
+        // Cálculos matemáticos basados en las teorías de Rasmussen, Hollnagel y Sistema Seguro
+        function updateCalculations() {
+            const bufferTime = parseInt(document.getElementById('bufferTime').value);
+            const procedures = parseInt(document.getElementById('procedures').value);
+            const vehicleMaintenance = parseInt(document.getElementById('vehicleMaintenance').value);
+            const companyPressure = parseInt(document.getElementById('companyPressure').value);
+
+            const trafficSeverity = parseInt(document.getElementById('trafficSeverity').value);
+            const driverFatigue = parseInt(document.getElementById('driverFatigue').value);
+            const predictiveMismatch = parseInt(document.getElementById('predictiveMismatch').value);
+            const roadForgiveness = parseInt(document.getElementById('roadForgiveness').value);
+
+            // Actualizar etiquetas numéricas de los sliders
+            document.getElementById('val-bufferTime').innerText = bufferTime + '%';
+            document.getElementById('val-procedures').innerText = procedures + '%';
+            document.getElementById('val-vehicleMaintenance').innerText = vehicleMaintenance + '%';
+            document.getElementById('val-companyPressure').innerText = companyPressure + '%';
+            document.getElementById('val-trafficSeverity').innerText = trafficSeverity + '%';
+            document.getElementById('val-driverFatigue').innerText = driverFatigue + '%';
+            document.getElementById('val-predictiveMismatch').innerText = predictiveMismatch + '%';
+            document.getElementById('val-roadForgiveness').innerText = roadForgiveness + '%';
+
+            // 1. Rasmussen Space Point Map
+            // Carga/Esfuerzo mental y físico (Eje X)
+            const xEffort = (driverFatigue * 0.45) + (trafficSeverity * 0.35) + (predictiveMismatch * 0.2);
+            xEffortGlobal = xEffort;
+            // Presión de Eficiencia / Económica (Eje Y)
+            const yEfficiency = (companyPressure * 0.6) + ((100 - bufferTime) * 0.4);
+            yEfficiencyGlobal = yEfficiency;
+
+            // 2. Brecha entre Trabajo Imaginado (WAI) y Trabajo Realizado (WAD)
+            const waiScore = (bufferTime * 0.3) + (procedures * 0.4) + (vehicleMaintenance * 0.3);
+            const wadScore = (trafficSeverity * 0.3) + (driverFatigue * 0.4) + (predictiveMismatch * 0.3);
+            const waiWadGap = Math.abs(waiScore - wadScore);
+
+            // 3. Mitigación del Sistema Seguro
+            const safeSystemMitigation = (roadForgiveness * 0.6) + (procedures * 0.4);
+
+            // 4. Multiplicador de Desajuste Predictivo bajo cansancio cognitivo
+            const cognitiveRiskMultiplier = 1 + (driverFatigue / 100) * (predictiveMismatch / 50);
+
+            // 5. Cálculo Final de Riesgo
+            let baseRisk = (xEffort * 0.5) + (yEfficiency * 0.5) + (waiWadGap * 0.3);
             
-            {/* COLUMNA IZQUIERDA: CONTROLES */}
-            <div className="lg:col-span-5 bg-slate-950 p-6 rounded-2xl border border-slate-800 flex flex-col gap-6 shadow-lg">
-              <div>
-                <h2 className="text-xl font-bold flex items-center gap-2 text-indigo-400">
-                  <Sliders className="w-5 h-5 text-indigo-400" />
-                  Configuración del Escenario
-                </h2>
-                <p className="text-xs text-slate-400 mt-1">
-                  Ajuste las variables organizativas (expectativas) y del entorno de conducción laboral (demandas reales).
-                </p>
-              </div>
+            // Penalización por baja mantención del vehículo
+            const maintenancePenalty = (100 - vehicleMaintenance) * 0.25;
+            baseRisk += maintenancePenalty;
 
-              {/* Selectores de Escenario */}
-              <div className="grid grid-cols-3 gap-2">
-                <button 
-                  onClick={() => applyScenarioPreset('commute')}
-                  className={`py-2 px-3 rounded-lg text-xs font-bold border transition-all flex flex-col items-center gap-1 ${scenario === 'commute' ? 'bg-indigo-600/20 border-indigo-500 text-indigo-300' : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'}`}
-                >
-                  <Car className="w-4 h-4" />
-                  In Itinere (Hogar-Trabajo)
-                </button>
-                <button 
-                  onClick={() => applyScenarioPreset('delivery')}
-                  className={`py-2 px-3 rounded-lg text-xs font-bold border transition-all flex flex-col items-center gap-1 ${scenario === 'delivery' ? 'bg-indigo-600/20 border-indigo-500 text-indigo-300' : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'}`}
-                >
-                  <Clock className="w-4 h-4" />
-                  En Misión (Logística)
-                </button>
-                <button 
-                  onClick={() => applyScenarioPreset('nightShift')}
-                  className={`py-2 px-3 rounded-lg text-xs font-bold border transition-all flex flex-col items-center gap-1 ${scenario === 'nightShift' ? 'bg-indigo-600/20 border-indigo-500 text-indigo-300' : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'}`}
-                >
-                  <Brain className="w-4 h-4" />
-                  Turno Nocturno
-                </button>
-              </div>
+            // Atenuación por protección de infraestructura (Sistema Seguro)
+            const mitigationFactor = (100 - (safeSystemMitigation * 0.55)) / 100;
+            
+            let finalRisk = baseRisk * cognitiveRiskMultiplier * mitigationFactor;
+            finalRisk = Math.max(0.5, Math.min(99.9, finalRisk));
+            finalRisk = Math.round(finalRisk * 10) / 10;
+            calculatedRiskGlobal = finalRisk;
 
-              <hr className="border-slate-800" />
+            // --- ACTUALIZAR INTERFAZ ---
 
-              {/* BLOQUE A: TRABAJO IMAGINADO / EXPECTATIVAS */}
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="w-2.5 h-2.5 bg-cyan-400 rounded-full"></span>
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-cyan-400">
-                    Trabajo Imaginado (WAI) - Gestión Organizacional
-                  </h3>
-                </div>
+            // A. Cambiar valor numérico del Gauge
+            document.getElementById('risk-value').innerText = finalRisk + '%';
 
-                <div className="space-y-4">
-                  {/* Slider 1 */}
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="flex items-center gap-1 text-slate-300">
-                        Margen de Tiempo Planificado (Buffer)
-                        <span className="group relative cursor-pointer">
-                          <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
-                          <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 bg-slate-800 text-slate-100 text-[10px] p-2 rounded w-48 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                            Tiempo extra asignado al viaje para no inducir prisa cognitiva. (Hollnagel / ETTO)
-                          </span>
-                        </span>
-                      </span>
-                      <span className="font-bold text-cyan-400">{bufferTime}%</span>
-                    </div>
-                    <input 
-                      type="range" min="0" max="100" value={bufferTime} 
-                      onChange={(e) => setBufferTime(Number(e.target.value))}
-                      className="w-full accent-cyan-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer"
-                    />
-                  </div>
+            // B. Actualizar offset del círculo Gauge
+            const circle = document.getElementById('gauge-circle');
+            const circumference = 263.89; // 2 * PI * r (r=42)
+            const strokeDashoffset = circumference - (circumference * finalRisk) / 100;
+            circle.style.strokeDashoffset = strokeDashoffset;
 
-                  {/* Slider 2 */}
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="flex items-center gap-1 text-slate-300">
-                        Capacitación y Claridad Normativa
-                        <span className="group relative cursor-pointer">
-                          <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
-                          <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 bg-slate-800 text-slate-100 text-[10px] p-2 rounded w-48 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                            Políticas claras de seguridad frente a metas operativas (Rasmussen: Reglas bien definidas).
-                          </span>
-                        </span>
-                      </span>
-                      <span className="font-bold text-cyan-400">{procedures}%</span>
-                    </div>
-                    <input 
-                      type="range" min="0" max="100" value={procedures} 
-                      onChange={(e) => setProcedures(Number(e.target.value))}
-                      className="w-full accent-cyan-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer"
-                    />
-                  </div>
+            // C. Color dinámico del Gauge
+            if (finalRisk < 30) {
+                circle.setAttribute('class', 'stroke-current text-emerald-500 transition-all duration-500');
+            } else if (finalRisk < 65) {
+                circle.setAttribute('class', 'stroke-current text-amber-500 transition-all duration-500');
+            } else {
+                circle.setAttribute('class', 'stroke-current text-rose-500 transition-all duration-500');
+            }
 
-                  {/* Slider 3 */}
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="flex items-center gap-1 text-slate-300">
-                        Mantenimiento del Vehículo
-                        <span className="group relative cursor-pointer">
-                          <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
-                          <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 bg-slate-800 text-slate-100 text-[10px] p-2 rounded w-48 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                            Estado preventivo mecánico que reduce la posibilidad de fallas activas inesperadas.
-                          </span>
-                        </span>
-                      </span>
-                      <span className="font-bold text-cyan-400">{vehicleMaintenance}%</span>
-                    </div>
-                    <input 
-                      type="range" min="0" max="100" value={vehicleMaintenance} 
-                      onChange={(e) => setVehicleMaintenance(Number(e.target.value))}
-                      className="w-full accent-cyan-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer"
-                    />
-                  </div>
+            // D. Diagnóstico de texto
+            const desc = document.getElementById('risk-description');
+            if (finalRisk < 30) {
+                desc.innerHTML = "🟢 <span class='font-bold text-emerald-400'>Nivel Seguro:</span> El equilibrio entre el plan teórico de la empresa (WAI) y el actuar en vía es robusto. El 'Sistema Seguro' es capaz de absorber errores cognitivos típicos.";
+            } else if (finalRisk < 65) {
+                desc.innerHTML = "🟡 <span class='font-bold text-amber-400'>Nivel de Alerta:</span> Brecha creciente de exigencias operacionales. El conductor realiza micro-ajustes informales (ETTO) que lo acercan al límite de pérdida de control sistémico.";
+            } else {
+                desc.innerHTML = "🔴 <span class='font-bold text-rose-400'>Alto Riesgo:</span> Resonancia disfuncional inminente. El procesamiento predictivo del conductor está bloqueado por fatiga extrema y presiones de entrega, operando al borde de la frontera catastrófica de Rasmussen.";
+            }
 
-                  {/* Slider 4 */}
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="flex items-center gap-1 text-slate-300">
-                        Presión de Productividad (KPIs de entrega)
-                        <span className="group relative cursor-pointer">
-                          <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
-                          <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 bg-slate-800 text-slate-100 text-[10px] p-2 rounded w-48 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                            Exigencias organizativas que empujan el punto de operación hacia el límite de peligro económico. (Rasmussen)
-                          </span>
-                        </span>
-                      </span>
-                      <span className="font-bold text-rose-400">{companyPressure}%</span>
-                    </div>
-                    <input 
-                      type="range" min="0" max="100" value={companyPressure} 
-                      onChange={(e) => setCompanyPressure(Number(e.target.value))}
-                      className="w-full accent-rose-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer"
-                    />
-                  </div>
-                </div>
-              </div>
+            // E. Alertas secundarias
+            const limitLabel = document.getElementById('limit-label');
+            if (xEffort + yEfficiency > 110) {
+                limitLabel.innerText = "🚨 Al Borde de la Catástrofe";
+                limitLabel.className = "font-bold text-rose-400";
+            } else {
+                limitLabel.innerText = "✅ Margen Seguro Existente";
+                limitLabel.className = "font-bold text-emerald-400";
+            }
 
-              <hr className="border-slate-800" />
+            const cognitiveLabel = document.getElementById('cognitive-label');
+            if (predictiveMismatch > 60 && driverFatigue > 60) {
+                cognitiveLabel.innerText = "⚠️ Ceguera al Cambio";
+                cognitiveLabel.className = "font-bold text-rose-400";
+            } else {
+                cognitiveLabel.innerText = "👌 Actualización de Priors OK";
+                cognitiveLabel.className = "font-bold text-cyan-400";
+            }
 
-              {/* BLOQUE B: TRABAJO REALIZADO / DEMANDAS REALES */}
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="w-2.5 h-2.5 bg-purple-400 rounded-full"></span>
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-purple-400">
-                    Trabajo Realizado (WAD) - Demandas Reales en Vía
-                  </h3>
-                </div>
+            // F. Actualizar Punto Dinámico en Gráfico SVG
+            const posX = 40 + (xEffort * 3.2); // Escala para ajustar al ancho del SVG (40 a 380)
+            const posY = 200 - (yEfficiency * 1.5); // Escala para ajustar a la altura (200 a 50)
+            
+            const svgPoint = document.getElementById('svg-point');
+            const svgHalo = document.getElementById('svg-halo');
+            const svgPointLabel = document.getElementById('svg-point-label');
 
-                <div className="space-y-4">
-                  {/* Slider 5 */}
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="flex items-center gap-1 text-slate-300">
-                        Gravedad del Entorno (Tráfico / Clima)
-                        <span className="group relative cursor-pointer">
-                          <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
-                          <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 bg-slate-800 text-slate-100 text-[10px] p-2 rounded w-48 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                            Factores dinámicos del ambiente vial que aumentan las demandas cognitivas físicas del conductor.
-                          </span>
-                        </span>
-                      </span>
-                      <span className="font-bold text-purple-400">{trafficSeverity}%</span>
-                    </div>
-                    <input 
-                      type="range" min="0" max="100" value={trafficSeverity} 
-                      onChange={(e) => setTrafficSeverity(Number(e.target.value))}
-                      className="w-full accent-purple-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer"
-                    />
-                  </div>
+            svgPoint.setAttribute('cx', posX);
+            svgPoint.setAttribute('cy', posY);
+            svgHalo.setAttribute('cx', posX);
+            svgHalo.setAttribute('cy', posY);
 
-                  {/* Slider 6 */}
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="flex items-center gap-1 text-slate-300">
-                        Fatiga del Conductor / Carga de Trabajo
-                        <span className="group relative cursor-pointer">
-                          <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
-                          <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 bg-slate-800 text-slate-100 text-[10px] p-2 rounded w-48 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                            Agotamiento físico, turnos acumulados o distracción. Reduce severamente la capacidad predictiva del cerebro.
-                          </span>
-                        </span>
-                      </span>
-                      <span className="font-bold text-purple-400">{driverFatigue}%</span>
-                    </div>
-                    <input 
-                      type="range" min="0" max="100" value={driverFatigue} 
-                      onChange={(e) => setDriverFatigue(Number(e.target.value))}
-                      className="w-full accent-purple-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer"
-                    />
-                  </div>
+            const isAtBoundary = posY <= 75;
+            svgPoint.setAttribute('fill', isAtBoundary ? '#e11d48' : '#6366f1');
+            svgHalo.setAttribute('fill', isAtBoundary ? 'rgba(244, 63, 94, 0.3)' : 'rgba(99, 102, 241, 0.2)');
+            svgHalo.setAttribute('r', isAtBoundary ? '14' : '8');
 
-                  {/* Slider 7 */}
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="flex items-center gap-1 text-slate-300">
-                        Desajuste Predictivo (Eventos Sorpresa)
-                        <span className="group relative cursor-pointer">
-                          <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
-                          <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 bg-slate-800 text-slate-100 text-[10px] p-2 rounded w-48 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                            Magnitud del 'Prediction Error'. Cuántas anomalías inesperadas ocurren frente al modelo mental del conductor.
-                          </span>
-                        </span>
-                      </span>
-                      <span className="font-bold text-purple-400">{predictiveMismatch}%</span>
-                    </div>
-                    <input 
-                      type="range" min="0" max="100" value={predictiveMismatch} 
-                      onChange={(e) => setPredictiveMismatch(Number(e.target.value))}
-                      className="w-full accent-purple-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer"
-                    />
-                  </div>
+            svgPointLabel.setAttribute('x', posX + 10);
+            svgPointLabel.setAttribute('y', posY - 10);
+            svgPointLabel.textContent = `Punto Operativo (${Math.round(xEffort)}, ${Math.round(yEfficiency)})`;
+        }
 
-                  {/* Slider 8 */}
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="flex items-center gap-1 text-slate-300">
-                        Tolerancia de la Vía (Sistema Seguro)
-                        <span className="group relative cursor-pointer">
-                          <HelpCircle className="w-3.5 h-3.5 text-slate-500" />
-                          <span className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 bg-slate-800 text-slate-100 text-[10px] p-2 rounded w-48 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50">
-                            Capacidad de la infraestructura para mitigar el error del conductor mediante defensas pasivas y límites tolerables de velocidad.
-                          </span>
-                        </span>
-                      </span>
-                      <span className="font-bold text-emerald-400">{roadForgiveness}%</span>
-                    </div>
-                    <input 
-                      type="range" min="0" max="100" value={roadForgiveness} 
-                      onChange={(e) => setRoadForgiveness(Number(e.target.value))}
-                      className="w-full accent-emerald-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+        // Simular Trayecto de Conducción en Tiempo Real
+        function runJourneySimulation() {
+            if (isSimulating) return;
+            isSimulating = true;
 
-            {/* COLUMNA DERECHA: DASHBOARD DE RIESGO */}
-            <div className="lg:col-span-7 flex flex-col gap-6">
-              
-              {/* INDICADOR CLAVE: PROBABILIDAD DE SINIESTRO */}
-              <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 shadow-lg flex flex-col md:flex-row items-center gap-6">
-                
-                {/* Gauge Circular */}
-                <div className="relative w-40 h-40 flex-shrink-0">
-                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                    {/* Background Circle */}
-                    <circle 
-                      cx="50" cy="50" r="42" 
-                      className="stroke-current text-slate-800" 
-                      strokeWidth="10" fill="none" 
-                    />
-                    {/* Foreground Circle */}
-                    <circle 
-                      cx="50" cy="50" r="42" 
-                      className={`stroke-current transition-all duration-500 ${
-                        currentRisk < 30 ? 'text-emerald-500' : currentRisk < 65 ? 'text-amber-500' : 'text-rose-500'
-                      }`} 
-                      strokeWidth="10" fill="none" 
-                      strokeDasharray="263.89"
-                      strokeDashoffset={263.89 - (263.89 * currentRisk) / 100}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col justify-center items-center">
-                    <span className="text-3xl font-extrabold tracking-tight">
-                      {currentRisk}%
-                    </span>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                      Probabilidad
-                    </span>
-                  </div>
-                </div>
+            const btn = document.getElementById('btn-simulate');
+            const text = document.getElementById('simulate-text');
+            const icon = document.getElementById('simulate-icon');
+            const container = document.getElementById('sim-log-container');
 
-                {/* Resumen Ejecutivo del Riesgo */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <AlertTriangle className={`w-5 h-5 ${
-                      currentRisk < 30 ? 'text-emerald-400' : currentRisk < 65 ? 'text-amber-400' : 'text-rose-400'
-                    }`} />
-                    <h3 className="text-lg font-bold">Diagnóstico Dinámico del Riesgo</h3>
-                  </div>
-                  <p className="text-sm text-slate-300 leading-relaxed mb-3">
-                    {currentRisk < 30 && "🟢 Nivel Seguro: El equilibrio entre el plan teórico de la empresa (WAI) y el actuar en vía es robusto. El 'Sistema Seguro' es capaz de absorber errores cognitivos típicos."}
-                    {currentRisk >= 30 && currentRisk < 65 && "🟡 Nivel de Alerta: Brecha creciente de exigencias operacionales. El conductor realiza micro-ajustes informales (ETTO) que lo acercan al límite de pérdida de control sistémico."}
-                    {currentRisk >= 65 && "🔴 Alto Riesgo: Resonancia disfuncional inminente. El procesamiento predictivo del conductor está bloqueado por fatiga extrema y presiones de entrega, operando al borde de la frontera catastrófica de Rasmussen."}
-                  </p>
-                  
-                  {/* Puntos destacados de Factores Humanos */}
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
-                      <span className="text-slate-400 block mb-0.5">Límite de Rasmussen:</span>
-                      <span className={`font-bold ${operatingPoint.x + operatingPoint.y > 110 ? 'text-rose-400' : 'text-emerald-400'}`}>
-                        {operatingPoint.x + operatingPoint.y > 110 ? '🚨 Al Borde de la Catástrofe' : '✅ Margen Seguro Existente'}
-                      </span>
-                    </div>
-                    <div className="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
-                      <span className="text-slate-400 block mb-0.5">Análisis Predictivo:</span>
-                      <span className={`font-bold ${predictiveMismatch > 60 && driverFatigue > 60 ? 'text-rose-400' : 'text-cyan-400'}`}>
-                        {predictiveMismatch > 60 && driverFatigue > 60 ? '⚠️ Ceguera al Cambio' : '👌 Actualización de Priors OK'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            // Ajustar UI de simulación activa
+            btn.disabled = true;
+            btn.classList.add('opacity-60', 'cursor-not-allowed');
+            icon.classList.add('animate-spin');
+            text.innerText = "Simulando...";
+            container.innerHTML = "";
 
-              {/* GRÁFICO DINÁMICO: EL ESPACIO DE RASMUSSEN */}
-              <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 shadow-lg flex-1">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-base font-bold flex items-center gap-2">
-                      <TrendingUp className="text-indigo-400 w-5 h-5" />
-                      Fronteras de Operación Segura (Conceptos de Rasmussen)
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1">
-                      El punto móvil representa las presiones dinámicas del viaje laboral. No permita que cruce el límite de seguridad.
-                    </p>
-                  </div>
-                  <div className="flex gap-2 text-[10px]">
-                    <span className="bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded border border-rose-500/20 font-bold">Límite de Accidente</span>
-                    <span className="bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded border border-cyan-500/20 font-bold">Límite de Esfuerzo</span>
-                  </div>
-                </div>
+            const steps = [
+                { t: "Inicio del trayecto", desc: "El conductor inicia el viaje con sus modelos mentales (Priors) establecidos sobre la ruta habitual." },
+                { t: "Dinámica del Tránsito", desc: "La densidad del tráfico real empieza a divergir de lo planificado (Brecha WAI vs WAD)." },
+                { t: "Presión del Límite", desc: "El conductor evalúa el tiempo disponible. ¿Aplica el atajo cognitivo ETTO sacrificando seguridad por puntualidad?" },
+                { t: "Foco y Cansancio", desc: "La fatiga reduce la precisión predictiva. Se incrementan los Prediction Errors en las esquinas." },
+                { t: "Incidente Crítico", desc: "Un actor vial (peatón/motociclista) realiza una maniobra imprevista. El sistema evalúa el perdón de la vía." },
+                { t: "Resultado del Trayecto", desc: "Finalización del análisis bajo el marco de gestión moderna del riesgo." }
+            ];
 
-                {/* Gráfico SVG */}
-                <div className="relative w-full h-72 bg-slate-900/50 rounded-xl border border-slate-800 overflow-hidden flex items-center justify-center p-2">
-                  <svg className="w-full h-full" viewBox="0 0 400 240">
-                    {/* Grilla */}
-                    <line x1="40" y1="20" x2="40" y2="200" stroke="#334155" strokeWidth="1" strokeDasharray="3 3" />
-                    <line x1="40" y1="200" x2="380" y2="200" stroke="#334155" strokeWidth="1" strokeDasharray="3 3" />
+            let currentStep = 0;
+            const interval = setInterval(() => {
+                if (currentStep < steps.length) {
+                    let dynamicOutcome = "";
 
-                    {/* Límite de Esfuerzo Humano (Izquierda a Derecha) */}
-                    <path d="M 40 200 Q 200 120 380 40" fill="none" stroke="#22d3ee" strokeWidth="2.5" strokeDasharray="5 5" />
-                    <text x="240" y="70" fill="#22d3ee" className="text-[10px] font-semibold" transform="rotate(-23 240 70)">Límite de Carga / Esfuerzo</text>
+                    const companyPressureVal = parseInt(document.getElementById('companyPressure').value);
+                    const driverFatigueVal = parseInt(document.getElementById('driverFatigue').value);
+                    const roadForgivenessVal = parseInt(document.getElementById('roadForgiveness').value);
 
-                    {/* Límite de Viabilidad Económica/KPIs (Abajo a Arriba) */}
-                    <path d="M 40 40 Q 200 140 380 200" fill="none" stroke="#e11d48" strokeWidth="2.5" strokeDasharray="5 5" />
-                    <text x="180" y="160" fill="#e11d48" className="text-[10px] font-semibold" transform="rotate(22 180 160)">Límite de Viabilidad Económica</text>
+                    // Analizar lógicas en tiempo real según parámetros
+                    if (currentStep === 2) {
+                        dynamicOutcome = companyPressureVal > 60 
+                            ? "⚠️ Alta presión organizacional detectada. El conductor fuerza velocidades para cumplir con el itinerario teórico."
+                            : "✅ Presión organizacional controlada. El conductor acepta un retraso razonable sin aumentar la velocidad.";
+                    } else if (currentStep === 3) {
+                        dynamicOutcome = driverFatigueVal > 60
+                            ? "⚠️ Cansancio elevado. El cerebro del conductor no actualiza adecuadamente los estímulos visuales; parpadeos largos."
+                            : "✅ Nivel de alerta adecuado. Tiempo de reacción óptimo para ajustar predicciones.";
+                    } else if (currentStep === 4) {
+                        const checkValue = Math.random() * 100;
+                        if (checkValue < calculatedRiskGlobal) {
+                            dynamicOutcome = roadForgivenessVal < 50
+                                ? "💥 ¡SINIESTRO! La infraestructura rígida y la velocidad inadecuada impidieron rectificar el error predictivo."
+                                : "🛡️ Susto en la vía. Hubo desajuste, pero la zona de despeje lateral (Sistema Seguro) absorbió el error de maniobra.";
+                        } else {
+                            dynamicOutcome = "🟢 Trayecto controlado. A pesar de ligeras alertas, no se traspasó el límite último de pérdida de control.";
+                        }
+                    }
 
-                    {/* Límite de Pérdida de Seguridad (Frontera Catastrófica Superior) */}
-                    <line x1="40" y1="60" x2="380" y2="60" stroke="#f43f5e" strokeWidth="3" />
-                    <text x="130" y="50" fill="#f43f5e" className="text-[11px] font-bold">FRONTERA DE SEGURIDAD (RIESGO CRÍTICO)</text>
+                    // Renderizar Log en pantalla
+                    const logEl = document.createElement('div');
+                    logEl.className = "border-l-2 border-indigo-500 pl-3 py-1 text-xs animate-fade-in";
+                    logEl.innerHTML = `
+                        <span class="font-bold text-slate-300 block">${steps[currentStep].t}</span>
+                        <p class="text-slate-400 mt-0.5">${steps[currentStep].desc}</p>
+                        ${dynamicOutcome ? `<div class="mt-1 font-semibold text-slate-200 bg-slate-950/60 p-2 rounded border border-slate-800/50">${dynamicOutcome}</div>` : ''}
+                    `;
+                    container.appendChild(logEl);
+                    container.scrollTop = container.scrollHeight;
 
-                    {/* Zona Segura del Sistema */}
-                    <path d="M 40 60 L 380 60 L 380 200 L 40 200 Z" fill="rgba(16, 185, 129, 0.03)" />
+                    currentStep++;
+                } else {
+                    clearInterval(interval);
+                    isSimulating = false;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-60', 'cursor-not-allowed');
+                    icon.classList.remove('animate-spin');
+                    text.innerText = "Simular Trayecto";
+                }
+            }, 2000);
+        }
 
-                    {/* Etiquetas de Ejes */}
-                    <text x="310" y="220" fill="#94a3b8" className="text-[10px] font-bold">Carga de Trabajo →</text>
-                    <text x="45" y="30" fill="#94a3b8" className="text-[10px] font-bold" transform="rotate(90 45 30)">← Presión Productiva (KPIs)</text>
+        // Selección de respuestas del Quiz de Auditoría
+        function selectAuditAnswer(qId, points, element) {
+            auditAnswers[qId] = points;
 
-                    {/* Punto de Operación Dinámico de la Simulación */}
-                    {(() => {
-                      const posX = 40 + (operatingPoint.x * 3.2); // Escala para caber en el gráfico
-                      const posY = 200 - (operatingPoint.y * 1.5);
-                      const isAtBoundary = posY <= 75; // Cerca de la línea límite en Y
-                      
-                      return (
-                        <g>
-                          {/* Halo de Peligro */}
-                          <circle 
-                            cx={posX} cy={posY} r={isAtBoundary ? "14" : "8"} 
-                            fill={isAtBoundary ? "rgba(244, 63, 94, 0.3)" : "rgba(99, 102, 241, 0.2)"} 
-                            className="animate-ping" 
-                          />
-                          {/* Punto Principal */}
-                          <circle 
-                            cx={posX} cy={posY} r="6" 
-                            fill={isAtBoundary ? "#e11d48" : "#6366f1"} 
-                          />
-                          <text x={posX + 10} y={posY - 10} fill="#f8fafc" className="text-[11px] font-bold bg-slate-950 p-1">
-                            Punto Operativo ({Math.round(operatingPoint.x)}, {Math.round(operatingPoint.y)})
-                          </text>
-                        </g>
-                      );
-                    })()}
-                  </svg>
-                </div>
-              </div>
+            // Resaltar visualmente el botón seleccionado
+            const parent = element.parentElement;
+            const buttons = parent.querySelectorAll('.audit-btn');
+            buttons.forEach(btn => {
+                if (btn === element) {
+                    btn.className = "audit-btn text-left p-3 rounded-lg text-xs transition-all border bg-indigo-600/20 border-indigo-500 text-indigo-200 font-semibold";
+                } else {
+                    btn.className = "audit-btn text-left p-3 rounded-lg text-xs transition-all border bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-900 hover:border-slate-700";
+                }
+            });
 
-              {/* SIMULAR ACCIÓN DINÁMICA DE TRAYECTO */}
-              <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 shadow-lg flex flex-col gap-4">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="text-base font-bold flex items-center gap-2">
-                      <Car className="text-indigo-400 w-5 h-5" />
-                      Simulación en Tiempo Real del Recorrido Laboral
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1">
-                      Ejecute dinámicamente un trayecto típico y observe cómo el sistema responde a la presión de la demanda real.
-                    </p>
-                  </div>
+            // Habilitar botón de enviar si todas las preguntas están respondidas
+            if (Object.keys(auditAnswers).length === 4) {
+                const submitBtn = document.getElementById('btn-submit-audit');
+                submitBtn.disabled = false;
+                submitBtn.className = "bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all text-sm w-full md:w-auto cursor-pointer";
+            }
+        }
 
-                  <button
-                    onClick={runJourneySimulation}
-                    disabled={isSimulating}
-                    className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 text-white font-semibold py-2.5 px-5 rounded-xl shadow-md transition-all text-sm"
-                  >
-                    <RefreshCw className={`w-4 h-4 ${isSimulating ? 'animate-spin' : ''}`} />
-                    {isSimulating ? 'Simulando...' : 'Simular Trayecto'}
-                  </button>
-                </div>
+        // Calcular puntaje total del test
+        function calculateAuditScore() {
+            const total = Object.values(auditAnswers).reduce((a, b) => a + b, 0);
 
-                {/* Log de la Simulación */}
-                <div className="space-y-3 bg-slate-900/50 p-4 rounded-xl border border-slate-800/80 max-h-60 overflow-y-auto">
-                  {simLog.length === 0 ? (
-                    <p className="text-xs text-slate-500 italic text-center py-4">
-                      Presione "Simular Trayecto" para iniciar el análisis interactivo de desviaciones.
-                    </p>
-                  ) : (
-                    simLog.map((log, idx) => (
-                      <div key={idx} className="border-l-2 border-indigo-500 pl-3 py-1 text-xs">
-                        <span className="font-bold text-slate-300 block">{log.title}</span>
-                        <p className="text-slate-400 mt-0.5">{log.desc}</p>
-                        {log.outcome && (
-                          <div className="mt-1 font-semibold text-slate-200 bg-slate-950/60 p-2 rounded border border-slate-800/50">
-                            {log.outcome}
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
+            const display = document.getElementById('audit-score-display');
+            const panel = document.getElementById('audit-results-panel');
+            const feedback = document.getElementById('audit-feedback-text');
 
-            </div>
-          </div>
-        )}
+            display.innerText = `${total} / 100`;
+            panel.classList.remove('hidden');
 
-        {/* TAB 2: FUNDAMENTO TEÓRICO */}
-        {activeTab === 'theory' && (
-          <div className="bg-slate-950 p-8 rounded-2xl border border-slate-800 shadow-xl max-w-4xl mx-auto space-y-8">
-            <div className="border-b border-slate-800 pb-4">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-                Comprensión Teórica Avanzada del Riesgo Vial
-              </h2>
-              <p className="text-sm text-slate-400 mt-1">
-                La prevención moderna abandona la culpa individual del conductor para centrarse en los sistemas socio-técnicos complejos.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Bloque 1: Rasmussen */}
-              <div className="bg-slate-900 p-5 rounded-xl border border-slate-800">
-                <div className="flex items-center gap-2 mb-3">
-                  <TrendingUp className="text-cyan-400 w-5 h-5" />
-                  <h3 className="font-bold text-slate-200">Fronteras de Seguridad de Jens Rasmussen</h3>
-                </div>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Las organizaciones están sometidas a dos fuerzas de presión constante: la presión económica (hacer más con menos recursos) y la de esfuerzo del trabajador (ahorrar energía y tiempo). 
-                  <br /><br />
-                  Estas fuerzas empujan sistemáticamente los procesos cotidianos de transporte hacia el <strong>Límite de Pérdida de Seguridad</strong>. El siniestro vial no es un error estático, sino una migración gradual de las operaciones normales que cruzan el umbral de estabilidad del sistema.
-                </p>
-              </div>
-
-              {/* Bloque 2: Erik Hollnagel */}
-              <div className="bg-slate-900 p-5 rounded-xl border border-slate-800">
-                <div className="flex items-center gap-2 mb-3">
-                  <Activity className="text-purple-400 w-5 h-5" />
-                  <h3 className="font-bold text-slate-200">Trabajo Imaginado (WAI) vs. Trabajo Realizado (WAD)</h3>
-                </div>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  <strong>Trabajo Imaginado (Work-As-Imagined):</strong> La visión idealizada desde los gerentes y reguladores sobre cómo fluyen las rutas, plasmado en políticas ideales, cronogramas perfectos y conductores que rinden al 100% todo el tiempo.
-                  <br /><br />
-                  <strong>Trabajo Realizado (Work-As-Done):</strong> La cruda realidad del tráfico, desvíos, fatiga oculta y exigencias reales de entrega. Para compensar, el conductor ejecuta constantes ajustes cognitivos eficientes (ETTO), cruzando fronteras sin advertirlo.
-                </p>
-              </div>
-
-              {/* Bloque 3: Procesamiento Predictivo */}
-              <div className="bg-slate-900 p-5 rounded-xl border border-slate-800">
-                <div className="flex items-center gap-2 mb-3">
-                  <Brain className="text-pink-400 w-5 h-5" />
-                  <h3 className="font-bold text-slate-200">Procesamiento Predictivo de los Factores Humanos</h3>
-                </div>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  El cerebro es un motor de inferencia que no procesa de forma directa toda la información visual de la carretera (insuficiente tiempo de cómputo). En su lugar, el cerebro genera <strong>predicciones ('priors')</strong> sobre lo que hay en el camino y solo procesa activamente los <strong>'prediction errors' (sorpresas)</strong>.
-                  <br /><br />
-                  Bajo condiciones de estrés, cansancio o fuerte carga mental, el cerebro reduce la atención y asume que la carretera se mantendrá vacía o despejada. Una sorpresa (por ejemplo, un cruce imprevisto) crea una descompensación fatal debido al retraso neuronal en corregir el modelo predictivo equivocado.
-                </p>
-              </div>
-
-              {/* Bloque 4: Sistema Seguro */}
-              <div className="bg-slate-900 p-5 rounded-xl border border-slate-800">
-                <div className="flex items-center gap-2 mb-3">
-                  <ShieldCheck className="text-emerald-400 w-5 h-5" />
-                  <h3 className="font-bold text-slate-200">Enfoque de Sistema Seguro (Safe System)</h3>
-                </div>
-                <div className="text-xs text-slate-400 leading-relaxed space-y-2">
-                  <p>
-                    El pilar fundamental de la gestión moderna del riesgo vial acepta que <strong>el ser humano comete errores intrínsecos por sus límites cognitivos</strong>.
-                  </p>
-                  <p>
-                    Por tanto, el sistema vial corporativo debe estar diseñado para absorber dicho error de conducción mediante:
-                  </p>
-                  <ul className="list-disc list-inside mt-2 space-y-1 text-[11px] text-slate-400">
-                    <li>Velocidades seguras adaptadas al entorno real.</li>
-                    <li>Vías que disculpan las fallas (zonas de despeje, barreras deformables).</li>
-                    <li>Vehículos seguros con asistencia avanzada activa.</li>
-                    <li>Cultura organizacional enfocada en resolver las brechas sistémicas.</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-indigo-950/40 p-5 rounded-xl border border-indigo-800 text-sm">
-              <h4 className="font-bold text-indigo-300 mb-2 flex items-center gap-2">
-                <Award className="w-4 h-4" />
-                Lección de Gestión Estratégica:
-              </h4>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Para disminuir el riesgo vial corporativo, la gerencia no debe limitarse a exigir "conducir con más cuidado". En su lugar, debe actuar sobre el <strong>Trabajo Imaginado</strong>: expandiendo los márgenes de tiempo permitidos, minimizando las penalizaciones severas por demoras imprevistas, y optimizando los cronogramas según las condiciones biológicas reales de la fatiga.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* TAB 3: AUDITORÍA / AUTOEVALUACIÓN */}
-        {activeTab === 'audit' && (
-          <div className="bg-slate-950 p-8 rounded-2xl border border-slate-800 shadow-xl max-w-3xl mx-auto">
-            <div className="border-b border-slate-800 pb-4 mb-6">
-              <h2 className="text-2xl font-bold flex items-center gap-2 text-indigo-400">
-                <ShieldCheck className="w-7 h-7" />
-                Auditoría Organizacional de Riesgo Vial Laboral
-              </h2>
-              <p className="text-sm text-slate-400 mt-1">
-                Evalúe cómo su empresa gestiona actualmente los desplazamientos (in-itinere y en misión) bajo la perspectiva de Safety-II.
-              </p>
-            </div>
-
-            {/* Lista de Preguntas */}
-            <div className="space-y-6">
-              {auditQuestions.map((q) => (
-                <div key={q.id} className="bg-slate-900 p-5 rounded-xl border border-slate-800/80">
-                  <h4 className="text-sm font-bold text-slate-200 mb-3 flex items-start gap-2">
-                    <span className="bg-indigo-600/30 text-indigo-400 w-5 h-5 rounded-full flex items-center justify-center text-xs flex-shrink-0 mt-0.5">
-                      {q.id}
-                    </span>
-                    {q.q}
-                  </h4>
-                  
-                  <div className="grid grid-cols-1 gap-2.5">
-                    {q.options.map((opt, oIdx) => (
-                      <button
-                        key={oIdx}
-                        onClick={() => handleSelectAudit(q.id, opt.points)}
-                        className={`text-left p-3 rounded-lg text-xs transition-all border flex justify-between items-center ${
-                          auditAnswers[q.id] === opt.points
-                            ? 'bg-indigo-600/20 border-indigo-500 text-indigo-200 font-semibold'
-                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:bg-slate-900 hover:border-slate-700'
-                        }`}
-                      >
-                        <span>{opt.text}</span>
-                        {auditAnswers[q.id] === opt.points && (
-                          <CheckCircle className="w-4 h-4 text-indigo-400 flex-shrink-0 ml-2" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Botón de Cálculo */}
-            <div className="mt-8 flex flex-col items-center gap-4">
-              <button
-                onClick={calculateAuditScore}
-                disabled={Object.keys(auditAnswers).length < auditQuestions.length}
-                className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all text-sm w-full md:w-auto"
-              >
-                Obtener Calificación Organizacional
-              </button>
-
-              {/* Resultados */}
-              {auditScore !== null && (
-                <div className="w-full bg-slate-900 p-6 rounded-xl border border-slate-800 mt-4 text-center">
-                  <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">
-                    Su Puntaje de Gestión de Riesgo
-                  </span>
-                  <div className="text-4xl font-black mb-3">
-                    <span className={auditScore >= 75 ? 'text-emerald-400' : auditScore >= 40 ? 'text-amber-400' : 'text-rose-400'}>
-                      {auditScore} / 100
-                    </span>
-                  </div>
-
-                  {/* Feedback */}
-                  <div className="max-w-md mx-auto text-xs text-slate-300 leading-relaxed">
-                    {auditScore >= 75 && (
-                      <p className="bg-emerald-950/40 text-emerald-300 p-3.5 rounded-lg border border-emerald-900/50">
+            // Feedback contextualizado según rango de puntajes
+            if (total >= 75) {
+                display.className = "text-emerald-400 text-4xl font-black";
+                feedback.innerHTML = `
+                    <p class="bg-emerald-950/40 text-emerald-300 p-3.5 rounded-lg border border-emerald-900/50">
                         🎉 Excelente: Su organización entiende la diferencia entre el trabajo real y el planificado. Se diseña proactivamente un entorno de conducción tolerante a los inevitables límites de fatiga y procesamiento humano.
-                      </p>
-                    )}
-                    {auditScore >= 40 && auditScore < 75 && (
-                      <p className="bg-amber-950/40 text-amber-300 p-3.5 rounded-lg border border-amber-900/50">
+                    </p>
+                `;
+            } else if (total >= 40) {
+                display.className = "text-amber-400 text-4xl font-black";
+                feedback.innerHTML = `
+                    <p class="bg-amber-950/40 text-amber-300 p-3.5 rounded-lg border border-amber-900/50">
                         ⚠️ Nivel Intermedio: La empresa cuenta con buenas políticas en papel (WAI), pero con frecuencia la presión diaria de la operación fuerza a los conductores a sacrificar su seguridad operacional (ETTO) para cumplir los objetivos.
-                      </p>
-                    )}
-                    {auditScore < 40 && (
-                      <p className="bg-rose-950/40 text-rose-300 p-3.5 rounded-lg border border-rose-900/50">
+                    </p>
+                `;
+            } else {
+                display.className = "text-rose-400 text-4xl font-black";
+                feedback.innerHTML = `
+                    <p class="bg-rose-950/40 text-rose-300 p-3.5 rounded-lg border border-rose-900/50">
                         🚨 Nivel Crítico: Su organización traslada toda la responsabilidad de la seguridad al conductor de forma individual. La falta de amortiguación de tiempo y la ceguera ante la fatiga aseguran una migración constante de la flota hacia límites catastróficos.
                       </p>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+                `;
+            }
+        }
 
-      </main>
-
-      {/* FOOTER METODOLÓGICO */}
-      <footer className="bg-slate-950 border-t border-slate-800 py-6 px-6 text-center text-xs text-slate-500 mt-auto">
-        <p className="max-w-2xl mx-auto leading-relaxed">
-          Este modelo simulador es una aproximación conceptual que integra los límites sociotécnicos de Rasmussen, las dinámicas de flexibilidad operativa (WAI vs WAD) de Hollnagel, la teoría del cerebro bayesiano aplicada a la conducción vial y los principios del Marco Global de Sistema Seguro adoptados por las normativas modernas de Seguridad Vial Laboral.
-        </p>
-        <p className="mt-2 text-indigo-400 font-medium">
-          Cultura de Seguridad II - "La seguridad no es la ausencia de accidentes, sino la presencia de capacidades."
-        </p>
-      </footer>
-    </div>
-  );
-}
+        // Inicialización y primer cálculo al cargar la página
+        window.onload = function() {
+            updateCalculations();
+        };
+    </script>
+</body>
+</html>
