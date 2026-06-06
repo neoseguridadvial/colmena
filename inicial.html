@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OjoVial - Entrenador de Percepción de Riesgos</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Outfit & Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for high visibility safety icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+        }
+        h1, h2, h3, .font-title {
+            font-family: 'Outfit', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #fbbf24;
+        }
+        /* Scanner animation effect for Hazard Hunt */
+        @keyframes scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        .scanner-line {
+            animation: scan 4s linear infinite;
+        }
+        /* Pulse danger ring */
+        @keyframes pulse-danger {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.18); opacity: 1; box-shadow: 0 0 20px rgba(239, 68, 68, 0.85); }
+        }
+        .pulse-danger-btn {
+            animation: pulse-danger 1.8s infinite;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-900 overflow-x-hidden touch-manipulation">
+
+    <!-- Audio synthesizer helper (No external audio file dependencies) -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'success') {
+                    // Uplifting double beep
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.35);
+                } else if (type === 'fail') {
+                    // Deep error buzz
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(130.81, audioCtx.currentTime); // C3
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.45);
+                } else if (type === 'click') {
+                    // Subtle dynamic interface tick
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.08);
+                } else if (type === 'danger') {
+                    // Alarm sound
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(440, audioCtx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.35);
+                }
+            } catch (e) {
+                console.warn("Audio context blocked or unsupported:", e);
+            }
+        }
+    </script>
+
+    <!-- NAVIGATION BAR -->
+    <header class="border-b border-slate-800 bg-slate-900/95 sticky top-0 z-50 backdrop-blur-md px-3 py-2.5 sm:px-4 sm:py-3">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-3 md:gap-4">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-2.5 cursor-pointer" onclick="navigate('dashboard')">
+                <div class="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/20 shrink-0">
+                    <i class="fa-solid fa-eye text-slate-950 text-lg animate-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white flex items-center gap-1">
+                        OJO<span class="text-amber-400">VIAL</span>
+                    </h1>
+                    <p class="text-[9px] text-slate-400 font-medium tracking-widest uppercase">Entrenador de Percepción</p>
+                </div>
+            </div>
+
+            <!-- Stats/XP Widget -->
+            <div class="flex items-center justify-between md:justify-end gap-3 sm:gap-5 text-xs bg-slate-950/60 px-3.5 py-2 rounded-xl border border-slate-800/80 w-full md:w-auto">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-amber-400 font-bold"><i class="fa-solid fa-trophy mr-1"></i>Nivel</span>
+                    <span id="user-level" class="bg-amber-400 text-slate-950 px-1.5 py-0.5 rounded font-black text-[10px]">1</span>
+                </div>
+                <div class="h-4 w-px bg-slate-800 hidden sm:block"></div>
+                <div class="flex flex-col gap-0.5 w-24 sm:w-28">
+                    <div class="flex justify-between text-[9px] text-slate-400">
+                        <span>Progreso XP</span>
+                        <span id="xp-text">0 / 100</span>
+                    </div>
+                    <div class="w-full h-1 bg-slate-800 rounded-full overflow-hidden">
+                        <div id="xp-bar" class="h-full bg-gradient-to-r from-amber-500 to-yellow-300 w-0 transition-all duration-500"></div>
+                    </div>
+                </div>
+                <div class="h-4 w-px bg-slate-800"></div>
+                <div class="flex items-center gap-1 text-emerald-400 font-semibold text-[11px]">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span id="score-val" class="font-bold">0</span> <span class="text-[9px] text-slate-500">Peligros</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT VIEWPORT -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-3 sm:p-4 flex flex-col justify-start">
+
+        <!-- VIEW: DASHBOARD -->
+        <section id="view-dashboard" class="space-y-6 sm:space-y-8 animate-fade-in py-2 sm:py-4">
+            <!-- Hero welcome banner -->
+            <div class="relative overflow-hidden bg-gradient-to-br from-slate-900 to-indigo-950/40 rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-slate-800 shadow-xl">
+                <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -left-10 -top-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="relative z-10 max-w-3xl space-y-3 sm:space-y-4">
+                    <span class="bg-amber-500/10 text-amber-400 text-[10px] sm:text-xs px-2.5 py-1 rounded-full border border-amber-500/20 font-semibold tracking-wider uppercase inline-flex items-center gap-1">
+                        <i class="fa-solid fa-brain"></i> Activación de Reflejos y Neuro-visión
+                    </span>
+                    <h2 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight">
+                        Entrena tu cerebro para <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">detectar amenazas viales</span> antes de que ocurran.
+                    </h2>
+                    <p class="text-slate-300 text-xs sm:text-sm lg:text-base leading-relaxed">
+                        El 90% de los accidentes de tránsito ocurren por demoras en la percepción visual de peligros. OjoVial agudiza tu capacidad de escaneo cognitivo rápido, acorta tus tiempos de reacción y te capacita mediante Inteligencia Artificial adaptativa.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                        <button onclick="navigate('hazard-hunt')" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold px-5 py-3 rounded-xl transition-all shadow-lg hover:shadow-amber-400/20 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                            <i class="fa-solid fa-gamepad text-base"></i> Iniciar Entrenamiento Activo
+                        </button>
+                        <button onclick="navigate('ai-lab')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 text-white font-bold px-5 py-3 rounded-xl transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
+                            <i class="fa-solid fa-wand-magic-sparkles text-amber-400 text-base"></i> Laboratorio Vial IA
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIPDE Method Cards Section -->
+            <div class="space-y-3">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-shield text-amber-400"></i> Metodología de Escaneo S.I.P.D.E.
+                </h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3">
+                    <div class="bg-slate-900 border border-slate-800/80 p-3 sm:p-4 rounded-xl flex flex-col items-center text-center space-y-1.5">
+                        <div class="w-8 h-8 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-sm border border-blue-500/20">S</div>
+                        <span class="font-bold text-[11px] text-white">Sondear (Scan)</span>
+                        <p class="text-[9px] text-slate-400 leading-snug">Mantener ojos en constante movimiento.</p>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800/80 p-3 sm:p-4 rounded-xl flex flex-col items-center text-center space-y-1.5">
+                        <div class="w-8 h-8 rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold text-sm border border-amber-500/20">I</div>
+                        <span class="font-bold text-[11px] text-white">Identificar</span>
+                        <p class="text-[9px] text-slate-400 leading-snug">Detectar peatones, baches o frenazos.</p>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800/80 p-3 sm:p-4 rounded-xl flex flex-col items-center text-center space-y-1.5">
+                        <div class="w-8 h-8 rounded-full bg-orange-500/10 text-orange-400 flex items-center justify-center font-bold text-sm border border-orange-500/20">P</div>
+                        <span class="font-bold text-[11px] text-white">Predecir</span>
+                        <p class="text-[9px] text-slate-400 leading-snug">Calcular trayectorias de otros vehículos.</p>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800/80 p-3 sm:p-4 rounded-xl flex flex-col items-center text-center space-y-1.5">
+                        <div class="w-8 h-8 rounded-full bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-sm border border-purple-500/20">D</div>
+                        <span class="font-bold text-[11px] text-white">Decidir</span>
+                        <p class="text-[9px] text-slate-400 leading-snug">Elegir la mejor ruta o frenado preventivo.</p>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800/80 p-3 sm:p-4 rounded-xl col-span-2 sm:col-span-1 flex flex-col items-center text-center space-y-1.5">
+                        <div class="w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-sm border border-emerald-500/20">E</div>
+                        <span class="font-bold text-[11px] text-white">Ejecutar</span>
+                        <p class="text-[9px] text-slate-400 leading-snug">Girar, frenar o acelerar con control.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Activity Selection Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                <!-- Training Card 1: Interactive Scan Simulator -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 hover:border-amber-400/40 transition-all flex flex-col justify-between group">
+                    <div class="space-y-2 sm:space-y-3">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg sm:text-xl border border-amber-500/20 group-hover:scale-105 transition-all">
+                            <i class="fa-solid fa-compass"></i>
+                        </div>
+                        <h4 class="text-lg sm:text-xl font-bold text-white">Caza-Riesgos Interactivo</h4>
+                        <p class="text-slate-400 text-xs leading-relaxed">
+                            Ponte a prueba en escenarios dinámicos donde debes encontrar y marcar riesgos ocultos antes de que se agote el tiempo de reacción óptimo.
+                        </p>
+                    </div>
+                    <button onclick="navigate('hazard-hunt')" class="mt-4 sm:mt-6 w-full py-2.5 sm:py-3 bg-slate-800 hover:bg-slate-700 text-amber-400 text-[11px] font-bold uppercase rounded-xl tracking-wider transition-all border border-slate-700">
+                        Entrar a la Caza
+                    </button>
+                </div>
+
+                <!-- Training Card 2: AI Lab -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 hover:border-violet-400/40 transition-all flex flex-col justify-between group">
+                    <div class="space-y-2 sm:space-y-3">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-violet-500/10 text-violet-400 flex items-center justify-center text-lg sm:text-xl border border-violet-500/20 group-hover:scale-105 transition-all">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </div>
+                        <h4 class="text-lg sm:text-xl font-bold text-white">Laboratorio de Escenarios IA</h4>
+                        <p class="text-slate-400 text-xs leading-relaxed">
+                            Crea situaciones de riesgo de acuerdo a tu clima y ciudad. Nuestra IA generará la escena y auditará tus flujos visuales.
+                        </p>
+                    </div>
+                    <button onclick="navigate('ai-lab')" class="mt-4 sm:mt-6 w-full py-2.5 sm:py-3 bg-slate-800 hover:bg-slate-700 text-violet-400 text-[11px] font-bold uppercase rounded-xl tracking-wider transition-all border border-slate-700">
+                        Configurar Escenario
+                    </button>
+                </div>
+
+                <!-- Training Card 3: Reaction Speed -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 hover:border-emerald-400/40 transition-all flex flex-col justify-between group">
+                    <div class="space-y-2 sm:space-y-3">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg sm:text-xl border border-emerald-500/20 group-hover:scale-105 transition-all">
+                            <i class="fa-solid fa-stopwatch"></i>
+                        </div>
+                        <h4 class="text-lg sm:text-xl font-bold text-white">Test de Frenado Veloz</h4>
+                        <p class="text-slate-400 text-xs leading-relaxed">
+                            ¿Qué tan rápido puedes accionar el pedal virtual? Mide tu tiempo exacto de reacción en milisegundos y calcula tu distancia física de frenado.
+                        </p>
+                    </div>
+                    <button onclick="navigate('reaction-test')" class="mt-4 sm:mt-6 w-full py-2.5 sm:py-3 bg-slate-800 hover:bg-slate-700 text-emerald-400 text-[11px] font-bold uppercase rounded-xl tracking-wider transition-all border border-slate-700">
+                        Medir Reflejos
+                    </button>
+                </div>
+
+                <!-- Training Card 4: Cognitive Quizzes -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 hover:border-sky-400/40 transition-all flex flex-col justify-between group md:col-span-3">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-lg sm:text-xl border border-sky-500/20 group-hover:scale-105 transition-all shrink-0">
+                                <i class="fa-solid fa-graduation-cap"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="text-lg sm:text-xl font-bold text-white">Academia Vial Cognitiva</h4>
+                                <p class="text-slate-400 text-xs max-w-xl">
+                                    Resuelve problemas cognitivos y comprende los fenómenos ópticos que causan choques cotidianos como la "visión de túnel" y la "ceguera por distracción".
+                                </p>
+                            </div>
+                        </div>
+                        <button onclick="navigate('quiz')" class="w-full sm:w-auto px-5 py-3 bg-sky-600 hover:bg-sky-500 text-white text-[11px] font-bold uppercase rounded-xl tracking-wider transition-all text-center">
+                            Iniciar Cuestionario (+XP)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: HAZARD HUNT GAME -->
+        <section id="view-hazard-hunt" class="hidden space-y-4 sm:space-y-6 animate-fade-in py-2 sm:py-4">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 bg-slate-900 p-4 rounded-xl sm:rounded-2xl border border-slate-800">
+                <div>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-compass text-amber-400"></i> Caza de Riesgos Viales
+                    </h3>
+                    <p class="text-[11px] sm:text-xs text-slate-400">Escanea la calle interactiva y presiona los focos de peligro activo antes de que acabe el tiempo.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto justify-between lg:justify-end">
+                    <span class="text-[11px] sm:text-xs bg-slate-800 border border-slate-700 px-2.5 py-1.5 rounded-lg font-medium text-slate-300">
+                        Tiempo: <span id="hunt-timer" class="text-amber-400 font-bold">15</span>s
+                    </span>
+                    <span class="text-[11px] sm:text-xs bg-slate-800 border border-slate-700 px-2.5 py-1.5 rounded-lg font-medium text-slate-300">
+                        Riesgos: <span id="hunt-score" class="text-emerald-400 font-bold">0 / 4</span>
+                    </span>
+                    <button onclick="navigate('dashboard')" class="text-[11px] sm:text-xs bg-red-500/10 hover:bg-red-500/20 text-red-400 px-2.5 py-1.5 rounded-lg transition-all border border-red-500/20">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> Salir
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+                <!-- Main Game Screen Board -->
+                <div class="lg:col-span-3 flex flex-col space-y-4">
+                    <!-- Scenario Interactive Canvas Wrapper -->
+                    <div class="relative bg-slate-950 rounded-2xl sm:rounded-3xl border border-slate-800 aspect-video overflow-hidden shadow-2xl flex items-center justify-center select-none" id="hunt-arena">
+                        <!-- Scanning line visual filter -->
+                        <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent scanner-line pointer-events-none" style="animation: scan 5s linear infinite;"></div>
+                        
+                        <!-- VECTOR SCENE RENDERER CONTAINER -->
+                        <div id="vector-scene" class="absolute inset-0 w-full h-full">
+                            <!-- Dynamically generated custom vector/SVG scene will load here -->
+                        </div>
+
+                        <!-- Touch and click indicators overlay -->
+                        <div id="hotspot-overlay" class="absolute inset-0 z-20"></div>
+
+                        <!-- Instructions Prompt overlay on start -->
+                        <div id="hunt-intro-overlay" class="absolute inset-0 z-30 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center text-center p-4 sm:p-6 space-y-3 sm:space-y-4 overflow-y-auto">
+                            <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center text-2xl sm:text-3xl border border-amber-500/30 animate-bounce shrink-0">
+                                <i class="fa-solid fa-crosshairs"></i>
+                            </div>
+                            <h4 class="text-lg sm:text-2xl font-bold text-white">¿Listo para activar tu percepción?</h4>
+                            <p class="text-slate-300 text-[11px] sm:text-sm max-w-md leading-relaxed">
+                                Examinarás un cruce de tráfico complejo. Busca activamente ciclistas imprudentes, vehículos frenando repentinamente, peatones distraídos y fallas de infraestructura.
+                            </p>
+                            <div class="flex flex-col sm:flex-row gap-2.5 w-full max-w-md">
+                                <button onclick="startHuntGame(1)" class="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs sm:text-sm transition-all shadow-md">
+                                    Escenario 1: Cruce Urbano Diurno
+                                </button>
+                                <button onclick="startHuntGame(2)" class="w-full bg-violet-600 hover:bg-violet-500 text-white font-bold px-4 py-2 rounded-xl text-xs sm:text-sm transition-all shadow-md">
+                                    Escenario 2: Autopista Lluviosa
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Game Over Screen -->
+                        <div id="hunt-result-overlay" class="absolute inset-0 z-30 bg-slate-950/95 backdrop-blur-md hidden flex flex-col items-center justify-center text-center p-4 sm:p-6 space-y-3 sm:space-y-4 overflow-y-auto">
+                            <div id="hunt-result-icon" class="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-2xl sm:text-3xl border shrink-0"></div>
+                            <h4 id="hunt-result-title" class="text-lg sm:text-2xl font-bold text-white">Fin de la Simulación</h4>
+                            <p id="hunt-result-desc" class="text-slate-300 text-[11px] sm:text-sm max-w-md leading-relaxed"></p>
+                            <div class="flex flex-col sm:flex-row gap-2.5 w-full max-w-md">
+                                <button onclick="resetHuntSelection()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold px-4 py-2 rounded-xl text-xs sm:text-sm transition-all border border-slate-700">
+                                    Cambiar Escenario
+                                </button>
+                                <button id="hunt-retry-btn" class="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs sm:text-sm transition-all shadow-md">
+                                    Intentar de Nuevo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scan Log Timeline feed -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl p-3 sm:p-4">
+                        <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">Bitácora de Escaneo Mental</span>
+                        <div class="space-y-1.5 h-16 sm:h-20 overflow-y-auto" id="scan-log">
+                            <p class="text-[11px] sm:text-xs text-slate-500 italic">Comienza la simulación para registrar las respuestas del ojo humano.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Learning Panel & Metodology integration -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 space-y-4">
+                    <h4 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-graduation-cap text-amber-400"></i> ¿Cómo escanear?
+                    </h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        No te quedes mirando fíjamente un solo punto (visión fija). Mueve tu vista en patrones circulares y diagonales:
+                    </p>
+                    
+                    <div class="space-y-3 pt-1">
+                        <div class="flex gap-2.5 items-start">
+                            <div class="bg-amber-500/10 text-amber-400 p-2 rounded-lg text-[10px] sm:text-xs border border-amber-500/20 font-bold shrink-0">01</div>
+                            <div>
+                                <span class="text-[11px] sm:text-xs font-bold text-white block">Espejos cada 5-8 segundos</span>
+                                <span class="text-[10px] text-slate-400 leading-snug">Verifica qué pasa detrás antes de tomar cualquier decisión de evasión.</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2.5 items-start">
+                            <div class="bg-amber-500/10 text-amber-400 p-2 rounded-lg text-[10px] sm:text-xs border border-amber-500/20 font-bold shrink-0">02</div>
+                            <div>
+                                <span class="text-[11px] sm:text-xs font-bold text-white block">Horizonte lejano</span>
+                                <span class="text-[10px] text-slate-400 leading-snug">Mira al menos a 15 segundos de distancia en tu trayectoria para anticipar frenadas masivas.</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2.5 items-start">
+                            <div class="bg-amber-500/10 text-amber-400 p-2 rounded-lg text-[10px] sm:text-xs border border-amber-500/20 font-bold shrink-0">03</div>
+                            <div>
+                                <span class="text-[11px] sm:text-xs font-bold text-white block">Puntos Ciegos</span>
+                                <span class="text-[10px] text-slate-400 leading-snug">Identifica vehículos posicionándose justo detrás de tus hombros.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: AI LAB SCENARIO SIMULATOR -->
+        <section id="view-ai-lab" class="hidden space-y-4 sm:space-y-6 animate-fade-in py-2 sm:py-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-900 p-4 rounded-xl sm:rounded-2xl border border-slate-800">
+                <div>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> Laboratorio de Riesgos IA
+                    </h3>
+                    <p class="text-[11px] sm:text-xs text-slate-400">Genera una calle interactiva personalizada y recibe un desglose cognitivo detallado de sus amenazas.</p>
+                </div>
+                <button onclick="navigate('dashboard')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl border border-slate-700 transition-all self-end sm:self-auto">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Panel
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+                <!-- AI Scenario Generator Controllers (Sidebar) -->
+                <div class="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 space-y-4 sm:space-y-5">
+                    <h4 class="text-xs font-bold uppercase text-slate-400 tracking-wider">Configurar Parámetros</h4>
+                    
+                    <!-- Form Controls -->
+                    <div class="space-y-3.5 text-xs">
+                        <!-- Parameter 1: Environment -->
+                        <div class="space-y-1">
+                            <label class="font-bold text-slate-300 flex justify-between">
+                                <span>Entorno Vial</span>
+                                <i class="fa-solid fa-city text-slate-500"></i>
+                            </label>
+                            <select id="ai-env" class="w-full bg-slate-950 border border-slate-800 text-white px-2.5 py-2.5 rounded-xl focus:border-amber-400 focus:outline-none">
+                                <option value="Cruce urbano de alta densidad, intersección de avenidas">Intersección de Ciudad Concurrida</option>
+                                <option value="Autopista rápida con puentes peatonales y tráfico denso">Autopista de Alta Velocidad</option>
+                                <option value="Glorieta o Rotonda con múltiples salidas y carriles">Glorieta Crítica (Roundabout)</option>
+                                <option value="Zona escolar con cruces peatonales pintados y señalización">Zona Escolar Urbana</option>
+                                <option value="Carretera de montaña con curvas cerradas y acantilado">Carretera Rural Sinuosa</option>
+                            </select>
+                        </div>
+
+                        <!-- Parameter 2: Climate / Weather -->
+                        <div class="space-y-1">
+                            <label class="font-bold text-slate-300 flex justify-between">
+                                <span>Clima & Visibilidad</span>
+                                <i class="fa-solid fa-cloud-sun text-slate-500"></i>
+                            </label>
+                            <select id="ai-weather" class="w-full bg-slate-950 border border-slate-800 text-white px-2.5 py-2.5 rounded-xl focus:border-amber-400 focus:outline-none">
+                                <option value="Lluvia intensa y asfalto mojado y reflectante, visibilidad reducida">Lluvia Intensa (Peligro de Hidroplaneo)</option>
+                                <option value="Niebla densa de madrugada, luces encendidas, siluetas difusas">Niebla Espesa</option>
+                                <option value="Noche cerrada con iluminación de farolas amarillas y destellos">Noche Urbana</option>
+                                <option value="Atardecer cegador con el sol de frente en el horizonte, reflejos">Sol de Frente Cegador</option>
+                                <option value="Día soleado y despejado, sombras marcadas">Despejado, Luz de Mediodía</option>
+                            </select>
+                        </div>
+
+                        <!-- Parameter 3: Threat focus -->
+                        <div class="space-y-1">
+                            <label class="font-bold text-slate-300 flex justify-between">
+                                <span>Riesgo Crítico Principal</span>
+                                <i class="fa-solid fa-triangle-exclamation text-slate-500"></i>
+                            </label>
+                            <select id="ai-threat" class="w-full bg-slate-950 border border-slate-800 text-white px-2.5 py-2.5 rounded-xl focus:border-amber-400 focus:outline-none">
+                                <option value="Un peatón distraído mirando el celular que cruza sin mirar">Peatón Distraído en la Vía</option>
+                                <option value="Un motociclista zigzagueando en el punto ciego del retrovisor">Motociclista en Punto Ciego</option>
+                                <option value="Un camión de carga pesada perdiendo carga u obstruyendo el paso">Obstrucción por Carga Pesada</option>
+                                <option value="Un bache profundo lleno de agua y alcantarillado sin tapa en el carril">Daño Crítico de Infraestructura</option>
+                                <option value="Un vehículo que frena bruscamente justo adelante sin luces de stop de emergencia">Frenazo Imprevisto del Líder</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="pt-1">
+                        <button onclick="generateAIScenario()" id="btn-generate-ai" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black py-3 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-xs uppercase">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Materializar Escenario
+                        </button>
+                    </div>
+
+                    <!-- Explanatory note -->
+                    <div class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800 text-[10px] sm:text-[11px] text-slate-400 leading-relaxed space-y-1.5">
+                        <span class="font-bold text-amber-400 block"><i class="fa-solid fa-circle-info mr-1"></i>¿Cómo funciona?</span>
+                        <p>Nuestra plataforma invocará a la red neuronal **Imagen 4.0** para pintar una foto realista de la vía combinando tus variables. Luego, el modelo cognitivo de **Gemini** auditará el peligro dándote indicaciones de visión defensiva viales.</p>
+                    </div>
+                </div>
+
+                <!-- AI Output Canvas (Interactive visual & analysis block) -->
+                <div class="lg:col-span-8 flex flex-col space-y-4 sm:space-y-6">
+                    <!-- Dynamic Generation Output Board -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl relative min-h-[280px] sm:min-h-[350px] flex flex-col">
+                        <div class="bg-slate-950/40 px-4 py-3 border-b border-slate-800/80 flex justify-between items-center">
+                            <span class="text-xs font-bold text-white flex items-center gap-2">
+                                <i class="fa-regular fa-image text-amber-400"></i> Render Visual Vial
+                            </span>
+                            <span class="text-[9px] sm:text-[10px] text-slate-500 bg-slate-950 px-2 py-0.5 rounded" id="ai-status">Inactivo</span>
+                        </div>
+
+                        <!-- Canvas image renderer -->
+                        <div class="flex-grow flex items-center justify-center relative p-3 sm:p-4 bg-slate-950" id="ai-viewport-container">
+                            <!-- Placeholder visual -->
+                            <div id="ai-placeholder" class="text-center p-6 max-w-sm space-y-3">
+                                <div class="w-12 h-12 rounded-full bg-slate-900 text-slate-600 border border-slate-800 flex items-center justify-center text-2xl mx-auto">
+                                    <i class="fa-solid fa-traffic-light"></i>
+                                </div>
+                                <h4 class="text-xs sm:text-sm font-bold text-white">Ningún Escenario Materializado</h4>
+                                <p class="text-[10px] sm:text-[11px] text-slate-400 leading-relaxed">Configura los parámetros climáticos y el tipo de vía en el menú lateral para pintar una escena realista.</p>
+                            </div>
+
+                            <!-- Real Output Image -->
+                            <img id="ai-output-img" class="hidden rounded-lg sm:rounded-xl object-cover max-h-[420px] w-full border border-slate-800 shadow-xl" src="" alt="Escenario vial simulado por IA" />
+
+                            <!-- Simulated Scanner Progress indicator -->
+                            <div id="ai-loading-panel" class="hidden text-center space-y-3">
+                                <div class="relative w-12 h-12 mx-auto">
+                                    <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
+                                    <div class="absolute inset-0 rounded-full border-4 border-amber-500 border-t-transparent animate-spin"></div>
+                                </div>
+                                <div class="space-y-1">
+                                    <p class="text-xs font-semibold text-white" id="ai-loading-step">Materializando asfalto...</p>
+                                    <p class="text-[9px] sm:text-[10px] text-slate-500">La simulación puede tomar unos segundos.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Audit Analysis panel -->
+                    <div id="ai-analysis-panel" class="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 space-y-3 sm:space-y-4 hidden animate-fade-in">
+                        <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-clipboard-check"></i>
+                            </div>
+                            <h4 class="text-sm sm:text-base font-bold text-white">Auditoría Vial y Patrones de Fijación Óptica</h4>
+                        </div>
+
+                        <!-- Audit Content (populated dynamically) -->
+                        <div id="ai-analysis-content" class="text-xs text-slate-300 space-y-3 leading-relaxed">
+                            <!-- Populated with beautiful HTML via Gemini -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: REACTION SPEED TESTER -->
+        <section id="view-reaction-test" class="hidden space-y-4 sm:space-y-6 animate-fade-in py-2 sm:py-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-900 p-4 rounded-xl sm:rounded-2xl border border-slate-800">
+                <div>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-stopwatch text-amber-400"></i> Medidor de Tiempo de Reacción
+                    </h3>
+                    <p class="text-[11px] sm:text-xs text-slate-400">Evalúa tus milisegundos de reacción para ver si lograrías evitar un impacto fatal.</p>
+                </div>
+                <button onclick="navigate('dashboard')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl border border-slate-700 transition-all self-end sm:self-auto">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Panel
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                <!-- Test Interaction Panel -->
+                <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 flex flex-col justify-between min-h-[360px] sm:min-h-[400px] relative overflow-hidden">
+                    <div class="text-center space-y-2">
+                        <span class="text-[9px] sm:text-[10px] bg-slate-950 px-2.5 py-1 rounded-full text-amber-400 border border-slate-800 font-semibold tracking-wider uppercase">Fisiología del Conductor</span>
+                        <h4 class="text-lg sm:text-xl font-bold text-white">Test de Frenado Repentino</h4>
+                        <p class="text-xs text-slate-400 max-w-md mx-auto">Presiona "INICIAR PRUEBA", mantén tu dedo listo sobre el gran botón. Espera a que cambie de <span class="text-slate-400 font-bold">Gris</span> a <span class="text-red-500 font-bold">¡ALERTA ROJA!</span> y presiona de inmediato.</p>
+                    </div>
+
+                    <!-- Trigger Zone (Sized dynamically for mobile layout) -->
+                    <div class="my-4 sm:my-6 flex items-center justify-center">
+                        <button id="reaction-pad" disabled class="w-48 h-48 sm:w-64 sm:h-64 rounded-full bg-slate-950 border-4 border-slate-800 hover:border-slate-700 text-slate-500 text-base sm:text-lg font-black tracking-wide uppercase transition-all flex flex-col items-center justify-center gap-2 select-none touch-none">
+                            <span class="text-3xl sm:text-4xl"><i class="fa-solid fa-gauge animate-pulse"></i></span>
+                            <span id="reaction-pad-text">Inactivo</span>
+                        </button>
+                    </div>
+
+                    <!-- Action/Control Triggers -->
+                    <div class="flex justify-center">
+                        <button id="btn-start-reaction" onclick="startReactionTest()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black px-6 sm:p-8 py-3 rounded-xl shadow-lg transition-all flex items-center gap-2 text-xs sm:text-sm uppercase tracking-wider">
+                            <i class="fa-solid fa-play"></i> Iniciar Prueba
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Physical Stats Feed -->
+                <div class="space-y-4 sm:space-y-6">
+                    <!-- Real-time metrics results card -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 space-y-3 sm:space-y-4">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400"><i class="fa-solid fa-heart-pulse text-amber-400 mr-1"></i> Métricas de tu Reacción</h4>
+                        
+                        <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                            <div class="bg-slate-950 p-3 sm:p-4 rounded-xl border border-slate-800 text-center">
+                                <span class="text-[9px] sm:text-[10px] text-slate-500 font-semibold uppercase block">Reacción</span>
+                                <span id="metric-ms" class="text-xl sm:text-2xl font-black text-white">--</span> <span class="text-xs text-slate-400">ms</span>
+                            </div>
+                            <div class="bg-slate-950 p-3 sm:p-4 rounded-xl border border-slate-800 text-center">
+                                <span class="text-[9px] sm:text-[10px] text-slate-500 font-semibold uppercase block">Frenado</span>
+                                <span id="metric-distance" class="text-xl sm:text-2xl font-black text-white">--</span> <span class="text-xs text-slate-400">m</span>
+                                <span class="text-[8px] text-slate-500 block">A 50 km/h</span>
+                            </div>
+                        </div>
+
+                        <!-- Performance Assessment Feedback Box -->
+                        <div id="reaction-feedback" class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-850 text-[11px] sm:text-xs text-slate-400 leading-relaxed text-center">
+                            Ninguna prueba activa. Haz clic en "Iniciar" para verificar tu velocidad óptima y motora.
+                        </div>
+                    </div>
+
+                    <!-- Scientific Context Table -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-5 space-y-2.5 text-[11px] sm:text-xs">
+                        <h4 class="font-bold text-white"><i class="fa-solid fa-calculator text-amber-400 mr-1"></i> Tabla de Tiempos de Respuesta</h4>
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center border-b border-slate-800/85 pb-1">
+                                <span class="text-slate-400">Menos de 200 ms</span>
+                                <span class="text-emerald-400 font-bold text-[10px] sm:text-xs">Excelente (Atento)</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-slate-800/85 pb-1">
+                                <span class="text-slate-400">200 a 350 ms</span>
+                                <span class="text-amber-400 font-bold text-[10px] sm:text-xs">Promedio Normal</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-slate-800/85 pb-1">
+                                <span class="text-slate-400">350 a 500 ms</span>
+                                <span class="text-orange-400 font-bold text-[10px] sm:text-xs">Lento (Distraído)</span>
+                            </div>
+                            <div class="flex justify-between items-center pb-1">
+                                <span class="text-slate-400">Más de 500 ms</span>
+                                <span class="text-red-500 font-bold text-[10px] sm:text-xs">Crítico (Fatiga/Inatención)</span>
+                            </div>
+                        </div>
+                        <p class="text-[9px] text-slate-500 leading-relaxed pt-1.5 border-t border-slate-800">
+                            *Nota: El tiempo promedio se duplica si estás manipulando el celular o tienes niveles leves de fatiga cognitiva en tránsito real.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: COGNITIVE QUIZ ACADEMY -->
+        <section id="view-quiz" class="hidden space-y-4 sm:space-y-6 animate-fade-in py-2 sm:py-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-900 p-4 rounded-xl sm:rounded-2xl border border-slate-800">
+                <div>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-graduation-cap text-amber-400"></i> Academia Vial Cognitiva
+                    </h3>
+                    <p class="text-[11px] sm:text-xs text-slate-400">Domina la psicología y la física del tránsito para desactivar errores perceptivos comunes.</p>
+                </div>
+                <button onclick="navigate('dashboard')" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-xl border border-slate-700 transition-all self-end sm:self-auto">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Panel
+                </button>
+            </div>
+
+            <div class="max-w-2xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl">
+                <!-- Question count indicator -->
+                <div class="bg-slate-950/40 px-5 py-3 sm:py-4 border-b border-slate-800/80 flex justify-between items-center text-[10px] sm:text-xs">
+                    <span class="text-slate-400 font-semibold uppercase">Desafío Cognitivo</span>
+                    <span id="quiz-progress" class="text-amber-400 font-bold">Pregunta 1 de 5</span>
+                </div>
+
+                <!-- Quiz Body Wrapper -->
+                <div class="p-5 sm:p-7 space-y-5">
+                    <div class="space-y-2">
+                        <div class="text-[9px] sm:text-[10px] bg-sky-500/10 text-sky-400 px-2.5 py-0.5 rounded border border-sky-500/20 font-bold tracking-wider inline-block uppercase" id="quiz-topic">Psicología de Tránsito</div>
+                        <h4 class="text-base sm:text-lg font-bold text-white leading-relaxed" id="quiz-question">¿Cuál es el principal factor óptico causante del "Efecto Túnel" al conducir a altas velocidades?</h4>
+                    </div>
+
+                    <!-- Answers Grid list -->
+                    <div class="grid grid-cols-1 gap-2.5" id="quiz-answers-container">
+                        <!-- Populated dynamically -->
+                    </div>
+
+                    <!-- Feedback Analysis Card -->
+                    <div id="quiz-feedback-box" class="bg-slate-950 p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-800 hidden space-y-2 animate-fade-in">
+                        <span id="quiz-feedback-title" class="font-bold text-xs sm:text-sm block"></span>
+                        <p id="quiz-feedback-text" class="text-[11px] sm:text-xs text-slate-400 leading-relaxed"></p>
+                        <div class="pt-1">
+                            <button onclick="nextQuizQuestion()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs px-3.5 py-2 rounded-lg transition-all flex items-center gap-1">
+                                Siguiente Pregunta <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-950 border-t border-slate-900 px-4 py-5 text-[10px] sm:text-xs text-center text-slate-500">
+        <div class="max-w-7xl mx-auto space-y-1.5">
+            <p>© 2026 OjoVial. Desarrollado para escuelas de conducción vial avanzada y salud ocupacional.</p>
+            <p>Toma descansos periódicos. Entrenar tu percepción visual incrementa tu respuesta cognitiva en condiciones reales de conducción.</p>
+        </div>
+    </footer>
+
+    <!-- GENERAL CONTROL SCRIPT -->
+    <script>
+        // Core states
+        let userStats = {
+            level: 1,
+            xp: 0,
+            detectedHazards: 0
+        };
+
+        // Screen views Navigation
+        function navigate(viewId) {
+            playSound('click');
+            // Hide all views
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            // Show selected view
+            const activeView = document.getElementById(`view-${viewId}`);
+            if (activeView) {
+                activeView.classList.remove('hidden');
+            }
+            
+            // Clean up timers or simulation configurations if needed when changing screens
+            if (viewId !== 'reaction-test') {
+                resetReactionState();
+            }
+            if (viewId !== 'hazard-hunt') {
+                clearInterval(huntInterval);
+            }
+        }
+
+        // System XP rewards helper
+        function earnXP(amount) {
+            userStats.xp += amount;
+            if (userStats.xp >= 100) {
+                userStats.level += 1;
+                userStats.xp = userStats.xp - 100;
+                playSound('success');
+                showFloatingLevelAlert();
+            }
+            updateStatsUI();
+        }
+
+        function updateStatsUI() {
+            document.getElementById('user-level').innerText = userStats.level;
+            document.getElementById('xp-text').innerText = `${userStats.xp} / 100`;
+            document.getElementById('xp-bar').style.width = `${userStats.xp}%`;
+            document.getElementById('score-val').innerText = userStats.detectedHazards;
+        }
+
+        function showFloatingLevelAlert() {
+            const levelAlert = document.createElement('div');
+            levelAlert.className = "fixed bottom-4 right-4 bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 px-4 py-3 rounded-xl shadow-2xl border border-amber-300 font-extrabold z-50 animate-bounce text-xs flex items-center gap-3";
+            levelAlert.innerHTML = `
+                <i class="fa-solid fa-cake-candles text-lg"></i>
+                <div>
+                    <span class="block text-[10px] uppercase font-bold text-slate-850">¡Ascenso Óptico!</span>
+                    <span>Subiste al nivel de percepción ${userStats.level}</span>
+                </div>
+            `;
+            document.body.appendChild(levelAlert);
+            setTimeout(() => levelAlert.remove(), 4000);
+        }
+
+        // Initialize user stats on load
+        window.addEventListener('DOMContentLoaded', () => {
+            updateStatsUI();
+        });
+    </script>
+
+    <!-- HUNT SIMULATION CODE -->
+    <script>
+        let huntActive = false;
+        let huntTimer = 15;
+        let huntScore = 0;
+        let huntInterval;
+        let currentSceneId = 1;
+        let activeHazards = [];
+
+        // Predefined Hazard scenarios layout
+        const hazardScenarios = {
+            1: {
+                title: "Cruce Urbano Diurno",
+                desc: "Zona residencial con cruce y peatones dispersos. Escanea baches, vehículos doblando sin guiño, ciclistas.",
+                bgColor: "#334155", // Slate background for SVG
+                hazards: [
+                    { id: "h1", name: "Peatón chateando cruzando imprudentemente", cx: "30%", cy: "68%", info: "Peatón cruzando distraído. El conductor debe bajar de inmediato a velocidad precautoria." },
+                    { id: "h2", name: "Vehículo girando a la derecha sin usar direccionales ni espejos", cx: "65%", cy: "55%", info: "Giro intempestivo de camioneta. Puede impactar a un ciclista en su punto ciego." },
+                    { id: "h3", name: "Ciclista circulando en sentido contrario al carril bici", cx: "15%", cy: "78%", info: "Ciclista en sentido contrario. Incrementa el riesgo de colisión frontal en cruces." },
+                    { id: "h4", name: "Alcantarilla rota y desnivel de asfalto oculto", cx: "80%", cy: "80%", info: "Falla de asfalto. Al intentar esquivarlo, los autos suelen dar volantazos peligrosos." }
+                ],
+                renderSVG: function() {
+                    return `
+                        <svg viewBox="0 0 800 450" class="w-full h-full bg-slate-800">
+                            <!-- Sky -->
+                            <rect x="0" y="0" width="800" height="150" fill="#60a5fa" opacity="0.3"/>
+                            <!-- Sun -->
+                            <circle cx="700" cy="50" r="30" fill="#fef08a" filter="blur(2px)"/>
+                            <!-- Road Base -->
+                            <rect x="0" y="150" width="800" height="300" fill="#334155"/>
+                            <!-- Road lines -->
+                            <line x1="0" y1="300" x2="800" y2="300" stroke="#fef08a" stroke-width="4" stroke-dasharray="15 15"/>
+                            <!-- Crosswalk -->
+                            <g fill="#e2e8f0" opacity="0.9">
+                                <rect x="200" y="150" width="40" height="300"/>
+                                <rect x="260" y="150" width="40" height="300"/>
+                                <rect x="320" y="150" width="40" height="300"/>
+                            </g>
+                            <!-- Sidewalks -->
+                            <rect x="0" y="120" width="800" height="30" fill="#475569"/>
+                            <rect x="0" y="420" width="800" height="30" fill="#475569"/>
+                            <!-- Sidewalk Trees and Buildings sketches -->
+                            <rect x="50" y="40" width="100" height="80" fill="#1e293b"/>
+                            <rect x="500" y="20" width="140" height="100" fill="#1e293b"/>
+                            
+                            <!-- Drawing Hazard 1: Distracted Pedestrian -->
+                            <g transform="translate(240, 260)">
+                                <circle cx="0" cy="0" r="10" fill="#f87171"/> <!-- head -->
+                                <line x1="0" y1="10" x2="0" y2="40" stroke="#f87171" stroke-width="4"/> <!-- body -->
+                                <line x1="0" y1="40" x2="-8" y2="60" stroke="#f87171" stroke-width="3"/> <!-- left leg -->
+                                <line x1="0" y1="40" x2="8" y2="60" stroke="#f87171" stroke-width="3"/> <!-- right leg -->
+                                <!-- Cellphone glowing dot -->
+                                <circle cx="-6" cy="15" r="3" fill="#60a5fa"/>
+                                <line x1="0" y1="15" x2="-6" y2="15" stroke="#f87171" stroke-width="2"/> <!-- arm holding phone -->
+                            </g>
+
+                            <!-- Drawing Hazard 2: SUV turning suddenly -->
+                            <g transform="translate(520, 200)">
+                                <rect x="0" y="0" width="120" height="60" rx="10" fill="#f1f5f9"/> <!-- Truck body -->
+                                <circle cx="30" cy="60" r="14" fill="#0f172a"/> <!-- wheel 1 -->
+                                <circle cx="90" cy="60" r="14" fill="#0f172a"/> <!-- wheel 2 -->
+                                <path d="M 10 30 L 70 30 L 100 0 L 10 0 Z" fill="#94a3b8"/> <!-- windows -->
+                                <!-- No blinker signal indicator -->
+                                <polygon points="120,30 135,20 135,40" fill="#ef4444" opacity="0.3"/>
+                            </g>
+
+                            <!-- Drawing Hazard 3: Bicycle wrong way -->
+                            <g transform="translate(110, 310)">
+                                <circle cx="15" cy="40" r="15" stroke="#38bdf8" stroke-width="3" fill="none"/> <!-- Wheel 1 -->
+                                <circle cx="55" cy="40" r="15" stroke="#38bdf8" stroke-width="3" fill="none"/> <!-- Wheel 2 -->
+                                <line x1="15" y1="40" x2="35" y2="20" stroke="#38bdf8" stroke-width="3"/> <!-- frame -->
+                                <line x1="55" y1="40" x2="35" y2="20" stroke="#38bdf8" stroke-width="3"/> <!-- frame -->
+                                <circle cx="35" cy="10" r="6" fill="#fb923c"/> <!-- Cyclist head -->
+                                <line x1="35" y1="16" x2="35" y2="30" stroke="#fb923c" stroke-width="3"/> <!-- Cyclist spine -->
+                            </g>
+
+                            <!-- Drawing Hazard 4: Pothole -->
+                            <g transform="translate(640, 360)">
+                                <ellipse cx="0" cy="0" rx="40" ry="15" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+                                <path d="M -20 -3 Q 0 5 20 -2" stroke="#475569" stroke-width="3" fill="none"/>
+                            </g>
+                        </svg>
+                    `;
+                }
+            },
+            2: {
+                title: "Autopista Lluviosa",
+                desc: "Frenazos en serie sobre autopista mojada bajo lluvia pesada. Peligros de falta de luces y derrapes.",
+                bgColor: "#1e293b",
+                hazards: [
+                    { id: "h5", name: "Coche adelante con luces traseras apagadas bajo lluvia", cx: "50%", cy: "46%", info: "Vehículo fantasma. Sin luces de stop, es imposible estimar la distancia a tiempo." },
+                    { id: "h6", name: "Charco masivo propicio para aquaplaning", cx: "25%", cy: "68%", info: "Acumulación de agua. Si cruzas rápido, pierdes dirección y tracción en milisegundos." },
+                    { id: "h7", name: "Camión aproximándose muy de prisa en el carril izquierdo", cx: "80%", cy: "50%", info: "Vehículo pesado a alta velocidad sobre asfalto húmedo. Riesgo de tijeretazo." },
+                    { id: "h8", name: "Restos de neumático reventado en el carril central", cx: "32%", cy: "58%", info: "Escombros en vía rápida. Tomar desvíos violentos suele volcar coches a más de 90km/h." }
+                ],
+                renderSVG: function() {
+                    return `
+                        <svg viewBox="0 0 800 450" class="w-full h-full bg-slate-900">
+                            <!-- Rain overlay lines -->
+                            <g stroke="#94a3b8" stroke-width="1" opacity="0.3">
+                                <line x1="20" y1="0" x2="0" y2="450"/>
+                                <line x1="120" y1="0" x2="100" y2="450"/>
+                                <line x1="220" y1="0" x2="200" y2="450"/>
+                                <line x1="320" y1="0" x2="300" y2="450"/>
+                                <line x1="420" y1="0" x2="400" y2="450"/>
+                                <line x1="520" y1="0" x2="500" y2="450"/>
+                                <line x1="620" y1="0" x2="600" y2="450"/>
+                                <line x1="720" y1="0" x2="700" y2="450"/>
+                            </g>
+                            
+                            <!-- Road perspective -->
+                            <polygon points="350,150 450,150 800,450 0,450" fill="#1e293b"/>
+                            <!-- Lane markings -->
+                            <polygon points="395,150 405,150 410,450 390,450" fill="#cbd5e1" opacity="0.5"/>
+                            <line x1="375" y1="150" x2="200" y2="450" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="10 15" opacity="0.5"/>
+                            <line x1="425" y1="150" x2="600" y2="450" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="10 15" opacity="0.5"/>
+
+                            <!-- Barrier sides -->
+                            <polygon points="0,150 350,150 0,450" fill="#0f172a"/>
+                            <polygon points="800,150 450,150 800,450" fill="#0f172a"/>
+
+                            <!-- Hazard 5: Ghost car center -->
+                            <g transform="translate(380, 190) scale(0.6)">
+                                <rect x="0" y="0" width="80" height="45" rx="8" fill="#334155"/>
+                                <rect x="10" y="5" width="60" height="20" rx="3" fill="#020617"/> <!-- glass -->
+                                <circle cx="20" cy="38" r="8" fill="#475569"/> <!-- tires -->
+                                <circle cx="60" cy="38" r="8" fill="#475569"/>
+                                <!-- Lights are off! Grey tail points -->
+                                <circle cx="10" cy="25" r="5" fill="#475569"/>
+                                <circle cx="70" cy="25" r="5" fill="#475569"/>
+                            </g>
+
+                            <!-- Hazard 6: Aquaplaning puddle left -->
+                            <g transform="translate(200, 310)">
+                                <ellipse cx="0" cy="0" rx="80" ry="18" fill="#38bdf8" opacity="0.4"/>
+                                <path d="M -50 -5 C -20 5, 20 -10, 50 0" stroke="#e0f2fe" stroke-width="2" fill="none" opacity="0.6"/>
+                            </g>
+
+                            <!-- Hazard 7: Approaching Truck on right -->
+                            <g transform="translate(600, 210) scale(0.8)">
+                                <rect x="0" y="0" width="100" height="90" rx="5" fill="#ef4444"/> <!-- Body cargo -->
+                                <rect x="30" y="30" width="40" height="30" fill="#020617"/>
+                                <circle cx="30" cy="90" r="12" fill="#020617"/>
+                                <circle cx="70" cy="90" r="12" fill="#020617"/>
+                                <!-- Blaring lights -->
+                                <circle cx="15" cy="70" r="8" fill="#fef08a" filter="blur(2px)"/>
+                                <circle cx="85" cy="70" r="8" fill="#fef08a" filter="blur(2px)"/>
+                            </g>
+
+                            <!-- Hazard 8: Tire fragment lane center -->
+                            <g transform="translate(260, 260)">
+                                <path d="M 0 0 C 15 -10, 25 -5, 40 2 L 35 12 C 20 5, 10 5, -5 8 Z" fill="#020617"/>
+                                <path d="M 5 -5 L 35 7" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="2 2"/>
+                            </g>
+                        </svg>
+                    `;
+                }
+            }
+        };
+
+        function resetHuntSelection() {
+            playSound('click');
+            document.getElementById('hunt-intro-overlay').classList.remove('hidden');
+            document.getElementById('hunt-result-overlay').classList.add('hidden');
+            document.getElementById('vector-scene').innerHTML = '';
+            document.getElementById('hotspot-overlay').innerHTML = '';
+            clearInterval(huntInterval);
+        }
+
+        function startHuntGame(sceneId) {
+            playSound('success');
+            currentSceneId = sceneId;
+            huntActive = true;
+            huntScore = 0;
+            huntTimer = 15;
+            
+            // UI elements
+            document.getElementById('hunt-intro-overlay').classList.add('hidden');
+            document.getElementById('hunt-result-overlay').classList.add('hidden');
+            document.getElementById('hunt-score').innerText = `0 / 4`;
+            document.getElementById('hunt-timer').innerText = huntTimer;
+            
+            const logBox = document.getElementById('scan-log');
+            logBox.innerHTML = `<p class="text-[11px] text-yellow-400 font-semibold"><i class="fa-solid fa-play mr-1.5"></i>Simulación iniciada: Escanea la calzada rápidamente.</p>`;
+
+            // Render vector SVG
+            const sceneData = hazardScenarios[sceneId];
+            document.getElementById('vector-scene').innerHTML = sceneData.renderSVG();
+
+            // Populate clickable interactive hotspots over layout
+            const hotspotContainer = document.getElementById('hotspot-overlay');
+            hotspotContainer.innerHTML = '';
+            
+            activeHazards = JSON.parse(JSON.stringify(sceneData.hazards)); // deep copy
+
+            activeHazards.forEach(hazard => {
+                const spot = document.createElement('button');
+                // Positioning using relative layout parameters
+                spot.style.left = hazard.cx;
+                spot.style.top = hazard.cy;
+                // Larger hit-box target optimized for fat fingers on mobile (w-14 h-14, -ml-7 -mt-7)
+                spot.className = "absolute w-14 h-14 -ml-7 -mt-7 sm:w-12 sm:h-12 sm:-ml-6 sm:-mt-6 rounded-full border-2 border-dashed border-red-500/80 bg-red-500/10 hover:bg-red-500/30 flex items-center justify-center text-red-400 focus:outline-none transition-all z-20 cursor-crosshair group pulse-danger-btn touch-manipulation";
+                spot.id = `spot-${hazard.id}`;
+                
+                // Touch start trigger for immediate response
+                spot.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    clickHazard(hazard.id);
+                });
+                
+                spot.onclick = (e) => {
+                    e.stopPropagation();
+                    clickHazard(hazard.id);
+                };
+                
+                // Pulsing indicator inner dot
+                spot.innerHTML = `
+                    <span class="w-3.5 h-3.5 sm:w-2.5 sm:h-2.5 rounded-full bg-red-500"></span>
+                `;
+                hotspotContainer.appendChild(spot);
+            });
+
+            // Start clock timer loop
+            clearInterval(huntInterval);
+            huntInterval = setInterval(() => {
+                huntTimer--;
+                document.getElementById('hunt-timer').innerText = huntTimer;
+
+                if (huntTimer <= 5) {
+                    document.getElementById('hunt-timer').classList.add('text-red-500');
+                    playSound('danger');
+                } else {
+                    document.getElementById('hunt-timer').classList.remove('text-red-500');
+                }
+
+                if (huntTimer <= 0) {
+                    endHuntGame(false);
+                }
+            }, 1000);
+        }
+
+        function clickHazard(hazardId) {
+            if (!huntActive) return;
+            playSound('success');
+
+            const hazardIndex = activeHazards.findIndex(h => h.id === hazardId);
+            if (hazardIndex === -1) return;
+
+            const hazard = activeHazards[hazardIndex];
+            
+            // Add entry in visual logger
+            const logBox = document.getElementById('scan-log');
+            const entry = document.createElement('p');
+            entry.className = "text-[11px] sm:text-xs text-slate-300 flex items-center gap-1";
+            entry.innerHTML = `<i class="fa-solid fa-check-circle text-emerald-400 shrink-0"></i> <span><strong>Riesgo Detectado:</strong> ${hazard.name}</span>`;
+            logBox.insertBefore(entry, logBox.firstChild);
+
+            // Remove hotspot button from display UI
+            const spotEl = document.getElementById(`spot-${hazardId}`);
+            if (spotEl) {
+                // Change style to successful lock-on indicator
+                spotEl.className = "absolute w-10 h-10 -ml-5 -mt-5 rounded-full border-2 border-emerald-400 bg-emerald-400/20 flex items-center justify-center text-emerald-400 z-10 pointer-events-none";
+                spotEl.innerHTML = `<i class="fa-solid fa-shield text-xs"></i>`;
+                spotEl.onclick = null;
+            }
+
+            // Remove from active tracking array list
+            activeHazards.splice(hazardIndex, 1);
+            
+            huntScore++;
+            document.getElementById('hunt-score').innerText = `${huntScore} / 4`;
+
+            earnXP(20); // Give rewarding XP
+            userStats.detectedHazards++;
+            updateStatsUI();
+
+            if (activeHazards.length === 0) {
+                endHuntGame(true);
+            }
+        }
+
+        function endHuntGame(victory) {
+            huntActive = false;
+            clearInterval(huntInterval);
+
+            const overlay = document.getElementById('hunt-result-overlay');
+            const icon = document.getElementById('hunt-result-icon');
+            const title = document.getElementById('hunt-result-title');
+            const desc = document.getElementById('hunt-result-desc');
+            const retryBtn = document.getElementById('hunt-retry-btn');
+
+            overlay.classList.remove('hidden');
+
+            if (victory) {
+                playSound('success');
+                icon.className = "w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl sm:text-3xl border border-emerald-500/30 shrink-0";
+                icon.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
+                title.innerText = "¡Excelente Campo de Visión!";
+                title.className = "text-xl sm:text-2xl font-bold text-emerald-400";
+                desc.innerText = `Has escaneado la escena con éxito identificando las 4 amenazas en ${15 - huntTimer} segundos. Demostraste un patrón visual activo y defensivo.`;
+                earnXP(40); // Bonus win XP
+            } else {
+                playSound('fail');
+                icon.className = "w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center text-xl sm:text-3xl border border-red-500/30 shrink-0";
+                icon.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
+                title.innerText = "Simulación No Superada";
+                title.className = "text-xl sm:text-2xl font-bold text-red-500";
+                desc.innerText = `Se acabó el tiempo óptimo de respuesta vial. Te faltó detectar ${activeHazards.length} riesgo(s) crítico(s). La inatención visual causa impactos severos.`;
+            }
+
+            retryBtn.onclick = () => startHuntGame(currentSceneId);
+        }
+    </script>
+
+    <!-- AI SCENARIO CONTROLLER -->
+    <script>
+        async function generateAIScenario() {
+            playSound('click');
+
+            const env = document.getElementById('ai-env').value;
+            const weather = document.getElementById('ai-weather').value;
+            const threat = document.getElementById('ai-threat').value;
+
+            // UI loading states
+            document.getElementById('ai-placeholder').classList.add('hidden');
+            document.getElementById('ai-output-img').classList.add('hidden');
+            document.getElementById('ai-loading-panel').classList.remove('hidden');
+            document.getElementById('ai-analysis-panel').classList.add('hidden');
+            
+            const generateBtn = document.getElementById('btn-generate-ai');
+            generateBtn.disabled = true;
+            generateBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            const statusLabel = document.getElementById('ai-status');
+            statusLabel.innerText = "Pintando escenario...";
+            statusLabel.className = "text-[9px] sm:text-[10px] text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded animate-pulse";
+
+            const loadingStep = document.getElementById('ai-loading-step');
+
+            // Set dynamic animated texts to keep user engaged during API generation
+            const stepTexts = [
+                "Estructurando la perspectiva del asfalto...",
+                "Ajustando refracción de luz y clima adverso...",
+                "Posicionando peatones y actores viales de peligro...",
+                "Auditando puntos ciegos y campo óptico..."
+            ];
+            let stepIndex = 0;
+            const stepInterval = setInterval(() => {
+                loadingStep.innerText = stepTexts[stepIndex % stepTexts.length];
+                stepIndex++;
+            }, 3000);
+
+            // 1. Generate Image using Imagen-4.0
+            const imagePrompt = `Un punto de vista detallado en primera persona de un conductor desde el parabrisas de un auto. La escena transcurre en: ${env}, con clima y visibilidad de: ${weather}. Se observa claramente un peligro vial crítico inmediato: ${threat}. Fotografía realista de alta definición de seguridad vial, iluminación natural, lente gran angular, enfoque nítido, asfalto detallado.`;
+            
+            let imageUrl = null;
+            try {
+                const imagePayload = {
+                    instances: [{ prompt: imagePrompt }],
+                    parameters: { sampleCount: 1 }
+                };
+                
+                // Calling API prediction
+                const apiKey = ""; // Canvas handles this in runtime
+                const imgApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
+                
+                const imgResponse = await fetch(imgApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(imagePayload)
+                });
+                
+                const imgResult = await imgResponse.json();
+                if (imgResult.predictions && imgResult.predictions.length > 0 && imgResult.predictions[0].bytesBase64Encoded) {
+                    imageUrl = `data:image/png;base64,${imgResult.predictions[0].bytesBase64Encoded}`;
+                } else {
+                    throw new Error("No image data returned from API.");
+                }
+
+            } catch (err) {
+                console.error("Imagen-4.0 Generation failed. Falling back to high quality road illustrations...", err);
+                imageUrl = `https://placehold.co/800x450/1e293b/fbbf24?text=Escenario:+${encodeURIComponent(env.split(',')[0])}`;
+            }
+
+            // Update UI with Generated Image
+            clearInterval(stepInterval);
+            document.getElementById('ai-loading-panel').classList.add('hidden');
+            const outputImg = document.getElementById('ai-output-img');
+            outputImg.src = imageUrl;
+            outputImg.classList.remove('hidden');
+            
+            statusLabel.innerText = "Analizando amenazas...";
+            statusLabel.className = "text-[9px] sm:text-[10px] text-violet-400 bg-violet-500/10 border border-violet-500/20 px-2 py-0.5 rounded animate-pulse";
+
+            // 2. Run Gemini 3.1 analysis audit explaining optical hazards based on the prompt
+            const systemPrompt = "Actúa como un instructor certificado de conducción defensiva e ingeniero de seguridad vial. Brinda un análisis breve, didáctico y directo estructurado en HTML para un portal interactivo de aprendizaje.";
+            const auditQuery = `Analiza la siguiente situación vial: Entorno: "${env}", Clima: "${weather}", Riesgo principal: "${threat}". Explica:
+            1. Los riesgos ocultos secundarios de esta escena.
+            2. El patrón exacto de escaneo que debe tener el ojo (a dónde mirar secuencialmente usando el método S.I.P.D.E.).
+            3. La acción defensiva táctica que evitaría un siniestro.
+            Hazlo conciso, directo, usando listas y etiquetas HTML de estilo (como <strong class="text-amber-400">) apropiadas para encajar en un fondo oscuro de pizarra. No agregues tags html globales como head, solo los bloques semánticos internos p, ul, li, div.`;
+
+            try {
+                const textPayload = {
+                    contents: [{ parts: [{ text: auditQuery }] }],
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    }
+                };
+
+                const textApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=`;
+                const textResponse = await fetch(textApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(textPayload)
+                });
+
+                const textResult = await textResponse.json();
+                const analysisText = textResult.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (analysisText) {
+                    const cleanHtml = analysisText.replace(/```html|```/g, ''); // strip potential code fences
+                    document.getElementById('ai-analysis-content').innerHTML = cleanHtml;
+                } else {
+                    document.getElementById('ai-analysis-content').innerHTML = `
+                        <p class="text-red-400"><i class="fa-solid fa-circle-exclamation"></i> No se pudo procesar el análisis cognitivo en este momento.</p>
+                    `;
+                }
+
+            } catch (err) {
+                console.error("Gemini context analysis failed:", err);
+                document.getElementById('ai-analysis-content').innerHTML = `
+                    <div class="space-y-3">
+                        <p class="text-amber-400 font-bold"><i class="fa-solid fa-shield-halved"></i> Auditoría Vial de Emergencia:</p>
+                        <p><strong>Peligro Primario Detectado:</strong> En este entorno de <strong>${env}</strong> y clima adverso de <strong>${weather}</strong>, el riesgo crucial es <strong>${threat}</strong>.</p>
+                        <p><strong>Recomendación S.I.P.D.E.:</strong> Aplica la regla de los 4 segundos. Aumenta la distancia respecto al vehículo que precede y mantén tus ojos oscilando constantemente entre el retrovisor interno y las cunetas laterales.</p>
+                    </div>
+                `;
+            }
+
+            // Reset loading buttons states
+            generateBtn.disabled = false;
+            generateBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            statusLabel.innerText = "Materializado";
+            statusLabel.className = "text-[9px] sm:text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded";
+            
+            document.getElementById('ai-analysis-panel').classList.remove('hidden');
+            earnXP(30); // Award XP for doing the AI investigation lab
+        }
+    </script>
+
+    <!-- REACTION TEST SCRIPT -->
+    <script>
+        let reactionStartTime = 0;
+        let reactionTimerId = null;
+        let reactionTimeoutId = null;
+        let reactionInProgress = false;
+
+        // Custom touch listener initialization for ultra low-latency reaction times
+        const rPad = document.getElementById('reaction-pad');
+        if (rPad) {
+            rPad.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // crucial on mobile to avoid double execution with click
+                triggerReactionPress();
+            });
+        }
+
+        function startReactionTest() {
+            playSound('click');
+            resetReactionState();
+
+            const startBtn = document.getElementById('btn-start-reaction');
+            const pad = document.getElementById('reaction-pad');
+            const padText = document.getElementById('reaction-pad-text');
+            const feedbackBox = document.getElementById('reaction-feedback');
+
+            startBtn.disabled = true;
+            startBtn.classList.add('opacity-50');
+
+            pad.disabled = false;
+            pad.className = "w-48 h-48 sm:w-64 sm:h-64 rounded-full bg-slate-800 border-4 border-slate-700 text-slate-300 text-base sm:text-lg font-black tracking-wide uppercase transition-all flex flex-col items-center justify-center gap-2 cursor-pointer select-none touch-none";
+            padText.innerText = "Espera...";
+            feedbackBox.innerHTML = `<span class="text-amber-400 font-bold flex items-center justify-center gap-1.5"><i class="fa-solid fa-spinner animate-spin"></i> Ojo enfocado en la vía... Espera el peligro.</span>`;
+
+            reactionInProgress = true;
+
+            // Generate a random delay between 2 and 5.5 seconds
+            const randomDelay = 2000 + Math.random() * 3500;
+
+            reactionTimeoutId = setTimeout(() => {
+                if (!reactionInProgress) return;
+                
+                // Trigger Danger signal state
+                playSound('danger');
+                pad.className = "w-48 h-48 sm:w-64 sm:h-64 rounded-full bg-red-600 border-4 border-red-300 hover:border-white text-white text-base sm:text-lg font-black tracking-widest uppercase transition-all flex flex-col items-center justify-center gap-2 cursor-pointer select-none pulse-danger-btn shadow-2xl shadow-red-500/50 touch-none";
+                padText.innerText = "¡¡FRENAR!!";
+                
+                feedbackBox.innerHTML = `<span class="text-red-400 font-black animate-pulse flex items-center justify-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> ¡RIESGO INMINENTE! PRESIONA EL PEDAL AHORA</span>`;
+                
+                reactionStartTime = performance.now();
+            }, randomDelay);
+        }
+
+        function triggerReactionPress() {
+            if (!reactionInProgress) return;
+
+            const endTime = performance.now();
+            const startBtn = document.getElementById('btn-start-reaction');
+            const pad = document.getElementById('reaction-pad');
+            const padText = document.getElementById('reaction-pad-text');
+            const feedbackBox = document.getElementById('reaction-feedback');
+
+            startBtn.disabled = false;
+            startBtn.classList.remove('opacity-50');
+            pad.disabled = true;
+
+            if (reactionStartTime === 0) {
+                // User pressed too early (Anticipation error)
+                playSound('fail');
+                clearTimeout(reactionTimeoutId);
+                pad.className = "w-48 h-48 sm:w-64 sm:h-64 rounded-full bg-amber-500/10 border-4 border-amber-500/30 text-amber-500 text-xs sm:text-sm font-bold uppercase transition-all flex flex-col items-center justify-center gap-2 select-none touch-none";
+                padText.innerText = "Salida en Falso";
+                feedbackBox.innerHTML = `<span class="text-amber-400 font-bold"><i class="fa-solid fa-circle-exclamation"></i> Presionaste antes de ver el peligro. En la vía real, un volantazo por pánico sin mirar puede provocar choques laterales severos.</span>`;
+            } else {
+                // Legitimate reaction press calculation
+                const reactionMs = Math.round(endTime - reactionStartTime);
+                
+                // Physical Braking distance simulation based on physical formula (d = v*t + v^2 / 2*g*f)
+                // Assumes 50 km/h constant speed (roughly 13.89 m/s) with a friction coefficient on dry road (f = 0.7)
+                const speedMetersPerSecond = 13.89; 
+                const perceptionDistance = speedMetersPerSecond * (reactionMs / 1000);
+                const brakingFrictionDistance = Math.pow(speedMetersPerSecond, 2) / (2 * 9.8 * 0.7);
+                const totalBrakingDistance = Math.round((perceptionDistance + brakingFrictionDistance) * 10) / 10;
+
+                document.getElementById('metric-ms').innerText = reactionMs;
+                document.getElementById('metric-distance').innerText = totalBrakingDistance;
+
+                pad.className = "w-48 h-48 sm:w-64 sm:h-64 rounded-full bg-slate-950 border-4 border-slate-800 text-slate-500 text-xs sm:text-sm font-bold uppercase transition-all flex flex-col items-center justify-center gap-2 select-none touch-none";
+                padText.innerText = `${reactionMs} ms`;
+
+                let evaluation = "";
+                if (reactionMs < 200) {
+                    playSound('success');
+                    evaluation = `<strong class="text-emerald-400 block mb-1">¡Reflejos de Piloto Profesional!</strong> Tu capacidad motora y de alerta visual es impecable. Lograrías frenar el auto a tiempo en una situación imprevista.`;
+                    earnXP(25);
+                } else if (reactionMs >= 200 && reactionMs < 350) {
+                    playSound('success');
+                    evaluation = `<strong class="text-amber-400 block mb-1">Reflejos Adecuados</strong> Tu respuesta está dentro del rango seguro para conducción defensiva ordinaria.`;
+                    earnXP(15);
+                } else if (reactionMs >= 350 && reactionMs < 500) {
+                    playSound('fail');
+                    evaluation = `<strong class="text-orange-400 block mb-1">Frenado Lento (Alerta Moderada)</strong> Te tomó casi medio segundo reaccionar. En carretera esto equivale a avanzar más de 7 metros a ciegas antes de tocar el freno.`;
+                    earnXP(5);
+                } else {
+                    playSound('fail');
+                    evaluation = `<strong class="text-red-500 block mb-1">¡Riesgo de Colisión Crítico!</strong> Tu tiempo es demasiado lento. En la vida real habrías impactado la amenaza por detrás.`;
+                }
+
+                feedbackBox.innerHTML = evaluation;
+            }
+
+            reactionInProgress = false;
+        }
+
+        function resetReactionState() {
+            clearTimeout(reactionTimeoutId);
+            reactionStartTime = 0;
+            reactionInProgress = false;
+            
+            const startBtn = document.getElementById('btn-start-reaction');
+            const pad = document.getElementById('reaction-pad');
+            const padText = document.getElementById('reaction-pad-text');
+            
+            if (startBtn && pad) {
+                startBtn.disabled = false;
+                startBtn.classList.remove('opacity-50');
+                pad.disabled = true;
+                pad.className = "w-48 h-48 sm:w-64 sm:h-64 rounded-full bg-slate-950 border-4 border-slate-800 text-slate-500 text-base sm:text-lg font-black tracking-wide uppercase transition-all flex flex-col items-center justify-center gap-2 select-none touch-none";
+                padText.innerText = "Inactivo";
+            }
+        }
+    </script>
+
+    <!-- COGNITIVE QUIZ LOGIC -->
+    <script>
+        const quizQuestions = [
+            {
+                topic: "Campo Visual",
+                question: "¿Qué efecto negativo produce conducir a 120 km/h sobre el ángulo de visión periférica del ojo humano?",
+                answers: [
+                    { text: "Amplía el campo visual hasta los 180° permitiendo notar más ciclistas.", correct: false },
+                    { text: "Reduce el campo a apenas 30° ('visión de túnel'), inhabilitando la vista de peligros laterales.", correct: true },
+                    { text: "Crea distorsión cromática haciendo que el asfalto se vea rojizo.", correct: false },
+                    { text: "Ninguno, el cerebro compensa la velocidad con movimientos oculares sacádicos.", correct: false }
+                ],
+                explanation: "El 'Efecto Túnel' estrecha la visión periférica a medida que aumenta la velocidad. El cerebro no alcanza a procesar las imágenes de los costados, lo que hace invisibles a peatones u obstáculos que entran a la calzada por los flancos."
+            },
+            {
+                topic: "Psicología de la Conducción",
+                question: "¿Qué fenómeno describe el no ver un obstáculo obvio debido a que toda nuestra atención está fija en el celular?",
+                answers: [
+                    { text: "Presbicia transitoria por fatiga muscular.", correct: false },
+                    { text: "Ceguera por inatención (Inattentional Blindness).", correct: true },
+                    { text: "Efecto de refracción óptica del parabrisas.", correct: false },
+                    { text: "Acomodación visual retardada.", correct: false }
+                ],
+                explanation: "La ceguera por inatención ocurre cuando el cerebro, saturado de atención en otra tarea (como leer un mensaje de texto), omite el procesamiento visual consciente de amenazas directas, haciendo que el conductor mire fijamente el peligro pero 'no lo vea'."
+            },
+            {
+                topic: "Física Vial y Espacio",
+                question: "¿Cuál es la regla de tiempo de seguridad aconsejada para mantener un margen de reacción óptimo con el auto que va delante en asfalto seco?",
+                answers: [
+                    { text: "La regla de 1 segundo (longitud aproximada de dos paragolpes).", correct: false },
+                    { text: "La regla de los 3 segundos (tiempo de escaneo, decisión y frenada básica).", correct: true },
+                    { text: "La regla de los 10 metros fijos (sin importar la velocidad).", correct: false },
+                    { text: "No hay regla, depende de los caballos de fuerza del motor.", correct: false }
+                ],
+                explanation: "La regla de los 3 segundos provee el colchón de tiempo mínimo necesario para que el ojo identifique la frenada del líder (1.5 segundos de retraso de percepción motora promedio) y las pastillas de freno detengan físicamente la inercia del vehículo."
+            },
+            {
+                topic: "Visión Nocturna",
+                question: "Al enfrentar el encandilamiento por luces altas de un coche en sentido contrario de noche, ¿hacia dónde debe dirigir la mirada?",
+                answers: [
+                    { text: "Fijamente al centro de los faros del coche que viene de frente.", correct: false },
+                    { text: "Hacia la línea blanca de demarcación del borde derecho de tu carril (cuneta).", correct: true },
+                    { text: "Cerrar los ojos durante dos segundos para descansar las retinas.", correct: false },
+                    { text: "Hacia el retrovisor interior central.", correct: false }
+                ],
+                explanation: "Mirar hacia el borde derecho de la calzada te permite usar la visión periférica para guiar la trayectoria de tu coche sin sobrecargar el centro de tu retina con la luz cegadora, reduciendo el tiempo de recuperación de la ceguera nocturna temporal."
+            },
+            {
+                topic: "Puntos Ciegos",
+                question: "¿Qué maniobra física complementaria deben realizar los ojos para neutralizar el punto ciego lateral de los espejos planos?",
+                answers: [
+                    { text: "Mover el espejo hacia adentro con la mano mientras se maneja.", correct: false },
+                    { text: "Girar levemente la cabeza unos 45° de lado (visión directa sobre el hombro).", correct: true },
+                    { text: "Bajar levemente la cabeza hacia el volante.", correct: false },
+                    { text: "Encender las luces intermitentes de emergencia permanentemente.", correct: false }
+                ],
+                explanation: "Girar brevemente la cabeza por encima del hombro es la única técnica rápida para cubrir el punto ciego lateral que los espejos retrovisores tradicionales no logran reflejar, fundamental antes de realizar cualquier cambio de carril."
+            }
+        ];
+
+        let currentQuizIndex = 0;
+        let selectedAnswering = false;
+
+        function loadQuizQuestion() {
+            selectedAnswering = false;
+            document.getElementById('quiz-feedback-box').classList.add('hidden');
+            
+            const currentQ = quizQuestions[currentQuizIndex];
+            
+            document.getElementById('quiz-progress').innerText = `Pregunta ${currentQuizIndex + 1} de ${quizQuestions.length}`;
+            document.getElementById('quiz-topic').innerText = currentQ.topic;
+            document.getElementById('quiz-question').innerText = currentQ.question;
+
+            const answersContainer = document.getElementById('quiz-answers-container');
+            answersContainer.innerHTML = '';
+
+            currentQ.answers.forEach((ans, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left bg-slate-950 border border-slate-800 hover:border-slate-700 hover:bg-slate-900 p-3.5 rounded-xl text-xs transition-all flex justify-between items-center text-slate-300 font-medium group focus:outline-none touch-manipulation";
+                btn.innerHTML = `
+                    <span class="pr-2">${ans.text}</span>
+                    <i class="fa-regular fa-circle text-slate-600 group-hover:text-amber-400 shrink-0 ml-2"></i>
+                `;
+                btn.onclick = () => selectAnswer(idx);
+                answersContainer.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(index) {
+            if (selectedAnswering) return;
+            selectedAnswering = true;
+
+            const currentQ = quizQuestions[currentQuizIndex];
+            const chosen = currentQ.answers[index];
+            const answersContainer = document.getElementById('quiz-answers-container');
+            const buttons = answersContainer.querySelectorAll('button');
+
+            buttons.forEach((btn, idx) => {
+                btn.onclick = null; // Disable clicking other options
+                const checkIcon = btn.querySelector('i');
+                
+                if (currentQ.answers[idx].correct) {
+                    btn.className = "w-full text-left bg-emerald-500/10 border-2 border-emerald-500 p-3.5 rounded-xl text-xs text-emerald-400 font-bold flex justify-between items-center";
+                    checkIcon.className = "fa-solid fa-circle-check text-emerald-400 shrink-0 ml-2";
+                } else if (idx === index) {
+                    btn.className = "w-full text-left bg-red-500/10 border-2 border-red-500 p-3.5 rounded-xl text-xs text-red-400 font-bold flex justify-between items-center";
+                    checkIcon.className = "fa-solid fa-circle-xmark text-red-400 shrink-0 ml-2";
+                } else {
+                    btn.className = "w-full text-left bg-slate-950/40 border border-slate-900 p-3.5 rounded-xl text-xs text-slate-600 flex justify-between items-center pointer-events-none";
+                    checkIcon.className = "fa-regular fa-circle text-slate-800 shrink-0 ml-2";
+                }
+            });
+
+            const feedbackBox = document.getElementById('quiz-feedback-box');
+            const feedbackTitle = document.getElementById('quiz-feedback-title');
+            const feedbackText = document.getElementById('quiz-feedback-text');
+
+            feedbackBox.classList.remove('hidden');
+
+            if (chosen.correct) {
+                playSound('success');
+                feedbackTitle.innerText = "¡Respuesta Correcta!";
+                feedbackTitle.className = "font-bold text-xs sm:text-sm text-emerald-400 flex items-center gap-1.5";
+                feedbackText.innerHTML = `${currentQ.explanation} <span class="block mt-1.5 text-[9px] sm:text-[10px] text-emerald-500/80 font-bold">+25 XP Ganados</span>`;
+                earnXP(25);
+            } else {
+                playSound('fail');
+                feedbackTitle.innerText = "Respuesta Incorrecta";
+                feedbackTitle.className = "font-bold text-xs sm:text-sm text-red-500 flex items-center gap-1.5";
+                feedbackText.innerHTML = `${currentQ.explanation} <span class="block mt-1.5 text-[9px] sm:text-[10px] text-slate-500 font-bold">Aprende del error y sigue entrenando.</span>`;
+            }
+        }
+
+        function nextQuizQuestion() {
+            playSound('click');
+            currentQuizIndex++;
+            if (currentQuizIndex < quizQuestions.length) {
+                loadQuizQuestion();
+            } else {
+                // Completed the academy questionnaire run
+                const feedbackBox = document.getElementById('quiz-feedback-box');
+                const answersContainer = document.getElementById('quiz-answers-container');
+                answersContainer.innerHTML = '';
+                
+                document.getElementById('quiz-progress').innerText = `¡Certificación Completada!`;
+                document.getElementById('quiz-topic').innerText = "Excelente";
+                document.getElementById('quiz-question').innerText = "Has finalizado el ciclo básico de entrenamiento de neuro-conducción.";
+                
+                feedbackBox.classList.remove('hidden');
+                document.getElementById('quiz-feedback-title').innerText = "¡Graduado en OjoVial!";
+                document.getElementById('quiz-feedback-title').className = "font-bold text-base sm:text-lg text-amber-400";
+                document.getElementById('quiz-feedback-text').innerText = "Felicidades. Tu conocimiento sobre psicología vial, tiempo de reacción y ceguera cognitiva se ha ampliado. Pon en práctica estos hábitos ópticos en tu conducción diaria.";
+                
+                // Reset button to start over
+                const actionBtn = feedbackBox.querySelector('button');
+                actionBtn.innerText = "Reiniciar Desafío Académico";
+                actionBtn.onclick = () => {
+                    currentQuizIndex = 0;
+                    loadQuizQuestion();
+                };
+            }
+        }
+
+        // Initialize first quiz question on loading DOM content
+        window.addEventListener('DOMContentLoaded', () => {
+            loadQuizQuestion();
+        });
+    </script>
+</body>
+</html>
