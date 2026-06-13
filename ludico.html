@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ColmenaVial: Seguridad en Movimiento</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+        }
+        .heading-font {
+            font-family: 'Space+Grotesk', sans-serif;
+        }
+        /* Colmena Theme Colors Custom Utilities */
+        .bg-colmena-orange { background-color: #F39200; }
+        .text-colmena-orange { color: #F39200; }
+        .border-colmena-orange { border-color: #F39200; }
+        .bg-colmena-green { background-color: #009639; }
+        .text-colmena-green { color: #009639; }
+        .border-colmena-green { border-color: #009639; }
+        
+        /* Custom Animations */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 0.4; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+        .animate-pulse-ring {
+            animation: pulse-ring 2s infinite ease-in-out;
+        }
+        @keyframes drift {
+            0% { transform: translateX(0px); }
+            50% { transform: translateX(15px); }
+            100% { transform: translateX(-15px); }
+        }
+        .animate-road-drift {
+            animation: drift 6s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-orange-200">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white border-b border-slate-100 py-4 px-6 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <!-- Colmena Hexagon Logo (SVG) -->
+                <svg class="w-10 h-10" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="50,5 93,30 93,80 50,105 7,80 7,30" fill="#F39200"/>
+                    <polygon points="50,15 84,35 84,75 50,95 16,75 16,35" fill="#009639"/>
+                    <circle cx="50" cy="55" r="20" fill="#FFFFFF"/>
+                    <path d="M45 45 L55 55 M55 45 L45 55" stroke="#F39200" stroke-width="6" stroke-linecap="round"/>
+                </svg>
+                <div>
+                    <h1 class="heading-font font-black text-2xl tracking-tight leading-none text-slate-900">
+                        Colmena<span class="text-colmena-orange">Vial</span>
+                    </h1>
+                    <span class="text-xs font-bold text-colmena-green tracking-wider block mt-0.5">
+                        Seguridad en Movimiento
+                    </span>
+                </div>
+            </div>
+            <div class="hidden md:flex items-center space-x-6 text-sm font-semibold">
+                <span class="text-slate-500">Pruebas Psicosensométricas Lúdicas</span>
+                <span class="bg-amber-100 text-colmena-orange px-3 py-1 rounded-full text-xs animate-pulse">ARL COLMENA</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Container -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8 flex flex-col justify-center">
+        
+        <!-- PANTALLA 1: BIENVENIDA -->
+        <div id="screen-welcome" class="bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 text-center max-w-3xl mx-auto space-y-8 transform transition-all duration-500">
+            <div class="space-y-4">
+                <span class="bg-emerald-50 text-colmena-green font-bold text-xs px-4 py-1.5 rounded-full uppercase tracking-wider border border-emerald-200">Desafío Cognitivo Vial</span>
+                <h2 class="heading-font text-4xl md:text-5xl font-black text-slate-900 leading-tight">
+                    ¿Qué tan rápido y seguro <br class="hidden md:block">reaccionas en la vía?
+                </h2>
+                <p class="text-slate-600 max-w-lg mx-auto text-base md:text-lg">
+                    Pon a prueba tu <strong class="text-slate-800">reacción visual</strong>, <strong class="text-slate-800">control de impulsos</strong> y <strong class="text-slate-800">atención sostenida</strong> con este test lúdico e interactivo de ARL Colmena.
+                </p>
+            </div>
+
+            <!-- Dashboard Mockup Visual -->
+            <div class="grid grid-cols-3 gap-3 md:gap-4 max-w-lg mx-auto py-4">
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col items-center">
+                    <span class="text-3xl">⏱️</span>
+                    <span class="text-xs font-bold text-slate-400 mt-2 uppercase">Prueba 1</span>
+                    <span class="text-sm font-extrabold text-slate-800">Reacción</span>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col items-center">
+                    <span class="text-3xl">🚫</span>
+                    <span class="text-xs font-bold text-slate-400 mt-2 uppercase">Prueba 2</span>
+                    <span class="text-sm font-extrabold text-slate-800">Autocontrol</span>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col items-center">
+                    <span class="text-3xl">👁️</span>
+                    <span class="text-xs font-bold text-slate-400 mt-2 uppercase">Prueba 3</span>
+                    <span class="text-sm font-extrabold text-slate-800">Atención</span>
+                </div>
+            </div>
+
+            <!-- Form Name and Config -->
+            <div class="max-w-md mx-auto space-y-4 pt-2">
+                <div>
+                    <label for="player-name" class="block text-left text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Ingresa tu Nombre del Conductor/a:</label>
+                    <input type="text" id="player-name" value="Conductor Estrella" class="w-full px-5 py-3 rounded-2xl border-2 border-slate-200 focus:border-colmena-orange focus:outline-none font-bold text-lg text-slate-800 text-center transition-all">
+                </div>
+                
+                <button onclick="startJourney()" class="w-full bg-colmena-orange hover:bg-orange-600 text-white font-extrabold py-4 px-8 rounded-2xl shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transform hover:-translate-y-1 transition-all text-xl heading-font flex items-center justify-center space-x-3">
+                    <span>¡Iniciar Prueba de Ruta!</span>
+                    <svg class="w-6 h-6 animate-bounce-h" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+            
+            <p class="text-xs text-slate-400">
+                Al iniciar, activaremos efectos de audio generados dinámicamente. ¡Sube el volumen para una mejor experiencia!
+            </p>
+        </div>
+
+        <!-- PANTALLA 2: INTRO/PREPARACIÓN TEST DE REACCIÓN -->
+        <div id="screen-reaction-intro" class="hidden bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 max-w-3xl mx-auto space-y-6 transform transition-all duration-500">
+            <div class="flex items-center space-x-3">
+                <span class="text-4xl">⏱️</span>
+                <div>
+                    <span class="text-xs font-extrabold text-colmena-orange uppercase tracking-wider">Módulo 1 de 3</span>
+                    <h3 class="heading-font text-2xl md:text-3xl font-black text-slate-900">Test de Reacción & Distancia de Frenado</h3>
+                </div>
+            </div>
+            <hr class="border-slate-100">
+            <p class="text-slate-600">
+                Este test mide tu <strong class="text-slate-800">tiempo de reacción visual</strong> (cuánto tardas en presionar el freno desde que ves un peligro). Luego, calcularemos dinámicamente los metros que recorrería tu vehículo antes de detenerse por completo.
+            </p>
+
+            <!-- Configuración de Simulación -->
+            <div class="bg-amber-50 rounded-2xl p-6 border border-amber-100 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest">Velocidad del Vehículo:</label>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button onclick="setSpeed(30, this)" class="speed-btn py-2 px-1 rounded-xl font-extrabold text-sm border-2 border-slate-300 bg-white text-slate-700 hover:border-colmena-orange transition-all">30 km/h</button>
+                        <button onclick="setSpeed(50, this)" class="speed-btn py-2 px-1 rounded-xl font-extrabold text-sm border-2 border-colmena-orange bg-white text-colmena-orange transition-all">50 km/h</button>
+                        <button onclick="setSpeed(80, this)" class="speed-btn py-2 px-1 rounded-xl font-extrabold text-sm border-2 border-slate-300 bg-white text-slate-700 hover:border-colmena-orange transition-all">80 km/h</button>
+                        <button onclick="setSpeed(120, this)" class="speed-btn py-2 px-1 rounded-xl font-extrabold text-sm border-2 border-slate-300 bg-white text-slate-700 hover:border-colmena-orange transition-all">120 km/h</button>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1">Velocidad recomendada en ciudad: 50 km/h</p>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest">Estado de la Vía:</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="setRoadCondition('dry', this)" class="road-btn py-2 px-4 rounded-xl font-extrabold text-sm border-2 border-colmena-orange bg-white text-colmena-orange transition-all flex items-center justify-center space-x-1">
+                            <span>☀️</span> <span>Seco</span>
+                        </button>
+                        <button onclick="setRoadCondition('wet', this)" class="road-btn py-2 px-4 rounded-xl font-extrabold text-sm border-2 border-slate-300 bg-white text-slate-700 hover:border-colmena-orange transition-all flex items-center justify-center space-x-1">
+                            <span>🌧️</span> <span>Mojado</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-xl text-xs text-slate-500 space-y-1">
+                <span class="font-bold text-slate-700 block">¿Cómo jugar?</span>
+                <p>1. Presiona "Comenzar Test de Reacción". El área de pruebas se volverá de color <span class="font-bold text-rose-500">Rojo</span>.</p>
+                <p>2. Espera pacientemente. En un momento aleatorio, el área se iluminará de <span class="font-bold text-colmena-green">Verde</span>.</p>
+                <p>3. <strong>¡Haz clic o toca la pantalla lo más rápido que puedas!</strong></p>
+            </div>
+
+            <button onclick="initiateReactionGame()" class="w-full bg-colmena-green hover:bg-emerald-700 text-white font-extrabold py-4 px-8 rounded-2xl shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transform hover:-translate-y-1 transition-all text-xl heading-font">
+                Comenzar Test de Reacción 🚦
+            </button>
+        </div>
+
+        <!-- PANTALLA 3: INTERFAZ JUEGO DE REACCIÓN -->
+        <div id="screen-reaction-game" class="hidden bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-100 max-w-4xl mx-auto space-y-6 transform transition-all duration-500">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">🚗</span>
+                    <span class="text-sm font-bold text-slate-500">Prueba 1: Control de Frenado</span>
+                </div>
+                <div class="flex space-x-4 text-xs font-bold bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
+                    <div>Velocidad: <span id="game-speed-val" class="text-colmena-orange">50 km/h</span></div>
+                    <div>Vía: <span id="game-road-val" class="text-blue-500">Seca</span></div>
+                </div>
+            </div>
+
+            <!-- Reaction Target Zone -->
+            <div id="reaction-box" onclick="handleReactionTrigger()" class="w-full h-80 rounded-2xl bg-red-500 flex flex-col items-center justify-center cursor-pointer text-white select-none transition-colors duration-100 relative overflow-hidden shadow-inner">
+                <!-- Decorative concentric rings -->
+                <div id="reaction-pulse-ring" class="absolute w-48 h-48 border-4 border-white/20 rounded-full animate-pulse-ring pointer-events-none"></div>
+                
+                <span id="reaction-emoji" class="text-6xl mb-4">🚨</span>
+                <h3 id="reaction-instruction" class="heading-font text-2xl md:text-3xl font-black tracking-wide text-center px-4">¡PREPARADO! NO HAGAS CLIC AÚN</h3>
+                <p id="reaction-sub" class="text-sm text-white/80 mt-2">Espera a que la pantalla cambie a VERDE</p>
+            </div>
+
+            <div class="text-center text-xs text-slate-400">
+                Puedes hacer clic en cualquier parte de la caja de arriba para reaccionar.
+            </div>
+        </div>
+
+        <!-- PANTALLA 4: RESULTADO FÍSICO TEST DE REACCIÓN (CON DISTANCIAS) -->
+        <div id="screen-reaction-results" class="hidden bg-white rounded-3xl p-6 md:p-10 shadow-xl border border-slate-100 max-w-4xl mx-auto space-y-8 transform transition-all duration-500">
+            <div class="text-center space-y-2">
+                <span class="bg-amber-100 text-colmena-orange font-black text-xs px-3 py-1 rounded-full uppercase">Física Vial Real</span>
+                <h3 class="heading-font text-3xl font-black text-slate-900">Tus Métricas de Reacción y Frenado</h3>
+            </div>
+
+            <!-- Big Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-amber-50 rounded-2xl p-6 border border-amber-100 text-center space-y-1">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-widest block">Tiempo de Reacción</span>
+                    <span id="res-reaction-time" class="text-4xl font-black text-colmena-orange heading-font">0.342 s</span>
+                    <p id="res-reaction-rank" class="text-xs font-bold text-amber-700">¡Muy buenos reflejos!</p>
+                </div>
+                <div class="bg-emerald-50 rounded-2xl p-6 border border-emerald-100 text-center space-y-1">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-widest block">Velocidad Configurada</span>
+                    <span id="res-speed" class="text-4xl font-black text-colmena-green heading-font">50 km/h</span>
+                    <p id="res-speed-ms" class="text-xs font-bold text-emerald-700">13.89 m/s recorridos</p>
+                </div>
+                <div class="bg-rose-50 rounded-2xl p-6 border border-rose-100 text-center space-y-1">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-widest block">Distancia Total Detención</span>
+                    <span id="res-total-dist" class="text-4xl font-black text-rose-600 heading-font">18.5 m</span>
+                    <p id="res-total-compare" class="text-xs font-bold text-rose-800">Casi media cancha de fútbol</p>
+                </div>
+            </div>
+
+            <!-- Interactive Dynamic Canvas / Driving Simulation Diagram -->
+            <div class="bg-slate-900 rounded-2xl p-6 text-white relative overflow-hidden">
+                <h4 class="text-sm font-bold text-slate-400 mb-4 flex items-center justify-between">
+                    <span>Simulador Dinámico de Detención</span>
+                    <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Física Interactiva</span>
+                </h4>
+                
+                <div class="relative h-28 bg-slate-800 rounded-xl overflow-hidden border border-slate-700">
+                    <!-- Road Marks -->
+                    <div class="absolute inset-x-0 top-1/2 h-1 bg-dashed border-t-2 border-dashed border-white/30 transform -translate-y-1/2"></div>
+                    
+                    <!-- Dynamic Elements (Car & Safe Stop Line) -->
+                    <!-- Obstacle / Hazard Wall -->
+                    <div class="absolute right-4 top-4 bottom-4 w-4 bg-rose-600 rounded-md flex flex-col justify-between py-2 text-[8px] font-black items-center text-white select-none">
+                        <span>P</span><span>E</span><span>L</span><span>I</span><span>G</span><span>R</span><span>O</span>
+                    </div>
+
+                    <!-- Braking zone limits on road -->
+                    <div id="visual-reaction-zone" class="absolute left-0 top-0 bottom-0 bg-amber-500/10 border-r-2 border-dashed border-amber-500 flex items-end p-2 text-[10px] text-amber-400 font-bold">
+                        Reacción
+                    </div>
+                    <div id="visual-braking-zone" class="absolute left-0 top-0 bottom-0 bg-rose-500/10 border-r-2 border-dashed border-rose-500 flex items-end justify-end p-2 text-[10px] text-rose-400 font-bold">
+                        Frenado Físico
+                    </div>
+
+                    <!-- Mini Car Avatar -->
+                    <div id="visual-car" class="absolute left-2 top-8 text-4xl transition-all duration-1000 ease-out z-10">
+                        🚗
+                    </div>
+                </div>
+
+                <!-- Descriptive Breakdown -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-xs">
+                    <div class="space-y-1 bg-slate-800 p-3 rounded-xl border border-slate-700">
+                        <span class="font-extrabold text-amber-400">🏎️ Distancia de Reacción (<span id="calc-dist-react">4.7</span> m):</span>
+                        <p class="text-slate-300">Es la distancia que avanzaste mientras tus ojos vieron el verde y tu cerebro dio la orden de frenar. ¡Tu auto se movió SIN frenar durante este tramo!</p>
+                    </div>
+                    <div class="space-y-1 bg-slate-800 p-3 rounded-xl border border-slate-700">
+                        <span class="font-extrabold text-rose-400">🛑 Distancia de Frenado Técnico (<span id="calc-dist-brake">13.8</span> m):</span>
+                        <p class="text-slate-300">La distancia que recorre el auto una vez presionados los frenos. Afectado por tu velocidad y la adherencia del asfalto.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-between items-center pt-2">
+                <button onclick="restartReactionTest()" class="text-xs font-bold text-slate-500 hover:text-colmena-orange underline">
+                    Volver a medir reacción
+                </button>
+                <button onclick="goToInhibitoryIntro()" class="bg-colmena-orange hover:bg-orange-600 text-white font-extrabold py-3.5 px-8 rounded-2xl shadow-md transition-all flex items-center space-x-2">
+                    <span>Siguiente: Control Inhibitorio</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- PANTALLA 5: INTRO/PREPARACIÓN TEST DE CONTROL INHIBITORIO -->
+        <div id="screen-inhibitory-intro" class="hidden bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 max-w-3xl mx-auto space-y-6 transform transition-all duration-500">
+            <div class="flex items-center space-x-3">
+                <span class="text-4xl">🚫</span>
+                <div>
+                    <span class="text-xs font-extrabold text-colmena-orange uppercase tracking-wider">Módulo 2 de 3</span>
+                    <h3 class="heading-font text-2xl md:text-3xl font-black text-slate-900">Test de Control Inhibitorio: Evita el Impulso</h3>
+                </div>
+            </div>
+            <hr class="border-slate-100">
+            <p class="text-slate-600">
+                En la vía, no siempre debemos reaccionar a todo estímulo. A veces, la decisión más inteligente y segura es <strong class="text-rose-600">inhibir el impulso</strong> de acelerar o actuar. Este test mide tu autocontrol ante distractores comunes en la carretera.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl flex items-start space-x-3">
+                    <div class="bg-colmena-green text-white p-2.5 rounded-xl font-bold text-sm">REACCIONA</div>
+                    <div>
+                        <span class="font-bold text-emerald-950 block text-sm">Señales Seguras (GO)</span>
+                        <p class="text-xs text-emerald-800">Presiona o haz clic ante señales verdes o normales de la vía.</p>
+                        <span class="text-xl mt-1 block">🟢 🛣️ 🚙</span>
+                    </div>
+                </div>
+                <div class="bg-rose-50 border border-rose-100 p-4 rounded-2xl flex items-start space-x-3">
+                    <div class="bg-rose-600 text-white p-2.5 rounded-xl font-bold text-sm">ALTO / DETENTE</div>
+                    <div>
+                        <span class="font-bold text-rose-950 block text-sm">Peligros Repentinos (NO-GO)</span>
+                        <p class="text-xs text-rose-800"><strong>¡NO HAGAS CLIC!</strong> ante peligros inminentes o animales.</p>
+                        <span class="text-xl mt-1 block">🛑 🐕 ⚠️</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-xl text-xs text-slate-500 space-y-1">
+                <span class="font-bold text-slate-700 block">Reglas del Desafío:</span>
+                <p>• Aparecerán un total de <span class="font-bold text-slate-800">10 estímulos rápidos</span>.</p>
+                <p>• Si ves un elemento verde o vía despejada, reacciona rápido.</p>
+                <p>• Si aparece un obstáculo de peligro o luz roja, ¡quédate quieto! Un solo clic te restará precisión.</p>
+            </div>
+
+            <button onclick="initiateInhibitoryGame()" class="w-full bg-colmena-orange hover:bg-orange-600 text-white font-extrabold py-4 px-8 rounded-2xl shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transform hover:-translate-y-1 transition-all text-xl heading-font">
+                Comenzar Test de Autocontrol 🎯
+            </button>
+        </div>
+
+        <!-- PANTALLA 6: INTERFAZ JUEGO DE CONTROL INHIBITORIO -->
+        <div id="screen-inhibitory-game" class="hidden bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-100 max-w-2xl mx-auto space-y-6 transform transition-all duration-500">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">🚦</span>
+                    <span class="text-sm font-bold text-slate-500">Prueba 2: Estímulos en Ruta</span>
+                </div>
+                <div class="flex space-x-2 text-xs font-bold bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
+                    <div>Progreso: <span id="inhib-progress" class="text-colmena-orange">0/10</span></div>
+                </div>
+            </div>
+
+            <!-- Main Interactive Display -->
+            <div id="inhib-game-area" onclick="handleInhibitoryClick()" class="w-full h-80 rounded-2xl bg-slate-100 border-4 border-slate-200 flex flex-col items-center justify-center cursor-pointer select-none relative overflow-hidden transition-colors duration-150">
+                <!-- Flashing indicators -->
+                <div id="inhib-overlay" class="absolute inset-0 pointer-events-none transition-opacity duration-150 opacity-0 z-10"></div>
+                
+                <span id="inhib-emoji" class="text-8xl mb-4 transition-transform duration-100">🏁</span>
+                <h4 id="inhib-text" class="heading-font text-2xl font-black text-slate-700 uppercase tracking-wide">¡Esperando Inicio!</h4>
+                <p id="inhib-subtext" class="text-xs text-slate-400 mt-2 text-center px-6">Toca el recuadro sólo si es un estímulo seguro</p>
+            </div>
+
+            <!-- On-screen click feedback -->
+            <div class="flex justify-between items-center text-sm font-extrabold px-2">
+                <span class="text-colmena-green">Estímulos GO Acertados: <span id="inhib-score-go" class="text-lg">0</span></span>
+                <span class="text-rose-600">Errores (Impulsividad): <span id="inhib-score-errors" class="text-lg">0</span></span>
+            </div>
+        </div>
+
+        <!-- PANTALLA 7: RESULTADO TEST DE CONTROL INHIBITORIO -->
+        <div id="screen-inhibitory-results" class="hidden bg-white rounded-3xl p-6 md:p-10 shadow-xl border border-slate-100 max-w-3xl mx-auto space-y-8 transform transition-all duration-500">
+            <div class="text-center space-y-2">
+                <span class="bg-emerald-100 text-colmena-green font-black text-xs px-3 py-1 rounded-full uppercase">Comportamiento en la Vía</span>
+                <h3 class="heading-font text-3xl font-black text-slate-900">Análisis de Control Inhibitorio</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Feedback Text -->
+                <div class="space-y-4">
+                    <h4 class="text-lg font-bold text-slate-800">Tu Perfil de Autocontrol:</h4>
+                    <p id="inhib-feedback-desc" class="text-slate-600 text-sm leading-relaxed">
+                        Cargando análisis personalizado...
+                    </p>
+                    <div class="bg-amber-50 p-4 rounded-xl border border-amber-100 space-y-2">
+                        <span class="text-xs font-bold text-amber-800 uppercase block">💡 Lección de Seguridad Vial:</span>
+                        <p class="text-xs text-slate-600">
+                            Un alto porcentaje de accidentes se produce por la incapacidad de inhibir respuestas aprendidas automáticas (como acelerar al ver cambiar el semáforo a amarillo, o no soltar el acelerador cuando vemos un peatón cerca de la acera).
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Circular gauge / Stats cards -->
+                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 space-y-4 flex flex-col justify-center">
+                    <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                        <span class="text-xs font-bold text-slate-400 uppercase">Estímulos GO correctly actioned:</span>
+                        <span id="inhib-res-go" class="text-sm font-black text-emerald-600">0 / 0</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                        <span class="text-xs font-bold text-slate-400 uppercase">Falsas Alarmas (Impulso Fallido):</span>
+                        <span id="inhib-res-no-go" class="text-sm font-black text-rose-600">0 / 0</span>
+                    </div>
+                    <div class="flex justify-between items-center pb-2">
+                        <span class="text-xs font-bold text-slate-400 uppercase">Precisión Inhibitoria:</span>
+                        <span id="inhib-res-accuracy" class="text-lg font-black text-colmena-orange">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="flex justify-end pt-2">
+                <button onclick="goToSustainedIntro()" class="bg-colmena-orange hover:bg-orange-600 text-white font-extrabold py-3.5 px-8 rounded-2xl shadow-md transition-all flex items-center space-x-2">
+                    <span>Siguiente: Atención Sostenida</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- PANTALLA 8: INTRO/PREPARACIÓN TEST DE ATENCIÓN SOSTENIDA -->
+        <div id="screen-sustained-intro" class="hidden bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 max-w-3xl mx-auto space-y-6 transform transition-all duration-500">
+            <div class="flex items-center space-x-3">
+                <span class="text-4xl">👁️</span>
+                <div>
+                    <span class="text-xs font-extrabold text-colmena-orange uppercase tracking-wider">Módulo 3 de 3</span>
+                    <h3 class="heading-font text-2xl md:text-3xl font-black text-slate-900">Test de Atención Sostenida: Evita la Hipnosis del Camino</h3>
+                </div>
+            </div>
+            <hr class="border-slate-100">
+            <p class="text-slate-600">
+                La monotonía de la carretera puede inducir fatiga y un fenómeno conocido como "hipnosis vial". Esta prueba simula la <strong class="text-slate-800">vigilancia activa en ruta</strong>: deberás monitorizar constantemente el panel del vehículo y actuar únicamente ante imprevistos específicos.
+            </p>
+
+            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="space-y-2">
+                    <span class="font-extrabold text-sm text-slate-800 block">¿Cómo funciona esta prueba?</span>
+                    <p class="text-xs text-slate-500">
+                        1. Verás una simulación de carretera en movimiento. Tu auto debe mantenerse centrado.
+                    </p>
+                    <p class="text-xs text-slate-500">
+                        2. De vez en cuando, el vehículo **comenzará a desviarse** de su carril (izquierda/derecha) o se encenderá una **alarma crítica de motor** ⚠️ en el panel.
+                    </p>
+                    <p class="text-xs text-slate-500">
+                        3. Debes presionar rápidamente el botón **"Corregir Trayectoria / Controlar Alerta"** tan pronto ocurra la anomalía.
+                    </p>
+                </div>
+                <div class="bg-amber-100 text-amber-900 p-4 rounded-xl text-center space-y-1 min-w-[150px]">
+                    <span class="text-3xl">⚠️</span>
+                    <span class="text-xs font-black block uppercase">Duración</span>
+                    <span class="text-sm font-extrabold">20 Segundos</span>
+                </div>
+            </div>
+
+            <button onclick="initiateSustainedGame()" class="w-full bg-colmena-green hover:bg-emerald-700 text-white font-extrabold py-4 px-8 rounded-2xl shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transform hover:-translate-y-1 transition-all text-xl heading-font">
+                Comenzar Prueba de Vigilancia Activa 🛣️
+            </button>
+        </div>
+
+        <!-- PANTALLA 9: INTERFAZ JUEGO DE ATENCIÓN SOSTENIDA -->
+        <div id="screen-sustained-game" class="hidden bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-100 max-w-3xl mx-auto space-y-6 transform transition-all duration-500">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl">👁️</span>
+                    <span class="text-sm font-bold text-slate-500">Monitoreo de Carril & Panel</span>
+                </div>
+                <div class="text-xs font-bold bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
+                    Tiempo Restante: <span id="sustained-timer" class="text-rose-600 text-sm">20s</span>
+                </div>
+            </div>
+
+            <!-- Road & Dash Dashboard Simulation Container -->
+            <div class="bg-slate-900 rounded-2xl p-6 text-white relative overflow-hidden h-64 flex flex-col justify-between">
+                
+                <!-- Simple 2D perspective road simulation -->
+                <div class="relative flex-grow flex items-center justify-center bg-slate-950 rounded-xl overflow-hidden">
+                    
+                    <!-- Perspective Lanes (SVG) -->
+                    <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 200" preserveAspectRatio="none">
+                        <!-- Grass sides -->
+                        <polygon points="0,200 150,80 250,80 400,200" fill="#1b4332"/>
+                        <!-- Road surface -->
+                        <polygon points="50,200 160,80 240,80 350,200" fill="#3d3a45"/>
+                        <!-- Left Line -->
+                        <line x1="50" y1="200" x2="160" y2="80" stroke="#FFFFFF" stroke-width="3"/>
+                        <!-- Right Line -->
+                        <line x1="350" y1="200" x2="240" y2="80" stroke="#FFFFFF" stroke-width="3"/>
+                        <!-- Dashed Center Line -->
+                        <line x1="200" y1="200" x2="200" y2="80" stroke="#F39200" stroke-width="4" stroke-dasharray="10,8"/>
+                    </svg>
+
+                    <!-- Alert Engine Light Indicator inside cockpit -->
+                    <div id="cockpit-engine-alert" class="absolute top-4 left-4 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-lg flex items-center space-x-2 transition-all duration-150 opacity-0">
+                        <span class="text-amber-500 animate-pulse text-xl">⚠️</span>
+                        <span class="text-[10px] font-black tracking-widest uppercase text-amber-500">ALERTA PANEL</span>
+                    </div>
+
+                    <!-- Drifting Car Avatar -->
+                    <div id="drifting-car" class="absolute bottom-4 text-5xl transition-all duration-200" style="transform: translateX(0px);">
+                        🚘
+                    </div>
+                </div>
+
+                <!-- Dashboard controls -->
+                <div class="flex items-center justify-between mt-4">
+                    <span class="text-xs text-slate-400">Si el auto se desvía o se enciende la luz, presiona corregir inmediatamente.</span>
+                </div>
+            </div>
+
+            <!-- Big Correction Trigger Button -->
+            <button onclick="handleSustainedCorrection()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-extrabold py-5 px-8 rounded-2xl shadow-xl hover:shadow-rose-600/30 transform hover:-translate-y-1 transition-all text-xl heading-font tracking-wide flex items-center justify-center space-x-3">
+                <span class="text-2xl">⚠️</span>
+                <span>¡CORREGIR ALERTA / TRAYECTORIA!</span>
+            </button>
+        </div>
+
+        <!-- PANTALLA 10: RESULTADO TEST DE ATENCIÓN SOSTENIDA -->
+        <div id="screen-sustained-results" class="hidden bg-white rounded-3xl p-6 md:p-10 shadow-xl border border-slate-100 max-w-3xl mx-auto space-y-8 transform transition-all duration-500">
+            <div class="text-center space-y-2">
+                <span class="bg-amber-100 text-colmena-orange font-black text-xs px-3 py-1 rounded-full uppercase">Atención Continuada</span>
+                <h3 class="heading-font text-3xl font-black text-slate-900">Métricas de Vigilancia Sostenida</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-emerald-50 p-4 rounded-xl text-center">
+                    <span class="text-xs text-slate-500 uppercase block font-bold">Alertas Corregidas</span>
+                    <span id="sust-res-corrected" class="text-2xl font-black text-emerald-700">0 / 0</span>
+                </div>
+                <div class="bg-rose-50 p-4 rounded-xl text-center">
+                    <span class="text-xs text-slate-500 uppercase block font-bold">Alertas Omitidas</span>
+                    <span id="sust-res-missed" class="text-2xl font-black text-rose-700">0 / 0</span>
+                </div>
+                <div class="bg-amber-50 p-4 rounded-xl text-center">
+                    <span class="text-xs text-slate-500 uppercase block font-bold">Tiempo Promedio Corrección</span>
+                    <span id="sust-res-avgtime" class="text-2xl font-black text-colmena-orange">0.0s</span>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 space-y-3">
+                <span class="font-extrabold text-sm text-slate-800 flex items-center space-x-2">
+                    <span>💡</span> <span>Análisis del Conductor con ARL Colmena:</span>
+                </span>
+                <p class="text-slate-600 text-xs leading-relaxed">
+                    Mantener una velocidad constante en carreteras monótonas adormece la capacidad de detección. Esta prueba simula cómo disminuyen los tiempos de reacción ante eventos aleatorios cuando la mente entra en modo piloto automático. Para prevenirlo, mantén el auto con aireación adecuada, evita comidas pesadas antes de conducir, y recuerda el estándar de seguridad: <strong>detenerse y descansar 15 minutos por cada 2 horas de conducción</strong>.
+                </p>
+            </div>
+
+            <div class="flex justify-end pt-2">
+                <button onclick="calculateFinalScore()" class="bg-colmena-green hover:bg-emerald-700 text-white font-extrabold py-4 px-10 rounded-2xl shadow-lg shadow-emerald-500/20 transform hover:-translate-y-1 transition-all text-xl heading-font flex items-center space-x-2">
+                    <span>Ver Mi Licencia Cognitiva Colmena</span>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- PANTALLA 11: REPORTE FINAL Y LICENCIA COGNITIVA -->
+        <div id="screen-final-report" class="hidden bg-white rounded-3xl p-6 md:p-10 shadow-xl border border-slate-100 max-w-4xl mx-auto space-y-8 transform transition-all duration-500">
+            <div class="text-center space-y-3">
+                <span class="bg-emerald-50 text-colmena-green font-black text-xs px-4 py-1.5 rounded-full uppercase border border-emerald-100">Evaluación Finalizada Exitosamente</span>
+                <h3 class="heading-font text-4xl font-black text-slate-900">Tu Reporte de Aptitud Vial Lúdico</h3>
+                <p class="text-slate-500 text-sm max-w-lg mx-auto">Basado en las tres dimensiones de análisis psicosensométrico realizadas hoy.</p>
+            </div>
+
+            <!-- THE COGNITIVE LICENSE CARD -->
+            <div class="bg-gradient-to-br from-emerald-50 to-white rounded-3xl p-6 md:p-8 border-4 border-colmena-green shadow-xl relative overflow-hidden max-w-2xl mx-auto">
+                <!-- Watermark -->
+                <div class="absolute -right-16 -bottom-16 opacity-5 pointer-events-none">
+                    <svg class="w-64 h-64" viewBox="0 0 100 100" fill="#009639">
+                        <polygon points="50,5 93,30 93,80 50,105 7,80 7,30"/>
+                    </svg>
+                </div>
+
+                <div class="flex justify-between items-start border-b border-emerald-100 pb-4 mb-6">
+                    <div>
+                        <span class="text-xs font-black text-colmena-green tracking-widest uppercase">LICENCIA COGNITIVA DE PREVENCIÓN</span>
+                        <h4 class="text-2xl font-black text-slate-900 leading-tight">ARL Colmena Seguros</h4>
+                    </div>
+                    <!-- Badge -->
+                    <span class="bg-colmena-orange text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider">APROBADO</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                    <!-- Photo Placeholder / Avatar -->
+                    <div class="flex flex-col items-center text-center space-y-2">
+                        <div class="w-24 h-24 bg-amber-100 rounded-2xl border-2 border-colmena-orange flex items-center justify-center text-5xl shadow-inner select-none">
+                            🧑‍✈️
+                        </div>
+                        <div>
+                            <span id="license-name" class="font-extrabold text-slate-800 block text-lg">Cargando...</span>
+                            <span class="text-xs font-bold text-slate-400">Conductor Seguro</span>
+                        </div>
+                    </div>
+
+                    <!-- Metrics -->
+                    <div class="md:col-span-2 space-y-3.5">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-500 font-bold">⚡ Reacción Visual:</span>
+                            <span id="lic-reaction" class="font-black text-slate-800">0.32 s</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-500 font-bold">🎯 Autocontrol e Inhibición:</span>
+                            <span id="lic-inhib" class="font-black text-slate-800">95% Precisión</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-500 font-bold">👁️ Vigilancia y Alerta:</span>
+                            <span id="lic-sustained" class="font-black text-slate-800">100% Corregido</span>
+                        </div>
+                        <hr class="border-dashed border-emerald-100">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-colmena-green font-extrabold text-base">Índice de Conducción Segura:</span>
+                            <span id="lic-total-score" class="font-black text-xl text-colmena-orange bg-amber-100 px-3 py-0.5 rounded-lg">92%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Decorative Barcode -->
+                <div class="mt-6 flex justify-between items-center pt-4 border-t border-emerald-100">
+                    <div class="text-[9px] text-slate-400">
+                        <span>EMITIDO POR SISTEMA COGNITIVO LÚDICO ARL COLMENA</span><br>
+                        <span>CÓDIGO DE VERIFICACIÓN: <span id="license-code">ARL-9842</span></span>
+                    </div>
+                    <!-- Virtual barcode simulation -->
+                    <div class="flex space-x-[1px] h-8 items-end opacity-50">
+                        <div class="w-1 h-full bg-slate-900"></div><div class="w-[2px] h-5/6 bg-slate-900"></div><div class="w-1 h-2/3 bg-slate-900"></div><div class="w-[2px] h-full bg-slate-900"></div><div class="w-[1px] h-4/5 bg-slate-900"></div><div class="w-1 h-full bg-slate-900"></div><div class="w-[3px] h-3/4 bg-slate-900"></div><div class="w-1 h-full bg-slate-900"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Interactive Action & Prevention Plan -->
+            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200/60 max-w-2xl mx-auto space-y-4">
+                <span class="text-xs font-bold text-colmena-green uppercase tracking-wider flex items-center space-x-1">
+                    <span>🛡️</span> <span>Plan de Acción Colmena Personalizado para Ti:</span>
+                </span>
+                <ul id="prevention-tips-list" class="text-xs text-slate-600 space-y-2 list-disc pl-4">
+                    <!-- Populated dynamically -->
+                </ul>
+            </div>
+
+            <!-- Reset / Reiniciar todo el ciclo -->
+            <div class="text-center pt-4">
+                <button onclick="restartEntireExperience()" class="bg-slate-900 hover:bg-slate-800 text-white font-extrabold py-3.5 px-8 rounded-2xl shadow-md transition-all text-sm">
+                    Rehacer todo el Test
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-100 py-6 text-center text-xs text-slate-400">
+        <div class="max-w-6xl mx-auto px-4 space-y-2">
+            <p>© 2026 ARL Colmena. Todos los derechos reservados. Basado en estándares psicosensométricos lúdicos.</p>
+            <p class="max-w-md mx-auto">Este test es un ejercicio de concientización lúdica y no reemplaza los exámenes médicos formales requeridos por la legislación de tránsito.</p>
+        </div>
+    </footer>
+
+    <!-- JS LOGIC AND STATE MACHINE -->
+    <script>
+        // Global State variables
+        let state = {
+            playerName: "Conductor Estrella",
+            
+            // Test 1 Settings & Results
+            speedKmh: 50,
+            roadCondition: 'dry', // dry or wet
+            reactionTimeMs: 0,
+            reactionDist: 0,
+            brakingDist: 0,
+            totalStoppingDist: 0,
+
+            // Test 2 Settings & Results
+            inhibitoryGoCount: 0,
+            inhibitoryGoCorrect: 0,
+            inhibitoryNoGoCount: 0,
+            inhibitoryNoGoErrors: 0, // False alarms / commission errors
+            inhibitorySequence: [],
+            inhibitoryIndex: 0,
+
+            // Test 3 Settings & Results
+            sustainedTotalAlerts: 0,
+            sustainedCorrected: 0,
+            sustainedMissed: 0,
+            sustainedResponseTimes: [],
+            sustainedIntervalId: null,
+            sustainedTimeoutId: null,
+            sustainedActiveAlert: false,
+            sustainedAlertStartTime: 0,
+            sustainedDurationLeft: 20, // 20s
+            sustainedTimerIntervalId: null
+        };
+
+        // Web Audio Context Synthesizer (Generates cute arcade & vehicle sounds without external assets)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'beep') {
+                    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.15);
+                } else if (type === 'success') {
+                    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'error') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                } else if (type === 'brake') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(80, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.8);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.8);
+                } else if (type === 'warning') {
+                    osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.1);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.2);
+                }
+            } catch (e) {
+                console.warn("Audio Context error: ", e);
+            }
+        }
+
+        // Screen Routing
+        function showScreen(screenId) {
+            const screens = [
+                'screen-welcome', 'screen-reaction-intro', 'screen-reaction-game', 'screen-reaction-results',
+                'screen-inhibitory-intro', 'screen-inhibitory-game', 'screen-inhibitory-results',
+                'screen-sustained-intro', 'screen-sustained-game', 'screen-sustained-results',
+                'screen-final-report'
+            ];
+            screens.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (id === screenId) {
+                        element.classList.remove('hidden');
+                        element.classList.add('block');
+                    } else {
+                        element.classList.add('hidden');
+                        element.classList.remove('block');
+                    }
+                }
+            });
+        }
+
+        // --- PANTALLA 1: BIENVENIDA ---
+        function startJourney() {
+            const nameInput = document.getElementById('player-name').value;
+            if (nameInput.trim()) {
+                state.playerName = nameInput.trim();
+            }
+            playSound('success');
+            showScreen('screen-reaction-intro');
+        }
+
+        // --- PANTALLA 2: CONFIGURACIÓN TEST REACCIÓN ---
+        function setSpeed(kmh, element) {
+            state.speedKmh = kmh;
+            playSound('beep');
+            
+            // Visual Active State Update
+            document.querySelectorAll('.speed-btn').forEach(btn => {
+                btn.classList.remove('border-colmena-orange', 'text-colmena-orange');
+                btn.classList.add('border-slate-300', 'text-slate-700');
+            });
+            element.classList.add('border-colmena-orange', 'text-colmena-orange');
+            element.classList.remove('border-slate-300', 'text-slate-700');
+        }
+
+        function setRoadCondition(condition, element) {
+            state.roadCondition = condition;
+            playSound('beep');
+
+            document.querySelectorAll('.road-btn').forEach(btn => {
+                btn.classList.remove('border-colmena-orange', 'text-colmena-orange');
+                btn.classList.add('border-slate-300', 'text-slate-700');
+            });
+            element.classList.add('border-colmena-orange', 'text-colmena-orange');
+            element.classList.remove('border-slate-300', 'text-slate-700');
+        }
+
+        // --- PANTALLA 3: INTERFAZ JUEGO DE REACCIÓN ---
+        let reactionTimer = null;
+        let testRunning = false;
+        let greenTime = 0;
+
+        function initiateReactionGame() {
+            showScreen('screen-reaction-game');
+            
+            // Set stats details inside game view header
+            document.getElementById('game-speed-val').innerText = `${state.speedKmh} km/h`;
+            document.getElementById('game-road-val').innerText = state.roadCondition === 'dry' ? '☀️ Seca' : '🌧️ Mojada';
+
+            // Reset box to Prepared / Red state
+            const rBox = document.getElementById('reaction-box');
+            rBox.className = "w-full h-80 rounded-2xl bg-rose-600 flex flex-col items-center justify-center cursor-pointer text-white select-none transition-colors duration-100 relative overflow-hidden shadow-inner";
+            document.getElementById('reaction-emoji').innerText = "🚦";
+            document.getElementById('reaction-instruction').innerText = "¡PREPARADO! NO PRESIONES AÚN";
+            document.getElementById('reaction-sub').innerText = "La pantalla se volverá verde en cualquier instante...";
+            document.getElementById('reaction-pulse-ring').style.display = 'block';
+
+            testRunning = true;
+
+            // Random delay between 1.5 to 4 seconds
+            const delay = 1500 + Math.random() * 2500;
+            reactionTimer = setTimeout(() => {
+                if (testRunning) {
+                    triggerGreenLight();
+                }
+            }, delay);
+        }
+
+        function triggerGreenLight() {
+            greenTime = performance.now();
+            const rBox = document.getElementById('reaction-box');
+            rBox.className = "w-full h-80 rounded-2xl bg-colmena-green flex flex-col items-center justify-center cursor-pointer text-white select-none transition-colors duration-100 relative overflow-hidden shadow-inner";
+            
+            document.getElementById('reaction-emoji').innerText = "🛑 ¡FRENAR! 🛑";
+            document.getElementById('reaction-instruction').innerText = "¡PRESIONA AHORA MISMO!";
+            document.getElementById('reaction-sub').innerText = "¡Reacciona lo más rápido que puedas!";
+            document.getElementById('reaction-pulse-ring').style.display = 'none';
+            playSound('beep');
+        }
+
+        function handleReactionTrigger() {
+            if (!testRunning) return;
+
+            const now = performance.now();
+            if (greenTime === 0) {
+                // Anticipated press / False Start (Disruptive alert)
+                clearTimeout(reactionTimer);
+                playSound('error');
+                
+                // Show dynamic Modal/Error feedback directly in the box
+                const rBox = document.getElementById('reaction-box');
+                rBox.className = "w-full h-80 rounded-2xl bg-slate-800 flex flex-col items-center justify-center cursor-pointer text-white select-none transition-colors duration-100 relative overflow-hidden";
+                document.getElementById('reaction-emoji').innerText = "⚠️";
+                document.getElementById('reaction-instruction').innerText = "¡ANTICIPACIÓN ERROR!";
+                document.getElementById('reaction-sub').innerText = "Presionaste antes del verde. Reiniciando simulación...";
+                
+                testRunning = false;
+                setTimeout(initiateReactionGame, 1800);
+            } else {
+                // Successful Reaction!
+                state.reactionTimeMs = (now - greenTime) / 1000; // in seconds
+                testRunning = false;
+                playSound('brake');
+                
+                // Transition to results screen
+                calculatePhysicsAndShowResults();
+            }
+        }
+
+        function restartReactionTest() {
+            greenTime = 0;
+            testRunning = false;
+            clearTimeout(reactionTimer);
+            initiateReactionGame();
+        }
+
+        // --- PANTALLA 4: PROCESAR FÍSICA Y MOSTRAR RESULTADOS ---
+        function calculatePhysicsAndShowResults() {
+            const v_ms = state.speedKmh / 3.6; // Km/h to m/s
+            
+            // Reaction distance
+            state.reactionDist = v_ms * state.reactionTimeMs;
+            
+            // Friction coefficient mu based on road conditions
+            const mu = state.roadCondition === 'dry' ? 0.7 : 0.4;
+            const g = 9.81;
+            
+            // Braking distance (classic mechanics formula)
+            state.brakingDist = (v_ms * v_ms) / (2 * g * mu);
+            
+            // Total stopping distance
+            state.totalStoppingDist = state.reactionDist + state.brakingDist;
+
+            // DOM Updates
+            document.getElementById('res-reaction-time').innerText = `${state.reactionTimeMs.toFixed(3)} s`;
+            document.getElementById('res-speed').innerText = `${state.speedKmh} km/h`;
+            document.getElementById('res-speed-ms').innerText = `${v_ms.toFixed(1)} m/s recorridos`;
+            document.getElementById('res-total-dist').innerText = `${state.totalStoppingDist.toFixed(1)} m`;
+
+            // Setup a readable rating scale
+            let rank = "";
+            if (state.reactionTimeMs < 0.22) {
+                rank = "⚡ ¡Reflejos Supersónicos! (Excelente)";
+            } else if (state.reactionTimeMs < 0.35) {
+                rank = "🟢 Excelente tiempo de reacción.";
+            } else if (state.reactionTimeMs < 0.5) {
+                rank = "🟡 Promedio aceptable. Podrías mejorar.";
+            } else {
+                rank = "🔴 Atención: Reflejos lentos. Fatiga posible.";
+            }
+            document.getElementById('res-reaction-rank').innerText = rank;
+
+            // Simple visual distance scale context
+            let contextText = "";
+            if (state.totalStoppingDist < 12) {
+                contextText = "Equivalente a un autobús escolar de largo.";
+            } else if (state.totalStoppingDist < 25) {
+                contextText = "Equivalente a una piscina semi-olímpica de largo.";
+            } else if (state.totalStoppingDist < 60) {
+                contextText = "Equivalente a medio campo de fútbol profesional.";
+            } else {
+                contextText = "¡Casi la longitud de un campo de fútbol entero!";
+            }
+            document.getElementById('res-total-compare').innerText = contextText;
+
+            // Calculations detailed breakdown update
+            document.getElementById('calc-dist-react').innerText = state.reactionDist.toFixed(1);
+            document.getElementById('calc-dist-brake').innerText = state.brakingDist.toFixed(1);
+
+            showScreen('screen-reaction-results');
+
+            // Trigger visual animation inside the simulated diagram
+            setTimeout(() => {
+                const totalM = state.totalStoppingDist;
+                // Limit the maximum width to make it fit beautifully on desktop / mobile
+                const maxMeterLimit = state.speedKmh === 120 ? 140 : 60; 
+                
+                // Calculate percentage positions for graphics rendering
+                const reactPercent = Math.min((state.reactionDist / totalM) * 100, 45);
+                const brakePercent = Math.min((state.brakingDist / totalM) * 100, 45);
+
+                const vReactZone = document.getElementById('visual-reaction-zone');
+                const vBrakeZone = document.getElementById('visual-braking-zone');
+                const vCar = document.getElementById('visual-car');
+
+                vReactZone.style.width = `${reactPercent}%`;
+                vBrakeZone.style.left = `${reactPercent}%`;
+                vBrakeZone.style.width = `${brakePercent}%`;
+
+                // Move car to final simulated point
+                const stopPercent = Math.min(reactPercent + brakePercent, 80);
+                vCar.style.left = `${stopPercent}%`;
+            }, 300);
+        }
+
+        // --- PANTALLA 5: INTRO TEST DE CONTROL INHIBITORIO ---
+        function goToInhibitoryIntro() {
+            playSound('success');
+            showScreen('screen-inhibitory-intro');
+        }
+
+        // --- PANTALLA 6: INTERFAZ JUEGO DE CONTROL INHIBITORIO ---
+        function initiateInhibitoryGame() {
+            showScreen('screen-inhibitory-game');
+            
+            // Reset state metrics
+            state.inhibitoryGoCount = 0;
+            state.inhibitoryGoCorrect = 0;
+            state.inhibitoryNoGoCount = 0;
+            state.inhibitoryNoGoErrors = 0;
+            state.inhibitoryIndex = 0;
+
+            // Generate an interesting random sequence of Go/No-Go items (10 total)
+            // 0: NO-GO, 1: GO
+            // We want roughly 7 Go elements and 3 No-Go elements
+            state.inhibitorySequence = [1, 0, 1, 1, 0, 1, 1, 1, 0, 1];
+            // Shuffle sequence slightly to keep it completely dynamic
+            state.inhibitorySequence.sort(() => Math.random() - 0.5);
+
+            document.getElementById('inhib-score-go').innerText = "0";
+            document.getElementById('inhib-score-errors').innerText = "0";
+            document.getElementById('inhib-progress').innerText = `0/10`;
+
+            nextInhibitoryStep();
+        }
+
+        const stimuliPool = {
+            go: [
+                { emoji: "🟢", text: "VÍA LIBRE / ADELANTE", bg: "bg-emerald-500" },
+                { emoji: "🛣️", text: "CARRETERA DESPEJADA", bg: "bg-emerald-500" },
+                { emoji: "🚙", text: "CIRCULACIÓN FLUIDA", bg: "bg-emerald-500" },
+                { emoji: "↗️", text: "GIRO PERMITIDO", bg: "bg-emerald-500" }
+            ],
+            nogo: [
+                { emoji: "🛑", text: "¡ALTO! PARADA", bg: "bg-rose-500" },
+                { emoji: "🐕", text: "ANIMAL EN LA VÍA", bg: "bg-rose-500" },
+                { emoji: "⚠️", text: "ZONA DE OBRAS", bg: "bg-rose-500" },
+                { emoji: "🚶", text: "PEATÓN CRUZANDO", bg: "bg-rose-500" }
+            ]
+        };
+
+        let currentStimulus = null;
+        let stimulusActive = false;
+        let stimulusTimer = null;
+        let responseReported = false;
+
+        function nextInhibitoryStep() {
+            if (state.inhibitoryIndex >= 10) {
+                // Completed the 10 stimuli series
+                showInhibitoryResults();
+                return;
+            }
+
+            document.getElementById('inhib-progress').innerText = `${state.inhibitoryIndex + 1}/10`;
+            responseReported = false;
+            stimulusActive = false;
+
+            const isGo = state.inhibitorySequence[state.inhibitoryIndex] === 1;
+
+            // Intermediate standby phase (neutral screen to avoid constant clicking)
+            const gArea = document.getElementById('inhib-game-area');
+            gArea.className = "w-full h-80 rounded-2xl bg-slate-100 border-4 border-slate-200 flex flex-col items-center justify-center cursor-pointer select-none relative overflow-hidden transition-all";
+            document.getElementById('inhib-emoji').innerText = "⏱️";
+            document.getElementById('inhib-text').innerText = "¡PREPÁRATE!";
+            document.getElementById('inhib-subtext').innerText = "Se aproxima la señalización...";
+
+            const waitTime = 1000 + Math.random() * 1500;
+            
+            setTimeout(() => {
+                // Display stimulus
+                stimulusActive = true;
+                if (isGo) {
+                    currentStimulus = stimuliPool.go[Math.floor(Math.random() * stimuliPool.go.length)];
+                    state.inhibitoryGoCount++;
+                } else {
+                    currentStimulus = stimuliPool.nogo[Math.floor(Math.random() * stimuliPool.nogo.length)];
+                    state.inhibitoryNoGoCount++;
+                }
+
+                gArea.classList.remove('bg-slate-100', 'border-slate-200');
+                gArea.classList.add('bg-white', 'border-slate-300');
+                
+                document.getElementById('inhib-emoji').innerText = currentStimulus.emoji;
+                document.getElementById('inhib-text').innerText = currentStimulus.text;
+                document.getElementById('inhib-subtext').innerText = "¡ACTÚA RÁPIDO SI ES SEGURO!";
+
+                // Pulse animation effect
+                document.getElementById('inhib-emoji').classList.add('scale-125');
+                setTimeout(() => {
+                    document.getElementById('inhib-emoji').classList.remove('scale-125');
+                }, 100);
+
+                // Play soft beep alert
+                playSound('beep');
+
+                // Stimulus visible limit (900ms - fast reaction requested)
+                stimulusTimer = setTimeout(() => {
+                    handleStimulusExpiration();
+                }, 900);
+
+            }, waitTime);
+        }
+
+        function handleInhibitoryClick() {
+            if (!stimulusActive || responseReported) return;
+            
+            responseReported = true;
+            const isGo = state.inhibitorySequence[state.inhibitoryIndex] === 1;
+            const overlay = document.getElementById('inhib-overlay');
+
+            if (isGo) {
+                // Excellent response
+                state.inhibitoryGoCorrect++;
+                document.getElementById('inhib-score-go').innerText = state.inhibitoryGoCorrect;
+                
+                // Green positive flashing
+                overlay.className = "absolute inset-0 pointer-events-none transition-opacity duration-150 bg-emerald-500/20 opacity-100 z-10";
+                playSound('success');
+            } else {
+                // Error of commission (Impulsivity)
+                state.inhibitoryNoGoErrors++;
+                document.getElementById('inhib-score-errors').innerText = state.inhibitoryNoGoErrors;
+
+                // Red error flashing
+                overlay.className = "absolute inset-0 pointer-events-none transition-opacity duration-150 bg-rose-500/20 opacity-100 z-10";
+                playSound('error');
+            }
+
+            // Quick fade out of splash
+            setTimeout(() => {
+                overlay.style.opacity = '0';
+            }, 150);
+
+            clearTimeout(stimulusTimer);
+            state.inhibitoryIndex++;
+            setTimeout(nextInhibitoryStep, 500);
+        }
+
+        function handleStimulusExpiration() {
+            if (!stimulusActive || responseReported) return;
+            
+            responseReported = true;
+            const isGo = state.inhibitorySequence[state.inhibitoryIndex] === 1;
+
+            if (isGo) {
+                // User missed a GO signal (omission)
+                // Not counted as error of impulsivity, but affects perfect score
+                playSound('warning');
+            } else {
+                // Correctly avoided the hazard (inhibited response!)
+                playSound('beep');
+            }
+
+            state.inhibitoryIndex++;
+            nextInhibitoryStep();
+        }
+
+        // --- PANTALLA 7: MOSTRAR RESULTADOS CONTROL INHIBITORIO ---
+        function showInhibitoryResults() {
+            // Calculate accuracy
+            const totalEst = state.inhibitoryGoCount + state.inhibitoryNoGoCount;
+            // Best accuracy = (Correct Gos + Avoided NoGos) / Total
+            const avoidedNoGos = state.inhibitoryNoGoCount - state.inhibitoryNoGoErrors;
+            const accuracy = ((state.inhibitoryGoCorrect + avoidedNoGos) / totalEst) * 100;
+
+            document.getElementById('inhib-res-go').innerText = `${state.inhibitoryGoCorrect} / ${state.inhibitoryGoCount}`;
+            document.getElementById('inhib-res-no-go').innerText = `${state.inhibitoryNoGoErrors} / ${state.inhibitoryNoGoCount}`;
+            document.getElementById('inhib-res-accuracy').innerText = `${accuracy.toFixed(0)}%`;
+
+            // Customize narrative analysis
+            let descText = "";
+            if (accuracy >= 90) {
+                descText = `<strong>¡Excelente Autocontrol!</strong> Tu nivel de reflexividad es óptimo. Sabes discriminar perfectamente entre las oportunidades de avance y las alertas reales que exigen frenar a cero. Eres una persona con excelente control inhibitorio en la conducción.`;
+            } else if (accuracy >= 70) {
+                descText = `<strong>Autocontrol Promedio.</strong> Respondiste adecuadamente a la mayoría de señales, pero tuviste algún impulso de actuar frente a peligros inminentes. Recuerda que ante la duda en la vía, la precaución siempre va primero.`;
+            } else {
+                descText = `<strong>Perfil Altamente Impulsivo.</strong> Tienes dificultades para contener la respuesta motora. Esto se traduce en la vida real en comportamientos de riesgo como acelerar ante semáforos en amarillo, sobrepasar de forma peligrosa o reaccionar instintivamente tarde ante imprevistos. ¡Debes entrenar tu paciencia tras el volante!`;
+            }
+            document.getElementById('inhib-feedback-desc').innerHTML = descText;
+
+            showScreen('screen-inhibitory-results');
+        }
+
+        function goToSustainedIntro() {
+            playSound('success');
+            showScreen('screen-sustained-intro');
+        }
+
+        // --- PANTALLA 8: ATENCIÓN SOSTENIDA (VIGILANCIA EN RUTA) ---
+        function initiateSustainedGame() {
+            showScreen('screen-sustained-game');
+
+            // Reset state
+            state.sustainedTotalAlerts = 0;
+            state.sustainedCorrected = 0;
+            state.sustainedMissed = 0;
+            state.sustainedResponseTimes = [];
+            state.sustainedActiveAlert = false;
+            state.sustainedDurationLeft = 20;
+
+            document.getElementById('sustained-timer').innerText = `20s`;
+
+            // Start countdown timer loop
+            state.sustainedTimerIntervalId = setInterval(() => {
+                state.sustainedDurationLeft--;
+                document.getElementById('sustained-timer').innerText = `${state.sustainedDurationLeft}s`;
+                
+                if (state.sustainedDurationLeft <= 0) {
+                    stopSustainedGame();
+                }
+            }, 1000);
+
+            // Start event generator loop (produces lane drift or engine alert every 3 to 5s)
+            generateSustainedEvent();
+        }
+
+        let eventType = ''; // 'drift-left', 'drift-right', 'alert-engine'
+
+        function generateSustainedEvent() {
+            if (state.sustainedDurationLeft <= 0) return;
+
+            const nextEventDelay = 2500 + Math.random() * 2500;
+            
+            state.sustainedTimeoutId = setTimeout(() => {
+                if (state.sustainedDurationLeft <= 0) return;
+
+                // Select event type
+                const r = Math.random();
+                const dCar = document.getElementById('drifting-car');
+                const alertLight = document.getElementById('cockpit-engine-alert');
+
+                if (r < 0.33) {
+                    eventType = 'drift-left';
+                    dCar.style.transform = 'translateX(-70px)';
+                } else if (r < 0.66) {
+                    eventType = 'drift-right';
+                    dCar.style.transform = 'translateX(70px)';
+                } else {
+                    eventType = 'alert-engine';
+                    alertLight.style.opacity = '1';
+                }
+
+                playSound('warning');
+                state.sustainedActiveAlert = true;
+                state.sustainedAlertStartTime = performance.now();
+                state.sustainedTotalAlerts++;
+
+                // Give the player exactly 1.8 seconds to correct before counting as "Missed/Failed"
+                state.sustainedIntervalId = setTimeout(() => {
+                    if (state.sustainedActiveAlert) {
+                        // Alert missed
+                        state.sustainedMissed++;
+                        state.sustainedActiveAlert = false;
+                        resetVisualIndicators();
+                        playSound('error');
+                        // Loop to next event
+                        generateSustainedEvent();
+                    }
+                }, 1800);
+
+            }, nextEventDelay);
+        }
+
+        function resetVisualIndicators() {
+            document.getElementById('drifting-car').style.transform = 'translateX(0px)';
+            document.getElementById('cockpit-engine-alert').style.opacity = '0';
+        }
+
+        function handleSustainedCorrection() {
+            if (!state.sustainedActiveAlert) {
+                // False correction click (clicked when everything was fine)
+                playSound('error');
+                return;
+            }
+
+            const now = performance.now();
+            const timeDiff = (now - state.sustainedAlertStartTime) / 1000;
+            state.sustainedResponseTimes.push(timeDiff);
+            
+            state.sustainedCorrected++;
+            state.sustainedActiveAlert = false;
+            
+            clearTimeout(state.sustainedIntervalId);
+            resetVisualIndicators();
+            playSound('success');
+
+            // Queue up the next event
+            generateSustainedEvent();
+        }
+
+        function stopSustainedGame() {
+            clearInterval(state.sustainedTimerIntervalId);
+            clearTimeout(state.sustainedTimeoutId);
+            clearTimeout(state.sustainedIntervalId);
+            resetVisualIndicators();
+
+            // Calculate metrics & move to next screen
+            const avgTime = state.sustainedResponseTimes.length > 0 
+                ? (state.sustainedResponseTimes.reduce((a, b) => a + b, 0) / state.sustainedResponseTimes.length).toFixed(2)
+                : "N/A";
+
+            document.getElementById('sust-res-corrected').innerText = `${state.sustainedCorrected} / ${state.sustainedTotalAlerts}`;
+            document.getElementById('sust-res-missed').innerText = `${state.sustainedMissed}`;
+            document.getElementById('sust-res-avgtime').innerText = avgTime !== "N/A" ? `${avgTime}s` : "0.0s";
+
+            showScreen('screen-sustained-results');
+        }
+
+        // --- PANTALLA 11: REPORTE FINAL Y LICENCIA COGNITIVA ---
+        function calculateFinalScore() {
+            playSound('success');
+
+            // Let's calculate an awesome final percentage score of safety
+            // Weighting: Reaction Time (30%), Inhibitory (40%), Sustained (30%)
+            
+            // 1. Reaction Score
+            let reactScore = 100;
+            if (state.reactionTimeMs > 0.5) reactScore = 50;
+            else if (state.reactionTimeMs > 0.35) reactScore = 75;
+            else if (state.reactionTimeMs > 0.25) reactScore = 90;
+
+            // 2. Inhibitory Score
+            const avoidedNoGos = state.inhibitoryNoGoCount - state.inhibitoryNoGoErrors;
+            const inhibScore = ((state.inhibitoryGoCorrect + avoidedNoGos) / (state.inhibitoryGoCount + state.inhibitoryNoGoCount)) * 100;
+
+            // 3. Sustained Score
+            const sustainedScore = state.sustainedTotalAlerts > 0 
+                ? (state.sustainedCorrected / state.sustainedTotalAlerts) * 100
+                : 100;
+
+            // Total Weighted Score
+            const totalScore = (reactScore * 0.3) + (inhibScore * 0.4) + (sustainedScore * 0.3);
+
+            // Populate the Virtual License Card
+            document.getElementById('license-name').innerText = state.playerName;
+            document.getElementById('lic-reaction').innerText = `${state.reactionTimeMs.toFixed(3)} s`;
+            document.getElementById('lic-inhib').innerText = `${inhibScore.toFixed(0)}% Precisión`;
+            document.getElementById('lic-sustained').innerText = `${sustainedScore.toFixed(0)}% Corrección`;
+            document.getElementById('lic-total-score').innerText = `${totalScore.toFixed(0)}%`;
+
+            // Unique random license check code
+            const randomCode = `ARL-${Math.floor(1000 + Math.random() * 9000)}`;
+            document.getElementById('license-code').innerText = randomCode;
+
+            // Prevention Recommendations Builder based on their weaknesses
+            const preventionTips = document.getElementById('prevention-tips-list');
+            preventionTips.innerHTML = ""; // Clear
+
+            const tips = [];
+            
+            // Custom logic feedback tips
+            if (state.reactionTimeMs > 0.35) {
+                tips.push("<strong>Frenos de reacción tardía:</strong> Presentas ligeras demoras al frenar de imprevisto. Te aconsejamos duplicar la distancia de seguridad con el vehículo de adelante (deja un espacio de mínimo 3 segundos).");
+            } else {
+                tips.push("<strong>Excelente velocidad de reacción:</strong> Mantén tus reflejos realizando pausas activas físicas para evitar espasmos musculares durante el manejo.");
+            }
+
+            if (inhibScore < 80) {
+                tips.push("<strong>Riesgo de respuesta compulsiva:</strong> Muestras tendencia a actuar apresuradamente bajo estrés. Evita sobrepasar en curvas y respeta estrictamente los cruces de peatones y semáforos amarillos.");
+            } else {
+                tips.push("<strong>Autocontrol de conductor profesional:</strong> Mantienes la cabeza fría en situaciones complejas, lo que disminuye en un 40% el riesgo de siniestros.");
+            }
+
+            if (sustainedScore < 80) {
+                tips.push("<strong>Monotonía y fatiga:</strong> Tu capacidad de reacción disminuyó durante el simulacro continuado. Si realizas trayectos de más de 2 horas, haz paradas obligatorias de 15 minutos para hidratarte y estirar.");
+            } else {
+                tips.push("<strong>Atención continua al 100%:</strong> Tienes muy buen enfoque periférico, esencial para detectar fallas mecánicas en el tablero e invasión de carriles.");
+            }
+
+            tips.forEach(tip => {
+                const li = document.createElement('li');
+                li.innerHTML = tip;
+                preventionTips.appendChild(li);
+            });
+
+            showScreen('screen-final-report');
+        }
+
+        function restartEntireExperience() {
+            // Reset core values
+            state.playerName = "Conductor Estrella";
+            state.speedKmh = 50;
+            state.roadCondition = 'dry';
+            greenTime = 0;
+            testRunning = false;
+            clearTimeout(reactionTimer);
+
+            // Back to initial screen
+            showScreen('screen-welcome');
+        }
+    </script>
+</body>
+</html>
