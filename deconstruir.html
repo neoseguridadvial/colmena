@@ -1,253 +1,1191 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Compass, 
-  HelpCircle, 
-  BookOpen, 
-  ArrowRight, 
-  CheckCircle2, 
-  XCircle, 
-  AlertTriangle, 
-  Award, 
-  RefreshCw, 
-  MessageSquare, 
-  FileText, 
-  Sliders, 
-  ShieldAlert, 
-  Users, 
-  Zap,
-  ChevronRight,
-  Info,
-  Lightbulb,
-  Send,
-  Sparkles
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvestigaConSentido - Asistente de Investigación con Enfoque HOP</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'spin-slow': 'spin 8s linear infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Smooth fade-in animation for tab switches */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-full flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-900">
 
-// ==========================================
-// SCENARIOS DATA (TALLER DE PRÁCTICA)
-// ==========================================
-const SCENARIOS = [
-  {
-    id: 1,
-    title: "El Técnico y la Prisa Operativa",
-    category: "Procedimientos & LOTO",
-    description: "Un electricista omitió el bloqueo de seguridad (LOTO) en un tablero secundario para reactivar rápidamente una línea de producción detenida. Sufrió un arco eléctrico leve al hacer contacto accidental.",
-    closedStatement: "El técnico fue negligente, no cumplió el procedimiento obligatorio de bloqueo por pereza o prisa.",
-    closedQuestion: "¿Por qué el técnico decidió ignorar la regla de oro de LOTO?",
-    contextTips: {
-      performanceMechanisms: "Presión de tiempo por paradas de producción, disponibilidad de candados de bloqueo en la zona, claridad física de los diagramas unifilares.",
-      organizationalBarriers: "Procedimientos de parada rápida aprobados por gerencia, auditorías de cumplimiento real frente a cumplimiento nominal."
-    },
-    idealExamples: [
-      "¿Qué demandas operativas o presiones externas estaban influyendo en el tiempo asignado para esta reparación?",
-      "¿Qué dificultades físicas o logísticas presenta el proceso de colocación de candados LOTO en este tablero específico?",
-      "¿Cómo se maneja organizacionalmente la tensión entre la velocidad de reactivación y los tiempos requeridos para un bloqueo seguro?"
-    ]
-  },
-  {
-    id: 2,
-    title: "El Conductor de Montacargas 'Distraído'",
-    category: "Logística y Almacén",
-    description: "Durante el turno de la noche, un conductor de montacargas colisionó fuertemente contra un estante de almacenamiento de doble altura, provocando la caída de estibas vacías. En las cámaras se observa que miraba hacia abajo.",
-    closedStatement: "El conductor se distrajo y no estaba prestando atención a la ruta de conducción.",
-    closedQuestion: "¿Por qué se distrajo el conductor de montacargas?",
-    contextTips: {
-      performanceMechanisms: "Alertas acústicas o visuales en la cabina, fatiga por turnos rotativos acumulados, necesidad de consultar hojas de ruta impresas o terminales de datos en movimiento.",
-      organizationalBarriers: "Diseño ergonómico de la interfaz de carga de tareas, iluminación en las zonas de tránsito de doble altura, políticas reales de descanso en turnos nocturnos."
-    },
-    idealExamples: [
-      "¿Qué herramientas, pantallas o demandas de información competían por la atención visual del conductor en ese instante?",
-      "¿Cuáles eran las condiciones de fatiga, ritmo de trabajo y rotación de turnos del operador durante esa noche?",
-      "¿De qué manera el diseño del flujo del almacén separa las tareas de lectura de órdenes de la tarea física de conducción?"
-    ]
-  },
-  {
-    id: 3,
-    title: "El Resbalón en la Plataforma",
-    category: "Mantenimiento / Alturas",
-    description: "Un mecánico de mantenimiento resbaló en los peldaños de la escalera de una plataforma de acceso mientras transportaba una caja de herramientas pesada. Se detectó una película delgada de aceite hidráulico en el peldaño.",
-    closedStatement: "El mecánico no tuvo cuidado, no limpió el derrame de aceite antes de subir y llevaba exceso de carga sin usar tres puntos de apoyo.",
-    closedQuestion: "¿Por qué el mecánico no limpió el aceite ni usó tres puntos de apoyo?",
-    contextTips: {
-      performanceMechanisms: "Disponibilidad de kits de limpieza cerca de la plataforma, diseño de la caja de herramientas (falta de arnés o correa de transporte), estado del calzado de seguridad provisto.",
-      organizationalBarriers: "Sistemas preventivos de reporte y eliminación de fugas crónicas de fluidos, diseño de las escaleras (rejilla autolimpiante vs peldaño liso)."
-    },
-    idealExamples: [
-      "¿Qué información y elementos de limpieza estaban disponibles y accesibles de manera inmediata para mitigar el derrame?",
-      "¿Qué alternativas seguras de transporte de herramientas pesadas (como poleas o mochilas técnicas) están integradas en la tarea?",
-      "¿Cómo se gestionan las fugas hidráulicas crónicas en esa sección para evitar que se conviertan en condiciones normales de trabajo?"
-    ]
-  },
-  {
-    id: 4,
-    title: "El Cambio de Válvula de Emergencia",
-    category: "Operación de Planta",
-    description: "Un operador realizó el cambio de una válvula de presión de vapor utilizando herramientas no calibradas y sin diligenciar el Permiso de Trabajo de Alto Riesgo, argumentando que era una emergencia para evitar una sobrepresión mayor.",
-    closedStatement: "El operador se saltó el protocolo de seguridad y actuó de manera temeraria sin autorización.",
-    closedQuestion: "¿Por qué el operador actuó de manera temeraria omitiendo el permiso?",
-    contextTips: {
-      performanceMechanisms: "Percepción de gravedad del peligro de sobrepresión, lentitud o burocracia percibida del sistema de permisos de trabajo en momentos críticos, disponibilidad de herramientas adecuadas.",
-      organizationalBarriers: "Definición organizacional clara de qué constituye una 'emergencia de planta' frente a una operación normal, mecanismos rápidos de autorización de seguridad."
-    },
-    idealExamples: [
-      "¿Qué señales de planta y alarmas llevaron al operador a percibir una situación de emergencia inminente?",
-      "¿Qué obstáculos o demoras en el proceso estándar de permisos de trabajo incentivan el bypass en situaciones urgentes?",
-      "¿Cómo responde el sistema de gestión de seguridad ante decisiones individuales tomadas bajo la premisa de proteger la planta?"
-    ]
-  }
-];
+    <!-- HEADER BAR -->
+    <header class="border-b border-slate-800 bg-slate-950 px-6 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40 shadow-md">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg border border-emerald-500/20">
+                <i data-lucide="shield-alert" class="w-6 h-6 animate-pulse"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                    InvestigaConSentido 
+                    <span class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded">Metodología HOP</span>
+                </h1>
+                <p class="text-xs text-slate-400">Entrenamiento Lingüístico y Metodológico para Seguridad Industrial</p>
+            </div>
+        </div>
 
-// ==========================================
-// LIBRARY OF TRANSLATIONS (EQUIVALENCIAS)
-// ==========================================
-const TRANSFORMATION_LIBRARY = [
-  {
-    original: "Se distrajo",
-    error: "Culpa al individuo, asume flojera cognitiva.",
-    openQuestion: "¿Qué demandas competían por su atención en ese momento?",
-    discovery: "Llamadas operativas de radio, alarmas concurrentes, pantallas de datos, fatiga o condiciones climáticas demandantes."
-  },
-  {
-    original: "No tuvo cuidado",
-    error: "Atribuye un rasgo de carácter temporal sin buscar el disparador situacional.",
-    openQuestion: "¿Qué información estaba disponible en el entorno y cuál no pudo ser interpretada o recibida?",
-    discovery: "Falta de sensores visuales, indicadores analógicos confusos, ruido ensordecedor que tapó una alerta de audio."
-  },
-  {
-    original: "No cumplió el procedimiento",
-    error: "Asume que el procedimiento escrito siempre es perfecto y aplicable al contexto real.",
-    openQuestion: "¿Qué condiciones del entorno hicieron difícil, ineficiente o peligroso cumplir el procedimiento al pie de la letra?",
-    discovery: "Herramientas faltantes, contradicción entre pasos teóricos y realidad física, procedimientos desactualizados por cambio de equipos."
-  },
-  {
-    original: "Cometió un error de cálculo / error humano",
-    error: "Usa el 'error humano' como causa raíz en lugar de verlo como el síntoma de un sistema mal diseñado.",
-    openQuestion: "¿Cómo apoyaba el diseño de los controles e interfaces la toma de decisiones correctas bajo las condiciones reales?",
-    discovery: "Botones idénticos colocados uno al lado del otro, escalas de medición difíciles de leer en la penumbra, falta de retroalimentación de confirmación."
-  },
-  {
-    original: "Trabajaba demasiado lento/rápido",
-    error: "Juzga el ritmo de trabajo sin comprender los incentivos y presiones subyacentes.",
-    openQuestion: "¿Cómo equilibra el equipo la tensión diaria entre los objetivos de productividad y las exigencias de seguridad?",
-    discovery: "Bonos ligados exclusivamente al tonelaje despachado, regaños verbales por retrasos en los informes diarios."
-  }
-];
+        <!-- API Key Controller -->
+        <div class="flex items-center space-x-2">
+            <button 
+                id="apiKeyBtn"
+                onclick="openApiKeyModal()"
+                class="text-xs px-3 py-1.5 rounded-md border flex items-center gap-1.5 transition-all bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700"
+            >
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-slate-400"></i>
+                <span id="apiKeyBtnText">Configurar Gemini API (Opcional)</span>
+            </button>
+        </div>
+    </header>
 
-// ==========================================
-// MAIN COMPONENT
-// ==========================================
-export default function App() {
-  const [activeTab, setActiveTab] = useState('theory'); // theory, workshop, sandbox, library
-  const [customApiKey, setCustomApiKey] = useState('');
-  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
-  
-  // States for interactive workshop
-  const [selectedScenarioIndex, setSelectedScenarioIndex] = useState(0);
-  const [userFormulation, setUserFormulation] = useState('');
-  const [evaluationResult, setEvaluationResult] = useState(null);
-  const [isEvaluating, setIsEvaluating] = useState(false);
-  
-  // States for sandbox
-  const [sandboxClosedPhrase, setSandboxClosedPhrase] = useState('');
-  const [sandboxResult, setSandboxResult] = useState(null);
-  const [isAnalyzingSandbox, setIsAnalyzingSandbox] = useState(false);
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-  // States for Toast/Notification
-  const [toastMessage, setToastMessage] = useState(null);
+    <!-- API KEY CONFIGURATION MODAL -->
+    <div id="apiKeyModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-md w-full p-6 shadow-2xl">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="sparkles" class="text-emerald-400 w-5 h-5"></i> Configurar API de Google Gemini
+                </h3>
+                <button onclick="closeApiKeyModal()" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+            </div>
+            
+            <p class="text-sm text-slate-400 mb-4 leading-relaxed">
+                Esta aplicación puede conectarse directamente con el modelo de lenguaje de última generación <strong class="text-emerald-400">gemini-2.5-flash-preview-09-2025</strong> para darte una evaluación pedagógica altamente personalizada de tus preguntas de investigación.
+            </p>
 
-  const showToast = (message, type = 'info') => {
-    setToastMessage({ message, type });
-    setTimeout(() => setToastMessage(null), 4000);
-  };
+            <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3 mb-4">
+                <p class="text-xs text-emerald-300 leading-snug">
+                    <strong>¿No tienes API Key?</strong> ¡No te preocupes! Déjala en blanco. La aplicación incluye un robusto motor heurístico local que simula con alta precisión el análisis técnico metodológico para todos los casos de estudio.
+                </p>
+            </div>
 
-  // Local rule-based fallback analysis in case API key is missing or fails
-  const localEvaluation = (question, closedPhrase, context) => {
-    const qLower = question.toLowerCase().trim();
-    
-    if (qLower.length < 15) {
-      return {
-        score: 35,
-        type: "Cerrada / Muy Corta",
-        critique: "La pregunta planteada es demasiado breve o simplificada. Difícilmente logrará abrir un espacio de indagación sobre el contexto sistémico. Intenta formular una pregunta completa que empiece con qué, cómo, o en qué condiciones.",
-        alternative: context.idealExamples[0],
-        mechanism_identified: "Falta de profundidad metodológica."
-      };
-    }
+            <div class="space-y-3">
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400">Tu Clave API de Google AI</label>
+                <input 
+                    type="password" 
+                    id="apiKeyInput"
+                    placeholder="AIzaSy..." 
+                    class="w-full bg-slate-950 border border-slate-800 rounded-md py-2 px-3 text-sm font-mono text-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                />
+                <p class="text-[11px] text-slate-500 italic">La API Key se almacena únicamente en tu navegador (localStorage) y se comunica exclusivamente de manera segura con los servidores de Google.</p>
+            </div>
 
-    // Check for open/closed markers
-    const closedKeywords = ["por qué", "por que", "quién", "quien", "culpable", "olvidó", "distrajo", "negligente", "desatención"];
-    const performanceKeywords = ["demanda", "atención", "información", "disponible", "tiempo", "presión", "fatiga", "turno", "herramienta", "físico", "obstáculo", "complicó", "complicidad", "diseño", "ayudó", "interfaz"];
-    const barrierKeywords = ["barrera", "procedimiento", "política", "control", "defensa", "salvaguarda", "auditoría", "organización", "gestión", "recurso", "capacitación", "entrenamiento"];
+            <div class="mt-6 flex justify-end gap-2">
+                <button
+                    onclick="clearApiKey()"
+                    class="px-3 py-1.5 rounded-md text-xs bg-red-950/40 text-red-400 border border-red-900/40 hover:bg-red-950/60"
+                >
+                  Limpiar Key
+                </button>
+                <button
+                    onclick="saveApiKey()"
+                    class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-1.5 rounded-md text-xs transition-colors"
+                >
+                  Guardar y Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
 
-    let score = 50;
-    let type = "Evaluación Local";
-    let detectedMechanisms = [];
-    
-    // Check closed keywords
-    let hasClosedMarkers = closedKeywords.some(kw => qLower.includes(kw));
-    if (hasClosedMarkers) {
-      score -= 20;
-    } else {
-      score += 15; // Point for avoiding closed traps
-    }
+    <!-- TOP NAVIGATION TABS -->
+    <nav class="bg-slate-950/80 backdrop-blur px-6 border-b border-slate-800 flex overflow-x-auto space-x-1 scrollbar-hide py-1">
+        <button 
+            onclick="switchTab('theory')"
+            id="tab-btn-theory"
+            class="tab-btn px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all whitespace-nowrap border-emerald-500 text-emerald-400 bg-emerald-500/5"
+        >
+            <i data-lucide="book-open" class="w-4 h-4"></i>
+            Metodología & Fundamento
+        </button>
 
-    // Check performance triggers
-    let hasPerformanceMarkers = false;
-    performanceKeywords.forEach(kw => {
-      if (qLower.includes(kw)) {
-        hasPerformanceMarkers = true;
-        score += 8;
-      }
-    });
+        <button 
+            onclick="switchTab('workshop')"
+            id="tab-btn-workshop"
+            class="tab-btn px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all whitespace-nowrap border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-800"
+        >
+            <i data-lucide="compass" class="w-4 h-4"></i>
+            Taller de Práctica
+        </button>
 
-    // Check barrier triggers
-    let hasBarrierMarkers = false;
-    barrierKeywords.forEach(kw => {
-      if (qLower.includes(kw)) {
-        hasBarrierMarkers = true;
-        score += 10;
-      }
-    });
+        <button 
+            onclick="switchTab('sandbox')"
+            id="tab-btn-sandbox"
+            class="tab-btn px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all whitespace-nowrap border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-800"
+        >
+            <i data-lucide="message-square" class="w-4 h-4"></i>
+            Laboratorio Libre (Deconstructor AI)
+        </button>
 
-    if (score > 100) score = 100;
-    if (score < 0) score = 15;
+        <button 
+            onclick="switchTab('library')"
+            id="tab-btn-library"
+            class="tab-btn px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all whitespace-nowrap border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-800"
+        >
+            <i data-lucide="sliders" class="w-4 h-4"></i>
+            Biblioteca de Equivalencias
+        </button>
+    </nav>
 
-    // Categorization
-    if (score < 55) {
-      type = "Pregunta Cerrada o Centrada en la Conducta";
-    } else if (hasBarrierMarkers && hasPerformanceMarkers) {
-      type = "Enfoque Integral (Mecanismos y Barreras)";
-    } else if (hasBarrierMarkers) {
-      type = "Enfoque en Barreras Organizacionales";
-    } else if (hasPerformanceMarkers) {
-      type = "Enfoque en Mecanismo de Desempeño";
-    } else {
-      type = "Pregunta Abierta Básica";
-    }
+    <!-- CORE LAYOUT -->
+    <main class="flex-1 overflow-y-auto p-6 max-w-7xl w-full mx-auto">
+        
+        <!-- ========================================== -->
+        <!-- TAB 1: THEORY & METHODOLOGY -->
+        <!-- ========================================== -->
+        <div id="tab-theory" class="tab-content active space-y-8">
+            
+            <!-- HERO INTRODUCTION -->
+            <div class="bg-gradient-to-r from-slate-900 via-slate-950 to-emerald-950 border border-slate-800 rounded-xl p-8 shadow-xl relative overflow-hidden">
+                <div class="absolute right-0 top-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="max-w-3xl space-y-4">
+                    <span class="text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full uppercase tracking-wider">
+                        El Poder de la Pregunta en HOP (Factores Humanos)
+                    </span>
+                    <h2 class="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">
+                        La calidad de una investigación depende de la calidad de sus preguntas.
+                    </h2>
+                    <p class="text-slate-300 text-base leading-relaxed">
+                        Si la pregunta es pobre y cerrada, la acción de respuesta será pobre y meramente punitiva. Cuando culpamos a un trabajador diciendo que <em>“se distrajo”</em> o <em>“no cumplió”</em>, cerramos el aprendizaje. Cuando preguntamos por los <strong>mecanismos del entorno físico y cognitivo</strong> que guiaron sus acciones en tiempo real, abrimos la puerta para rediseñar sistemas intrínsecamente más seguros.
+                    </p>
+                    <div class="flex flex-wrap gap-4 pt-4">
+                        <button 
+                            onclick="switchTab('workshop')"
+                            class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-5 py-2.5 rounded-lg text-sm flex items-center gap-2 transition-all shadow-lg hover:shadow-emerald-500/10"
+                        >
+                            Ir al Taller Práctico <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                        <button 
+                            onclick="switchTab('sandbox')"
+                            class="bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold px-5 py-2.5 rounded-lg text-sm border border-slate-700 transition-all"
+                        >
+                            Deconstruir mis propias frases
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-    // Draft customized feedback
-    let critique = "";
-    if (score < 55) {
-      critique = "Tu pregunta aún arrastra términos de juicio o busca el 'motivo personal' (el por qué interno de la acción). Esto puede inducir al entrevistado a defenderse o racionalizar su error en vez de describir el entorno físico e instructivo de la tarea.";
-    } else if (score >= 55 && score < 80) {
-      critique = "¡Vas por excelente camino! Has estructurado una pregunta abierta que evita culpar directamente. Sin embargo, para profundizar aún más, intenta indagar sobre las limitaciones específicas del entorno físico o los incentivos cruzados (como la tensión entre tiempo y seguridad).";
-    } else {
-      critique = "¡Excelente formulación! Esta pregunta desvía por completo el foco de la culpa individual. Abre la puerta para que el entrevistado describa de forma honesta las demandas que competían por su atención, los cuellos de botella del proceso y la disponibilidad real de herramientas o información.";
-    }
+            <!-- THE METODOLOGY TRANSITION MODEL -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+                <!-- CARD 1: CONDUCTA OBSERVABLE -->
+                <div class="bg-slate-950/60 border border-red-500/20 rounded-xl p-6 relative overflow-hidden animate-fadeIn">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-red-500/40"></div>
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-xs bg-red-500/10 text-red-400 border border-red-500/20 px-2.5 py-1 rounded-md font-bold uppercase">
+                            Paso 1: Lo que vimos
+                        </span>
+                        <i data-lucide="x-circle" class="w-5 h-5 text-red-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Conducta Observable</h3>
+                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+                        Es la superficie del problema. Lo que las cámaras grabaron o lo que dice el reporte preliminar del suceso.
+                    </p>
+                    <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-slate-300 italic mb-4">
+                        "El operador ingresó a la línea sin guantes protectores."
+                    </div>
+                    <div class="text-xs text-red-300 bg-red-950/20 border border-red-900/30 p-3 rounded-lg flex items-start gap-2">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0 mt-0.5"></i>
+                        <span><strong>Error común:</strong> Preguntar <em>¿Por qué no usó los guantes?</em> asumiendo desprecio deliberado por la seguridad.</span>
+                    </div>
+                </div>
 
-    return {
-      score,
-      type,
-      critique,
-      alternative: context.idealExamples[Math.floor(Math.random() * context.idealExamples.length)],
-      mechanism_identified: hasPerformanceMarkers ? "Factores contextuales inmediatos y carga de atención física/cognitiva." : "Sistemas organizacionales de control y gobernanza documental."
-    };
-  };
+                <!-- CARD 2: MECANISMO DE DESEMPEÑO -->
+                <div class="bg-slate-950/60 border border-emerald-500/20 rounded-xl p-6 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500/40"></div>
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-md font-bold uppercase">
+                            Paso 2: Cómo se produjo
+                        </span>
+                        <i data-lucide="sliders" class="w-5 h-5 text-emerald-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Mecanismo de Desempeño</h3>
+                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+                        El puente cognitivo y físico. Las demandas operativas que competían por la atención y las herramientas que realmente estaban disponibles.
+                    </p>
+                    <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-emerald-300 italic mb-4">
+                        "¿Qué demandas de destreza física o disponibilidad de equipos afectaron la elección del tipo de guante?"
+                    </div>
+                    <div class="text-xs text-emerald-300 bg-emerald-950/20 border border-emerald-900/30 p-3 rounded-lg flex items-start gap-2">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 shrink-0 mt-0.5"></i>
+                        <span><strong>Aporte:</strong> Revela que los guantes asignados no permiten manejar micro-componentes y el operador requería alta sensibilidad táctil.</span>
+                    </div>
+                </div>
 
-  // Perform Gemini AI request for Workshop Analysis
-  const evaluateQuestionWithAI = async (userQuestion, scenario) => {
-    setIsEvaluating(true);
-    
-    const systemPrompt = `Eres un experto en investigación de incidentes de seguridad industrial, Factores Humanos y Desempeño Organizacional (HOP) y de la corriente Safety-II.
+                <!-- CARD 3: BARRERA ORGANIZACIONAL -->
+                <div class="bg-slate-950/60 border border-blue-500/20 rounded-xl p-6 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-blue-500/40"></div>
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-md font-bold uppercase">
+                            Paso 3: Qué debió protegernos
+                        </span>
+                        <i data-lucide="shield-alert" class="w-5 h-5 text-blue-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Barrera Organizacional</h3>
+                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+                        Las salvaguardas de diseño que el sistema debió proveer para mitigar las consecuencias de la acción humana libre o errada.
+                    </p>
+                    <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-blue-300 italic mb-4">
+                        "¿De qué manera los procesos de compras de PPE integran la retroalimentación de los técnicos en campo?"
+                    </div>
+                    <div class="text-xs text-blue-300 bg-blue-950/20 border border-blue-900/30 p-3 rounded-lg flex items-start gap-2">
+                        <i data-lucide="lightbulb" class="w-4 h-4 shrink-0 mt-0.5"></i>
+                        <span><strong>Resultado sistémico:</strong> Se implementa un canal ágil para homologar diferentes tipos de guantes especializados con compras corporativas.</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- VISUAL CONTRAST BOXES -->
+            <div class="bg-slate-950 border border-slate-800 rounded-xl p-6">
+                <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                    <i data-lucide="info" class="text-emerald-400 w-5 h-5"></i> Contraste Filosófico: De la Culpa al Entendimiento
+                </h3>
+              
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                    <div class="space-y-4">
+                        <h4 class="text-sm font-bold text-red-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-red-950/40 pb-2">
+                            <i data-lucide="x-circle" class="w-4 h-4"></i> Lenguaje de Cierre (Atribuciones Individuales)
+                        </h4>
+                        <ul class="space-y-3">
+                            <li class="flex gap-2 text-sm text-slate-300">
+                                <span class="font-bold text-red-500">&bull;</span>
+                                <div>
+                                    <strong>"Se distrajo"</strong>
+                                    <p class="text-xs text-slate-500">Asume desatención consciente. Genera defensividad inmediata.</p>
+                                </div>
+                            </li>
+                            <li class="flex gap-2 text-sm text-slate-300">
+                                <span class="font-bold text-red-500">&bull;</span>
+                                <div>
+                                    <strong>"No tuvo cuidado"</strong>
+                                    <p class="text-xs text-slate-500">Omite la trampa física que la interfaz gráfica o las señales físicas tendieron.</p>
+                                </div>
+                            </li>
+                            <li class="flex gap-2 text-sm text-slate-300">
+                                <span class="font-bold text-red-500">&bull;</span>
+                                <div>
+                                    <strong>"No cumplió el procedimiento"</strong>
+                                    <p class="text-xs text-slate-500">Asume que el procedimiento escrito representaba fielmente la forma óptima de ejecutar la tarea.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h4 class="text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-emerald-950/40 pb-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4"></i> Lenguaje Abierto (Mecanismo y Sistema)
+                        </h4>
+                        <ul class="space-y-3">
+                            <li class="flex gap-2 text-sm text-slate-300">
+                                <span class="font-bold text-emerald-400">&bull;</span>
+                                <div>
+                                    <strong>"¿Qué demandas competían por su atención?"</strong>
+                                    <p class="text-xs text-emerald-400/80">Abre un mapa de procesos paralelos, radios, fatiga o presiones operativas.</p>
+                                </div>
+                            </li>
+                            <li class="flex gap-2 text-sm text-slate-300">
+                                <span class="font-bold text-emerald-400">&bull;</span>
+                                <div>
+                                    <strong>"¿Qué información estaba disponible y cuál no se interpretó?"</strong>
+                                    <p class="text-xs text-emerald-400/80">Enfocado en el diseño ergonómico de los sensores y la claridad del canal comunicativo.</p>
+                                </div>
+                            </li>
+                            <li class="flex gap-2 text-sm text-slate-300">
+                                <span class="font-bold text-emerald-400">&bull;</span>
+                                <div>
+                                    <strong>"¿Qué condiciones dificultaron seguir el procedimiento escrito?"</strong>
+                                    <p class="text-xs text-emerald-400/80">Busca discrepancias entre el trabajo "prescrito" y el trabajo "real".</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- INSTRUCTIONAL TIP -->
+            <div class="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-6 flex flex-col sm:flex-row gap-4 items-center sm:items-start text-center sm:text-left">
+                <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg shrink-0">
+                    <i data-lucide="users" class="w-6 h-6"></i>
+                </div>
+                <div class="space-y-1">
+                    <h4 className="font-bold text-white text-base">La Práctica hace al Investigador Moderno</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed font-semibold">
+                        Para asimilar de verdad este método, te recomendamos ingresar al <strong>Taller de Práctica</strong>. Allí encontrarás situaciones críticas reales de seguridad laboral donde tendrás que reescribir la pregunta sesgada y someterla a nuestra IA metodológica para retroalimentación instantánea.
+                    </p>
+                    <button 
+                        onclick="switchTab('workshop')"
+                        class="text-emerald-400 hover:text-emerald-300 text-xs font-bold flex items-center gap-1 mt-2 inline-flex"
+                    >
+                        Ir al Taller ahora <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: INTERACTIVE WORKSHOP (TALLER) -->
+        <!-- ========================================== -->
+        <div id="tab-workshop" class="tab-content space-y-8">
+            
+            <!-- SCENARIOS SELECTION -->
+            <div>
+                <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider block mb-2">Escoge un escenario para entrenar</span>
+                <div id="scenariosGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <!-- Loaded dynamically via Javascript -->
+                </div>
+            </div>
+
+            <!-- SCENARIO DETAILED PANEL -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              
+                <!-- LEFT COLUMN: SCENARIO INFO -->
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                <i data-lucide="file-text" class="text-emerald-400 w-4.5 h-4.5"></i> Detalles de la Situación
+                            </h3>
+                            <span id="caseIdBadge" class="text-xs text-slate-500 font-mono">Caso #--</span>
+                        </div>
+
+                        <div>
+                            <h4 class="text-sm font-semibold text-slate-300 mb-1">El Suceso</h4>
+                            <p id="scenarioDescription" class="text-xs text-slate-400 leading-relaxed bg-slate-900/60 p-3 rounded-lg border border-slate-900">
+                                Cargando información del escenario...
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 class="text-xs font-semibold text-red-400 tracking-wider uppercase flex items-center gap-1">
+                                <i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Pensamiento de Culpa Cerrado
+                            </h4>
+                            <p id="scenarioClosedStatement" class="text-xs text-slate-400 leading-relaxed mt-1 italic">
+                                --
+                            </p>
+                        </div>
+
+                        <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                            <h4 class="text-xs font-semibold text-red-400 flex items-center gap-1.5 mb-1">
+                                <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Pregunta Deficiente a Reformular:
+                            </h4>
+                            <p id="scenarioClosedQuestion" class="text-sm text-slate-200 font-medium italic">
+                                --
+                            </p>
+                            <p class="text-[10px] text-red-300 mt-2 leading-snug">
+                                Esta pregunta centra todo el análisis en el trabajador, orillándolo a defenderse o a excusarse. Tu misión es superarla.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- HELP CARD: COGNITIVE TRIGGERS -->
+                    <div class="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-5 space-y-3">
+                        <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <i data-lucide="lightbulb" class="w-4 h-4"></i> Pistas de Contexto (HOP)
+                        </h4>
+                        <p class="text-xs text-slate-400">Para una excelente pregunta, intenta apuntar a cualquiera de estas dos variables:</p>
+                        
+                        <div class="space-y-2">
+                            <div class="bg-slate-900/60 p-2.5 rounded border border-slate-800">
+                                <span class="text-[11px] font-bold text-emerald-300 block mb-0.5">Mecanismo de Desempeño:</span>
+                                <p id="performanceTips" class="text-[11px] text-slate-400 leading-snug">Cargando pistas...</p>
+                            </div>
+                            <div class="bg-slate-900/60 p-2.5 rounded border border-slate-800">
+                                <span class="text-[11px] font-bold text-blue-300 block mb-0.5">Barrera Organizacional:</span>
+                                <p id="barrierTips" class="text-[11px] text-slate-400 leading-snug">Cargando pistas...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: REFORMULATION WORK BENCH -->
+                <div class="lg:col-span-7 space-y-4">
+                    
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                <i data-lucide="compass" class="text-emerald-400 w-4.5 h-4.5 animate-spin-slow"></i> Tu Banco de Reformulación
+                            </h3>
+                            <span class="text-[11px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded">Entrenamiento en Vivo</span>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                Escribe tu pregunta investigable, abierta y sistémica:
+                            </label>
+                            <textarea
+                                id="userFormulationInput"
+                                rows="4"
+                                placeholder="Ej: ¿Qué demandas o alarmas en el tablero competían por la atención visual del técnico en ese preciso instante?..."
+                                class="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 placeholder-slate-600 disabled:opacity-50"
+                            ></textarea>
+                            <div class="flex justify-between items-center text-[11px] text-slate-500">
+                                <span>Evita palabras acusadoras como "Por qué", "Negligente", o "Cuidado".</span>
+                                <span id="charCount">0 caracteres</span>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2 justify-end">
+                            <button
+                                onclick="clearWorkshop()"
+                                class="px-4 py-2 rounded-lg text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-all"
+                            >
+                                Limpiar
+                            </button>
+                            <button
+                                id="submitEvaluationBtn"
+                                onclick="evaluateWorkshopQuestion()"
+                                class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-5 py-2.5 rounded-lg text-xs flex items-center gap-1.5 transition-all disabled:opacity-50"
+                            >
+                                <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Someter a Evaluación
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- EVALUATION RESULTS PANEL -->
+                    <div id="evaluationResultBlock" class="bg-slate-950 border border-emerald-500/20 rounded-xl p-5 space-y-4 hidden animate-fadeIn">
+                        
+                        <div class="flex flex-wrap items-center justify-between border-b border-slate-800 pb-3 gap-2">
+                            <div class="flex items-center gap-2">
+                                <div class="p-1.5 bg-emerald-500/10 text-emerald-400 rounded">
+                                    <i data-lucide="award" class="w-4 h-4"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-white">Resultado del Análisis</h4>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="resultTypeBadge" class="text-[11px] text-slate-400 uppercase tracking-wider font-semibold bg-slate-900 border border-slate-800 px-2 py-0.5 rounded">
+                                    Cargando...
+                                </span>
+                                <div id="resultScoreBadge" class="text-base font-extrabold px-3 py-1 rounded">
+                                    --/100 pts
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                          
+                            <div>
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Crítica Constructiva:</span>
+                                <p id="resultCritique" class="text-xs text-slate-300 leading-relaxed bg-slate-900/40 p-3 rounded-lg border border-slate-900">
+                                    --
+                                </p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800/60">
+                                    <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block mb-1">Mecanismo Identificado:</span>
+                                    <p id="resultMechanism" class="text-xs text-slate-300 leading-snug">
+                                        --
+                                    </p>
+                                </div>
+
+                                <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800/60">
+                                    <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wider block mb-1">Mejor opción sugerida:</span>
+                                    <p id="resultAlternative" class="text-xs text-slate-300 leading-snug italic">
+                                        --
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800/40 flex items-start gap-2">
+                            <i data-lucide="info" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+                            <p class="text-[11px] text-slate-400 leading-snug">
+                                <strong>Recuerda:</strong> El objetivo no es obtener la pregunta perfecta, sino erradicar los sesgos de culpa y entrenar la agudeza mental de que un error en el trabajo es casi siempre consecuencia de un entorno mal equilibrado.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: FREE DECONSTRUCTOR (SANDBOX) -->
+        <!-- ========================================== -->
+        <div id="tab-sandbox" class="tab-content space-y-6">
+            
+            <div class="bg-slate-950 border border-slate-800 rounded-xl p-6 relative overflow-hidden">
+                <div class="absolute right-0 top-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none"></div>
+                
+                <div class="max-w-3xl space-y-2 mb-6">
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i data-lucide="message-square" class="text-emerald-400 w-5 h-5 animate-pulse"></i> Laboratorio Libre (Deconstructor AI de Frases)
+                    </h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        ¿Tienes una frase de un reporte real de tu empresa que suene acusatoria o cerrada? Escríbela a continuación. Nuestro Co-piloto de IA identificará los sesgos y la desmenuzará para entregarte un abanico de preguntas investigables sobre mecanismos de desempeño e infraestructura organizacional.
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                            Frase culpabilizadora de origen (Ej: "El operario no revisó el nivel de gas por estar apurado"):
+                        </label>
+                        <div class="flex gap-2">
+                            <input 
+                                type="text" 
+                                id="sandboxPhraseInput"
+                                placeholder="Escribe aquí tu frase sesgada..." 
+                                class="flex-1 bg-slate-900 border border-slate-800 rounded-lg py-2.5 px-3 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 placeholder-slate-600 disabled:opacity-50"
+                            />
+                            <button
+                                id="submitSandboxBtn"
+                                onclick="deconstructSandboxPhrase()"
+                                class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2.5 rounded-lg text-xs flex items-center gap-1.5 transition-all disabled:opacity-50 whitespace-nowrap"
+                            >
+                                <i data-lucide="send" class="w-3.5 h-3.5"></i> Deconstruir
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 pt-1">
+                        <span class="text-[10px] text-slate-500">Ejemplos para probar:</span>
+                        <button 
+                            onclick="trySandboxPreset('Se cayó porque caminaba distraído con el celular.')"
+                            class="text-[10px] bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 px-2 py-0.5 rounded transition-all"
+                        >
+                            "Caminaba distraído con el celular"
+                        </button>
+                        <button 
+                            onclick="trySandboxPreset('No utilizó la guarda de seguridad debido a un exceso de confianza.')"
+                            class="text-[10px] bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 px-2 py-0.5 rounded transition-all"
+                        >
+                            "Exceso de confianza"
+                        </button>
+                        <button 
+                            onclick="trySandboxPreset('El supervisor no rellenó la matriz de riesgo por flojera.')"
+                            class="text-[10px] bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 px-2 py-0.5 rounded transition-all"
+                        >
+                            "No rellenó la matriz por flojera"
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- SANDBOX OUTCOME GRAPHICS -->
+            <div id="sandboxResultBlock" class="grid grid-cols-1 lg:grid-cols-12 gap-6 hidden animate-fadeIn">
+                
+                <!-- DECONSTRUCTION EXPLANATION -->
+                <div class="lg:col-span-4 bg-slate-950 border border-red-500/20 rounded-xl p-5 space-y-4">
+                    <h4 class="text-sm font-bold text-red-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
+                        <i data-lucide="alert-triangle" class="w-4 h-4"></i> Anatomía del Sesgo Detectado
+                    </h4>
+
+                    <div class="space-y-3 text-xs">
+                        <div>
+                            <span class="font-semibold text-slate-300 block mb-0.5">Tipo de Sesgo:</span>
+                            <p id="sandboxBias" class="text-slate-400 leading-relaxed bg-slate-900/40 p-2.5 rounded border border-slate-900">
+                                --
+                            </p>
+                        </div>
+
+                        <div>
+                            <span class="font-semibold text-slate-300 block mb-0.5">Consecuencia Organizacional:</span>
+                            <p id="sandboxConsequence" class="text-slate-400 leading-relaxed bg-slate-900/40 p-2.5 rounded border border-slate-900">
+                                --
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="text-[10px] text-slate-500 bg-slate-900 p-2 rounded-lg leading-snug italic">
+                        "Cuando culpamos a la persona, detenemos la investigación. Solo cuando aceptamos que su error es el síntoma de un problema sistémico comenzamos a aprender."
+                    </div>
+                </div>
+
+                <!-- THE SYSTEM QUESTIONS -->
+                <div class="lg:col-span-8 space-y-4">
+                  
+                    <!-- Performance questions -->
+                    <div class="bg-slate-950 border border-emerald-500/20 rounded-xl p-5">
+                        <h4 class="text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2 mb-3">
+                            <i data-lucide="compass" class="w-4 h-4"></i> Preguntas del Mecanismo de Desempeño
+                        </h4>
+                        <p class="text-xs text-slate-400 mb-3 leading-relaxed">
+                            Utiliza estas preguntas abiertas durante las entrevistas de campo para desenterrar las trampas cognitivas del entorno real:
+                        </p>
+                        <div id="sandboxPerformanceQuestions" class="space-y-2">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Barrier questions -->
+                    <div class="bg-slate-950 border border-blue-500/20 rounded-xl p-5">
+                        <h4 class="text-sm font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2 mb-3">
+                            <i data-lucide="shield-alert" class="w-4 h-4"></i> Preguntas de Barreras Organizacionales
+                        </h4>
+                        <p class="text-xs text-slate-400 mb-3 leading-relaxed">
+                            Utiliza estas preguntas para analizar las defensas que debieron proteger la tarea de los errores típicos inevitables de las personas:
+                        </p>
+                        <div id="sandboxBarrierQuestions" class="space-y-2">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: LIBRARY OF EQUIVALENCES -->
+        <!-- ========================================== -->
+        <div id="tab-library" class="tab-content space-y-6">
+            
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
+                <div>
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i data-lucide="sliders" class="text-emerald-400 w-5 h-5"></i> Diccionario Metodológico: Frases vs Preguntas
+                    </h3>
+                    <p class="text-xs text-slate-400">Guía de referencia rápida para redactar reportes modernos y conducir entrevistas operativas.</p>
+                </div>
+                <span class="text-xs font-mono bg-slate-950 text-slate-500 border border-slate-800 px-2.5 py-1 rounded">
+                    HOP Framework v2.1
+                </span>
+            </div>
+
+            <div id="equivalencesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Injected dynamically -->
+            </div>
+
+            <!-- FINAL SYSTEMIC CALLOUT -->
+            <div class="bg-slate-950 border border-slate-800 rounded-xl p-6 text-center space-y-4 max-w-2xl mx-auto">
+                <i data-lucide="compass" class="w-12 h-12 text-emerald-400 mx-auto animate-spin-slow"></i>
+                <h4 class="text-lg font-bold text-white">¿Quieres cambiar la cultura de tu equipo?</h4>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Exporta esta filosofía de preguntas en tus plantillas diarias de análisis de riesgo pre-tarea (AST, IPERC, Take-5). Cambiar las preguntas obliga a los líderes operacionales a buscar soluciones técnicas en lugar de culpar a las personas de primera línea.
+                </p>
+                <div class="flex gap-2 justify-center">
+                    <button 
+                        onclick="switchTab('workshop')"
+                        class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs transition-all"
+                    >
+                        Volver al taller de práctica
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER BAR -->
+    <footer class="bg-slate-950 border-t border-slate-800 px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-3 text-slate-500 text-xs mt-auto">
+        <p>&copy; 2026 InvestigaConSentido - Seguridad Resiliente & Factores Humanos.</p>
+        <div class="flex space-x-4">
+            <span class="hover:text-slate-400 transition-colors">Normativa HOP (Human & Organizational Performance)</span>
+            <span>&bull;</span>
+            <span class="hover:text-slate-400 transition-colors">Principios de Safety-II</span>
+        </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- APPLICATION JAVASCRIPT LOGIC -->
+    <!-- ========================================== -->
+    <script>
+        // ==========================================
+        // DATA SOURCES
+        // ==========================================
+        const SCENARIOS = [
+            {
+                id: 1,
+                title: "El Técnico y la Prisa Operativa",
+                category: "Procedimientos & LOTO",
+                description: "Un electricista omitió el bloqueo de seguridad (LOTO) en un tablero secundario para reactivar rápidamente una línea de producción detenida. Sufrió un arco eléctrico leve al hacer contacto accidental.",
+                closedStatement: "El técnico fue negligente, no cumplió el procedimiento obligatorio de bloqueo por pereza o prisa.",
+                closedQuestion: "¿Por qué el técnico decidió ignorar la regla de oro de LOTO?",
+                contextTips: {
+                    performanceMechanisms: "Presión de tiempo por paradas de producción, disponibilidad de candados de bloqueo en la zona, claridad física de los diagramas unifilares.",
+                    organizationalBarriers: "Procedimientos de parada rápida aprobados por gerencia, auditorías de cumplimiento real frente a cumplimiento nominal."
+                },
+                idealExamples: [
+                    "¿Qué demandas operativas o presiones externas estaban influyendo en el tiempo asignado para esta reparación?",
+                    "¿Qué dificultades físicas o logísticas presenta el proceso de colocación de candados LOTO en este tablero específico?",
+                    "¿Cómo se maneja organizacionalmente la tensión entre la velocidad de reactivación y los tiempos requeridos para un bloqueo seguro?"
+                ]
+            },
+            {
+                id: 2,
+                title: "El Conductor de Montacargas 'Distraído'",
+                category: "Logística y Almacén",
+                description: "Durante el turno de la noche, un conductor de montacargas colisionó fuertemente contra un estante de almacenamiento de doble altura, provocando la caída de estibas vacías. En las cámaras se observa que miraba hacia abajo.",
+                closedStatement: "El conductor se distrajo y no estaba prestando atención a la ruta de conducción.",
+                closedQuestion: "¿Por qué se distrajo el conductor de montacargas?",
+                contextTips: {
+                    performanceMechanisms: "Alertas acústicas o visuales en la cabina, fatiga por turnos rotativos acumulados, necesidad de consultar hojas de ruta impresas o terminales de datos en movimiento.",
+                    organizationalBarriers: "Diseño ergonómico de la interfaz de carga de tareas, iluminación en las zonas de tránsito de doble altura, políticas reales de descanso en turnos nocturnos."
+                },
+                idealExamples: [
+                    "¿Qué herramientas, pantallas o demandas de información competían por la atención visual del conductor en ese instante?",
+                    "¿Cuáles eran las condiciones de fatiga, ritmo de trabajo y rotación de turnos del operador durante esa noche?",
+                    "¿De qué manera el diseño del flujo del almacén separa las tareas de lectura de órdenes de la tarea física de conducción?"
+                ]
+            },
+            {
+                id: 3,
+                title: "El Resbalón en la Plataforma",
+                category: "Mantenimiento / Alturas",
+                description: "Un mecánico de mantenimiento resbaló en los peldaños de la escalera de una plataforma de acceso mientras transportaba una caja de herramientas pesada. Se detectó una película delgada de aceite hidráulico en el peldaño.",
+                closedStatement: "El mecánico no tuvo cuidado, no limpió el derrame de aceite antes de subir y llevaba exceso de carga sin usar tres puntos de apoyo.",
+                closedQuestion: "¿Por qué el mecánico no limpió el aceite ni usó tres puntos de apoyo?",
+                contextTips: {
+                    performanceMechanisms: "Disponibilidad de kits de limpieza cerca de la plataforma, diseño de la caja de herramientas (falta de arnés o correa de transporte), estado del calzado de seguridad provisto.",
+                    organizationalBarriers: "Sistemas preventivos de reporte y eliminación de fugas crónicas de fluidos, diseño de las escaleras (rejilla autolimpiante vs peldaño liso)."
+                },
+                idealExamples: [
+                    "¿Qué información y elementos de limpieza estaban disponibles y accesibles de manera inmediata para mitigar el derrame?",
+                    "¿Qué alternativas seguras de transporte de herramientas pesadas (como poleas o mochilas técnicas) están integradas en la tarea?",
+                    "¿Cómo se gestionan las fugas hidráulicas crónicas en esa sección para evitar que se conviertan en condiciones normales de trabajo?"
+                ]
+            },
+            {
+                id: 4,
+                title: "El Cambio de Válvula de Emergencia",
+                category: "Operación de Planta",
+                description: "Un operador realizó el cambio de una válvula de presión de vapor utilizando herramientas no calibradas y sin diligenciar el Permiso de Trabajo de Alto Riesgo, argumentando que era una emergencia para evitar una sobrepresión mayor.",
+                closedStatement: "El operador se saltó el protocolo de seguridad y actuó de manera temeraria sin autorización.",
+                closedQuestion: "¿Por qué el operador actuó de manera temeraria omitiendo el permiso?",
+                contextTips: {
+                    performanceMechanisms: "Percepción de gravedad del peligro de sobrepresión, lentitud o burocracia percibida del sistema de permisos de trabajo en momentos críticos, disponibilidad de herramientas adecuadas.",
+                    organizationalBarriers: "Definición organizacional clara de qué constituye una 'emergencia de planta' frente a una operación normal, mecanismos rápidos de autorización de seguridad."
+                },
+                idealExamples: [
+                    "¿Qué señales de planta y alarmas llevaron al operador a percibir una situación de emergencia inminente?",
+                    "¿Qué obstáculos o demoras en el proceso estándar de permisos de trabajo incentivan el bypass en situaciones urgentes?",
+                    "¿Cómo responde el sistema de gestión de seguridad ante decisiones individuales tomadas bajo la premisa de proteger la planta?"
+                ]
+            }
+        ];
+
+        const TRANSFORMATION_LIBRARY = [
+            {
+                original: "Se distrajo",
+                error: "Culpa al individuo, asume flojera cognitiva.",
+                openQuestion: "¿Qué demandas competían por su atención en ese momento?",
+                discovery: "Llamadas operativas de radio, alarmas concurrentes, pantallas de datos, fatiga o condiciones climáticas demandantes."
+            },
+            {
+                original: "No tuvo cuidado",
+                error: "Atribuye un rasgo de carácter temporal sin buscar el disparador situacional.",
+                openQuestion: "¿Qué información estaba disponible en el entorno y cuál no pudo ser interpretada o recibida?",
+                discovery: "Falta de sensores visuales, indicadores analógicos confusos, ruido ensordecedor que tapó una alerta de audio."
+            },
+            {
+                original: "No cumplió el procedimiento",
+                error: "Asume que el procedimiento escrito siempre es perfecto y aplicable al contexto real.",
+                openQuestion: "¿Qué condiciones del entorno hicieron difícil, ineficiente o peligroso cumplir el procedimiento al pie de la letra?",
+                discovery: "Herramientas faltantes, contradicción entre pasos teóricos y realidad física, procedimientos desactualizados por cambio de equipos."
+            },
+            {
+                original: "Cometió un error de cálculo / error humano",
+                error: "Usa el 'error humano' como causa raíz en lugar de verlo como el síntoma de un sistema mal diseñado.",
+                openQuestion: "¿Cómo apoyaba el diseño de los controles e interfaces la toma de decisiones correctas bajo las condiciones reales?",
+                discovery: "Botones idénticos colocados uno al lado del otro, escalas de medición difíciles de leer en la penumbra, falta de retroalimentación de confirmación."
+            },
+            {
+                original: "Trabajaba demasiado lento/rápido",
+                error: "Juzga el ritmo de trabajo sin comprender los incentivos y presiones subyacentes.",
+                openQuestion: "¿Cómo equilibra el equipo la tensión diaria entre los objetivos de productividad y las exigencias de seguridad?",
+                discovery: "Bonos ligados exclusivamente al tonelaje despachado, regaños verbales por retrasos en los informes diarios."
+            }
+        ];
+
+        // ==========================================
+        // STATE STORAGE
+        // ==========================================
+        let state = {
+            activeTab: 'theory',
+            customApiKey: localStorage.getItem('gemini_api_key') || '',
+            selectedScenarioIndex: 0,
+            userFormulation: '',
+            sandboxClosedPhrase: ''
+        };
+
+        // ==========================================
+        // INITIALIZATION & EVENT LISTENERS
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            // Check stored API key representation
+            updateApiKeyButtonState();
+            
+            // Build permanent templates
+            buildScenariosSelector();
+            buildEquivalencesLibrary();
+            loadSelectedScenario();
+
+            // Set up listener for character length on formulation text area
+            const textInput = document.getElementById('userFormulationInput');
+            textInput.addEventListener('input', (e) => {
+                state.userFormulation = e.target.value;
+                document.getElementById('charCount').textContent = `${state.userFormulation.length} caracteres`;
+            });
+
+            // Set up Enter key listener on sandbox input
+            document.getElementById('sandboxPhraseInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    deconstructSandboxPhrase();
+                }
+            });
+
+            // Render Lucide SVG elements
+            lucide.createIcons();
+        });
+
+        // ==========================================
+        // TOASTS & NOTIFICATIONS
+        // ==========================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            toast.className = `flex items-center gap-2.5 px-4 py-3 rounded-lg border shadow-xl transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto bg-slate-950 border-slate-800 text-sm max-w-sm`;
+            
+            let iconMarkup = '';
+            if (type === 'success') {
+                iconMarkup = `<i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i>`;
+            } else if (type === 'warning') {
+                iconMarkup = `<i data-lucide="alert-triangle" class="w-5 h-5 text-amber-400"></i>`;
+            } else {
+                iconMarkup = `<i data-lucide="info" class="w-5 h-5 text-blue-400"></i>`;
+            }
+
+            toast.innerHTML = `
+                ${iconMarkup}
+                <p class="text-slate-200 font-medium">${message}</p>
+            `;
+            
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            // Animate In
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            // Animate Out & Remove
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 4000);
+        }
+
+        // ==========================================
+        // API KEY MANAGEMENT
+        // ==========================================
+        function updateApiKeyButtonState() {
+            const btn = document.getElementById('apiKeyBtn');
+            const textSpan = document.getElementById('apiKeyBtnText');
+            const icon = btn.querySelector('i');
+
+            if (state.customApiKey) {
+                btn.className = "text-xs px-3 py-1.5 rounded-md border flex items-center gap-1.5 transition-all bg-emerald-950/40 text-emerald-300 border-emerald-700 hover:bg-emerald-950/60";
+                textSpan.textContent = "API de Gemini Conectada";
+                if (icon) icon.className = "w-3.5 h-3.5 text-emerald-400 animate-spin-slow";
+            } else {
+                btn.className = "text-xs px-3 py-1.5 rounded-md border flex items-center gap-1.5 transition-all bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700";
+                textSpan.textContent = "Configurar Gemini API (Opcional)";
+                if (icon) icon.className = "w-3.5 h-3.5 text-slate-400";
+            }
+            lucide.createIcons();
+        }
+
+        function openApiKeyModal() {
+            document.getElementById('apiKeyInput').value = state.customApiKey;
+            document.getElementById('apiKeyModal').classList.remove('hidden');
+        }
+
+        function closeApiKeyModal() {
+            document.getElementById('apiKeyModal').classList.add('hidden');
+        }
+
+        function saveApiKey() {
+            const val = document.getElementById('apiKeyInput').value.trim();
+            state.customApiKey = val;
+            localStorage.setItem('gemini_api_key', val);
+            updateApiKeyButtonState();
+            closeApiKeyModal();
+            showToast("Clave de API guardada y actualizada.", "success");
+        }
+
+        function clearApiKey() {
+            state.customApiKey = '';
+            localStorage.removeItem('gemini_api_key');
+            document.getElementById('apiKeyInput').value = '';
+            updateApiKeyButtonState();
+            closeApiKeyModal();
+            showToast("Clave de API eliminada.", "info");
+        }
+
+        // ==========================================
+        // TAB CONTROLLER
+        // ==========================================
+        function switchTab(tabName) {
+            // Update active states of tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all whitespace-nowrap border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-800";
+            });
+
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            if (activeBtn) {
+                activeBtn.className = "tab-btn px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all whitespace-nowrap border-emerald-500 text-emerald-400 bg-emerald-500/5";
+            }
+
+            // Hide/Show tab panels
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            const targetContent = document.getElementById(`tab-${tabName}`);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+
+            state.activeTab = tabName;
+            lucide.createIcons();
+            
+            // Scroll to top of main context on change
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ==========================================
+        // WORKSHOP MODULE GENERATION & INTERACTIONS
+        // ==========================================
+        function buildScenariosSelector() {
+            const grid = document.getElementById('scenariosGrid');
+            grid.innerHTML = '';
+
+            SCENARIOS.forEach((scenario, index) => {
+                const isActive = index === state.selectedScenarioIndex;
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.onclick = () => selectScenario(index);
+                button.id = `scenario-card-${index}`;
+                button.className = `scenario-card p-4 rounded-xl border text-left transition-all relative ${
+                    isActive 
+                        ? 'bg-slate-950 border-emerald-500 ring-1 ring-emerald-500' 
+                        : 'bg-slate-950/40 border-slate-800 hover:border-slate-700 hover:bg-slate-950/60'
+                }`;
+
+                button.innerHTML = `
+                    <span class="text-[10px] font-bold tracking-wider uppercase text-slate-500 bg-slate-900 border border-slate-800 px-2 py-0.5 rounded-full mb-2 inline-block">
+                        ${scenario.category}
+                    </span>
+                    <h4 class="font-bold text-sm text-white mb-1 line-clamp-1">${scenario.title}</h4>
+                    <p class="text-xs text-slate-400 line-clamp-2">${scenario.description}</p>
+                    <div class="active-dot absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-400 ${isActive ? '' : 'hidden'}"></div>
+                `;
+                grid.appendChild(button);
+            });
+        }
+
+        function selectScenario(index) {
+            state.selectedScenarioIndex = index;
+            
+            // Update UI card boundaries
+            document.querySelectorAll('.scenario-card').forEach((card, cIndex) => {
+                if (cIndex === index) {
+                    card.className = "scenario-card p-4 rounded-xl border text-left transition-all relative bg-slate-950 border-emerald-500 ring-1 ring-emerald-500";
+                    card.querySelector('.active-dot').classList.remove('hidden');
+                } else {
+                    card.className = "scenario-card p-4 rounded-xl border text-left transition-all relative bg-slate-950/40 border-slate-800 hover:border-slate-700 hover:bg-slate-950/60";
+                    card.querySelector('.active-dot').classList.add('hidden');
+                }
+            });
+
+            clearWorkshop();
+            loadSelectedScenario();
+        }
+
+        function loadSelectedScenario() {
+            const scenario = SCENARIOS[state.selectedScenarioIndex];
+            
+            document.getElementById('caseIdBadge').textContent = `Caso #${scenario.id}`;
+            document.getElementById('scenarioDescription').textContent = scenario.description;
+            document.getElementById('scenarioClosedStatement').textContent = `"${scenario.closedStatement}"`;
+            document.getElementById('scenarioClosedQuestion').textContent = `"${scenario.closedQuestion}"`;
+            
+            document.getElementById('performanceTips').textContent = scenario.contextTips.performanceMechanisms;
+            document.getElementById('barrierTips').textContent = scenario.contextTips.organizationalBarriers;
+        }
+
+        function clearWorkshop() {
+            document.getElementById('userFormulationInput').value = '';
+            state.userFormulation = '';
+            document.getElementById('charCount').textContent = '0 caracteres';
+            
+            const resultsBlock = document.getElementById('evaluationResultBlock');
+            resultsBlock.classList.add('hidden');
+        }
+
+        // ==========================================
+        // WORKSHOP EVALUATION ENGINE (LOCAL + AI)
+        // ==========================================
+        function calculateLocalEvaluation(question, context) {
+            const qLower = question.toLowerCase().trim();
+            
+            if (qLower.length < 15) {
+                return {
+                    score: 35,
+                    type: "Cerrada / Muy Corta",
+                    critique: "La pregunta planteada es demasiado breve o simplificada. Difícilmente logrará abrir un espacio de indagación sobre el contexto sistémico. Intenta formular una pregunta completa que empiece con qué, cómo, o en qué condiciones.",
+                    alternative: context.idealExamples[0],
+                    mechanism_identified: "Falta de profundidad metodológica."
+                };
+            }
+
+            const closedKeywords = ["por qué", "por que", "quién", "quien", "culpable", "olvidó", "distrajo", "negligente", "desatención"];
+            const performanceKeywords = ["demanda", "atención", "información", "disponible", "tiempo", "presión", "fatiga", "turno", "herramienta", "físico", "obstáculo", "complicó", "complicidad", "diseño", "ayudó", "interfaz"];
+            const barrierKeywords = ["barrera", "procedimiento", "política", "control", "defensa", "salvaguarda", "auditoría", "organización", "gestión", "recurso", "capacitación", "entrenamiento"];
+
+            let score = 55;
+            let type = "Evaluación Local";
+            
+            let hasClosedMarkers = closedKeywords.some(kw => qLower.includes(kw));
+            if (hasClosedMarkers) {
+                score -= 20;
+            } else {
+                score += 15;
+            }
+
+            let hasPerformanceMarkers = false;
+            performanceKeywords.forEach(kw => {
+                if (qLower.includes(kw)) {
+                    hasPerformanceMarkers = true;
+                    score += 8;
+                }
+            });
+
+            let hasBarrierMarkers = false;
+            barrierKeywords.forEach(kw => {
+                if (qLower.includes(kw)) {
+                    hasBarrierMarkers = true;
+                    score += 10;
+                }
+            });
+
+            if (score > 100) score = 100;
+            if (score < 0) score = 15;
+
+            if (score < 55) {
+                type = "Pregunta Cerrada o Centrada en la Conducta";
+            } else if (hasBarrierMarkers && hasPerformanceMarkers) {
+                type = "Enfoque Integral (Mecanismos y Barreras)";
+            } else if (hasBarrierMarkers) {
+                type = "Enfoque en Barreras Organizacionales";
+            } else if (hasPerformanceMarkers) {
+                type = "Enfoque en Mecanismo de Desempeño";
+            } else {
+                type = "Pregunta Abierta Básica";
+            }
+
+            let critique = "";
+            if (score < 55) {
+                critique = "Tu pregunta aún arrastra términos de juicio o busca el 'motivo personal' (el por qué interno de la acción). Esto puede inducir al entrevistado a defenderse o racionalizar su error en vez de describir el entorno físico e instructivo de la tarea.";
+            } else if (score >= 55 && score < 80) {
+                critique = "¡Vas por excelente camino! Has estructurado una pregunta abierta que evita culpar directamente. Sin embargo, para profundizar aún más, intenta indagar sobre las limitaciones específicas del entorno físico o los incentivos cruzados (como la tensión entre tiempo y seguridad).";
+            } else {
+                critique = "¡Excelente formulación! Esta pregunta desvía por completo el foco de la culpa individual. Abre la puerta para que el entrevistado describa de forma honesta las demandas que competían por su atención, los cuellos de botella del proceso y la disponibilidad real de herramientas o información.";
+            }
+
+            return {
+                score,
+                type,
+                critique,
+                alternative: context.idealExamples[Math.floor(Math.random() * context.idealExamples.length)],
+                mechanism_identified: hasPerformanceMarkers ? "Factores contextuales inmediatos y carga de atención física/cognitiva." : "Sistemas organizacionales de control y gobernanza documental."
+            };
+        }
+
+        async function fetchWithRetry(url, options, retries = 5, delay = 1000) {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    throw new Error(`HTTP status: ${response.status}`);
+                }
+                const data = await response.json();
+                const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!responseText) {
+                    throw new Error("Respuesta vacía de Gemini");
+                }
+                return JSON.parse(responseText.replace(/```json/g, '').replace(/```/g, '').trim());
+            } catch (error) {
+                if (retries > 0) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return fetchWithRetry(url, options, retries - 1, delay * 2);
+                }
+                throw error;
+            }
+        }
+
+        async function evaluateWorkshopQuestion() {
+            const userQuestion = state.userFormulation.trim();
+            if (!userQuestion) {
+                showToast("Por favor escribe una propuesta antes de someterla a evaluación.", "warning");
+                return;
+            }
+
+            const btn = document.getElementById('submitEvaluationBtn');
+            const scenario = SCENARIOS[state.selectedScenarioIndex];
+            
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="refresh-cw" class="w-3.5 h-3.5 animate-spin"></i> Evaluando...`;
+            lucide.createIcons();
+
+            // Local simulation helper delay
+            const localDelay = () => new Promise(res => setTimeout(res, 1200));
+
+            if (!state.customApiKey) {
+                await localDelay();
+                const localRes = calculateLocalEvaluation(userQuestion, scenario);
+                renderEvaluationResults(localRes);
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Someter a Evaluación`;
+                lucide.createIcons();
+                showToast("Análisis completado usando motor heurístico local.", "info");
+                return;
+            }
+
+            // Real Gemini Request
+            const systemPrompt = `Eres un experto en investigación de incidentes de seguridad industrial, Factores Humanos y Desempeño Organizacional (HOP) y de la corriente Safety-II.
 Tu objetivo es evaluar y refinar la pregunta formulada por un estudiante de seguridad.
 El estudiante está intentando transformar un análisis de culpabilidad/conducta observable ("se distrajo", "no cumplió") en una pregunta investigable de sistema que busque "Mecanismos de desempeño" (¿qué demandas competían por su atención?, ¿qué información estaba disponible?) o "Barreras organizacionales" (¿qué falló en las defensas?).
 
@@ -265,7 +1203,7 @@ DEBES RESPONDER EXCLUSIVAMENTE CON UN OBJETO JSON VÁLIDO CON LAS SIGUIENTES PRO
   "mechanism_identified": "Qué mecanismo subyacente (fisiológico, cognitivo, de diseño o de cultura) identifica o intenta investigar la pregunta planteada."
 }`;
 
-    const userPrompt = `Escenario: ${scenario.title}
+            const userPrompt = `Escenario: ${scenario.title}
 Descripción del caso: ${scenario.description}
 Frase de juicio original: ${scenario.closedStatement}
 Pregunta cerrada inicial: ${scenario.closedQuestion}
@@ -274,84 +1212,107 @@ Pregunta propuesta por el estudiante: "${userQuestion}"
 
 Evalúa esta propuesta y responde estrictamente con el formato JSON solicitado.`;
 
-    const apiKeyToUse = customApiKey || "";
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${state.customApiKey}`;
 
-    // If key is empty, do a premium-feeling local simulated response with a loading transition to make it beautiful
-    if (!apiKeyToUse) {
-      setTimeout(() => {
-        const result = localEvaluation(userQuestion, scenario.closedQuestion, scenario);
-        setEvaluationResult(result);
-        setIsEvaluating(false);
-        showToast("Análisis completado usando motor heurístico local.", "info");
-      }, 1200);
-      return;
-    }
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: userPrompt }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    generationConfig: { responseMimeType: "application/json" }
+                })
+            };
 
-    // Call real Gemini API
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKeyToUse}`;
-    
-    // Simple exponential backoff retry mechanism
-    const fetchWithRetry = async (retries = 5, delay = 1000) => {
-      try {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: userPrompt }] }],
-            systemInstruction: { parts: [{ text: systemPrompt }] },
-            generationConfig: {
-              responseMimeType: "application/json"
+            try {
+                const aiResult = await fetchWithRetry(url, requestOptions);
+                renderEvaluationResults(aiResult);
+                showToast("Análisis completado por IA de Gemini exitosamente.", "success");
+            } catch (err) {
+                // contingency local execution
+                const fallback = calculateLocalEvaluation(userQuestion, scenario);
+                renderEvaluationResults(fallback);
+                showToast("Falla de API o clave de Gemini. Ejecutado motor heurístico local.", "warning");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Someter a Evaluación`;
+                lucide.createIcons();
             }
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP Error Status: ${response.status}`);
         }
 
-        const data = await response.json();
-        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        
-        if (!responseText) {
-          throw new Error("No text candidates returned from model");
+        function renderEvaluationResults(res) {
+            const block = document.getElementById('evaluationResultBlock');
+            block.classList.remove('hidden');
+
+            const scoreBadge = document.getElementById('resultScoreBadge');
+            scoreBadge.textContent = `${res.score}/100 pts`;
+            
+            // Color badges dynamic class injection
+            if (res.score >= 80) {
+                scoreBadge.className = "text-base font-extrabold px-3 py-1 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-700/40";
+            } else if (res.score >= 55) {
+                scoreBadge.className = "text-base font-extrabold px-3 py-1 rounded bg-amber-950/60 text-amber-400 border border-amber-700/40";
+            } else {
+                scoreBadge.className = "text-base font-extrabold px-3 py-1 rounded bg-red-950/60 text-red-400 border border-red-700/40";
+            }
+
+            document.getElementById('resultTypeBadge').textContent = res.type;
+            document.getElementById('resultCritique').textContent = res.critique;
+            document.getElementById('resultMechanism').textContent = res.mechanism_identified || 'Indefinido.';
+            document.getElementById('resultAlternative').textContent = `"${res.alternative}"`;
+
+            // Scroll down a bit to see the evaluation panel
+            block.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
-        return JSON.parse(responseText.replace(/```json/g, '').replace(/```/g, '').trim());
-      } catch (error) {
-        if (retries > 0) {
-          await new Promise(resolve => setTimeout(resolve, delay));
-          return fetchWithRetry(retries - 1, delay * 2);
-        } else {
-          throw error;
+        // ==========================================
+        // FREE SANDBOX DECONSTRUCTOR
+        // ==========================================
+        function trySandboxPreset(phrase) {
+            document.getElementById('sandboxPhraseInput').value = phrase;
+            state.sandboxClosedPhrase = phrase;
+            deconstructSandboxPhrase();
         }
-      }
-    };
 
-    try {
-      const parsedData = await fetchWithRetry();
-      setEvaluationResult(parsedData);
-      showToast("Análisis completado por IA de Gemini exitosamente.", "success");
-    } catch (err) {
-      console.error(err);
-      // Fallback to local evaluation if network or API key fails
-      const fallback = localEvaluation(userQuestion, scenario.closedQuestion, scenario);
-      setEvaluationResult(fallback);
-      showToast("Error en API de Gemini. Se aplicó evaluación heurística de contingencia.", "warning");
-    } finally {
-      setIsEvaluating(false);
-    }
-  };
+        async function deconstructSandboxPhrase() {
+            const phrase = document.getElementById('sandboxPhraseInput').value.trim();
+            if (!phrase) {
+                showToast("Por favor introduce una frase antes de iniciar la deconstrucción.", "warning");
+                return;
+            }
 
-  // Perform Gemini AI request for Free Sandbox Analysis
-  const analyzeSandboxPhraseWithAI = async (phrase) => {
-    if (!phrase.trim()) {
-      showToast("Por favor ingresa una frase válida", "warning");
-      return;
-    }
-    
-    setIsAnalyzingSandbox(true);
+            const btn = document.getElementById('submitSandboxBtn');
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="refresh-cw" class="w-3.5 h-3.5 animate-spin"></i> Procesando...`;
+            lucide.createIcons();
 
-    const systemPrompt = `Eres un experto internacional en Human and Organizational Performance (HOP) y gestión moderna de seguridad industrial.
+            const localDelay = () => new Promise(res => setTimeout(res, 1300));
+
+            if (!state.customApiKey) {
+                await localDelay();
+                const fallback = {
+                    biasIdentified: "Sesgo de Retrospectiva (Hindsight Bias) y Atribución Fundamental. Se asume que por conocer el desenlace, el trabajador pudo predecirlo con facilidad en tiempo real.",
+                    consequenceExplanation: "Cuando imputamos flojera, prisa o falta de atención, la solución organizacional resultante siempre será ineficaz (más capacitación, amonestar al trabajador o generar otra regla redundante). Esto deja intactas las condiciones de trampa física y operativa que causarán otro accidente idéntico en el futuro.",
+                    performanceQuestions: [
+                        `¿Qué señales físicas en el entorno indicaban con claridad que esta condición de riesgo se estaba acumulando?`,
+                        `¿Cómo competían las presiones de productividad contra el tiempo extra que requiere realizar la acción segura?`,
+                        `¿Cuáles fueron los últimos tres incidentes similares reportados de manera informal y qué adaptaciones se requirieron para resolverlos?`
+                    ],
+                    barrierQuestions: [
+                        `¿Con qué mecanismos prácticos cuenta la gerencia para detener un trabajo comprometido sin que represente una sanción explícita o implícita para la cuadrilla?`,
+                        `¿Cada cuánto tiempo se audita la viabilidad real y ergonómica de los procedimientos operativos estandarizados en contraste con las herramientas reales en sitio?`
+                    ]
+                };
+                renderSandboxResults(fallback);
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="send" class="w-3.5 h-3.5"></i> Deconstruir`;
+                lucide.createIcons();
+                showToast("Deconstrucción generada mediante motor heurístico local.", "info");
+                return;
+            }
+
+            // Real Gemini sandbox API request
+            const systemPrompt = `Eres un experto internacional en Human and Organizational Performance (HOP) y gestión moderna de seguridad industrial.
 Tu objetivo es tomar una afirmación cerrada o acusatoria típica de accidentes laborales y deconstruirla.
 Debes identificar el sesgo, explicar por qué cierra el aprendizaje, proponer al menos 3 preguntas de "Mecanismo de desempeño" (el contexto de la tarea y demandas de atención) y al menos 2 preguntas de "Barreras organizacionales" (defensas duras, normativas e incentivos).
 
@@ -370,950 +1331,136 @@ DEBES RESPONDER EXCLUSIVAMENTE CON UN OBJETO JSON VÁLIDO CON LAS SIGUIENTES PRO
   ]
 }`;
 
-    const userPrompt = `Frase acusatoria o juicio cerrado a deconstruir: "${phrase}"`;
-    const apiKeyToUse = customApiKey || "";
+            const userPrompt = `Frase acusatoria o juicio cerrado a deconstruir: "${phrase}"`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${state.customApiKey}`;
 
-    if (!apiKeyToUse) {
-      // Local Heuristic Fallback for Sandbox
-      setTimeout(() => {
-        const fallback = {
-          biasIdentified: "Sesgo de Retrospectiva (Hindsight Bias) y Atribución Fundamental. Se asume que por conocer el desenlace, el trabajador pudo predecirlo con facilidad en tiempo real.",
-          consequenceExplanation: "Cuando imputamos flojera, prisa o falta de atención, la solución organizacional resultante siempre será ineficaz (más capacitación, amonestar al trabajador o generar otra regla redundante). Esto deja intactas las condiciones de trampa física y operativa que causarán otro accidente idéntico en el futuro.",
-          performanceQuestions: [
-            `¿Qué señales físicas en el entorno indicaban con claridad que esta condición de riesgo se estaba acumulando?`,
-            `¿Cómo competían las presiones de productividad contra el tiempo extra que requiere realizar la acción segura?`,
-            `¿Cuáles fueron los últimos tres incidentes similares reportados bajo cuerda y qué adaptaciones informales de trabajo se requirieron para resolverlos?`
-          ],
-          barrierQuestions: [
-            `¿Con qué mecanismos prácticos cuenta la gerencia para detener un trabajo comprometido sin que represente una sanción explícita o implícita para la cuadrilla?`,
-            `¿Cada cuánto tiempo se audita la viabilidad real y ergonómica de los procedimientos operativos estandarizados en contraste con las herramientas reales en sitio?`
-          ]
-        };
-        setSandboxResult(fallback);
-        setIsAnalyzingSandbox(false);
-        showToast("Deconstrucción generada mediante heurística local de contingencia.", "info");
-      }, 1300);
-      return;
-    }
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: userPrompt }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    generationConfig: { responseMimeType: "application/json" }
+                })
+            };
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKeyToUse}`;
-
-    const fetchWithRetry = async (retries = 5, delay = 1000) => {
-      try {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: userPrompt }] }],
-            systemInstruction: { parts: [{ text: systemPrompt }] },
-            generationConfig: {
-              responseMimeType: "application/json"
+            try {
+                const aiResult = await fetchWithRetry(url, requestOptions);
+                renderSandboxResults(aiResult);
+                showToast("Frase deconstruida exitosamente con Inteligencia Artificial.", "success");
+            } catch (err) {
+                // Fallback to local
+                const fallback = {
+                    biasIdentified: "Error de Atribución Fundamental. Se juzga el carácter del operador omitiendo las poderosas variables de contexto operacional.",
+                    consequenceExplanation: "Culpar de forma directa esconde la falta de robustez del sistema y condena a otros a fallar por la misma causa.",
+                    performanceQuestions: [
+                        `¿De qué información en tiempo real disponía el operador antes de la maniobra?`,
+                        `¿Cómo se priorizaban los objetivos operativos versus las tolerancias de seguridad en esa jornada?`,
+                        `¿Qué adaptaciones cotidianas de trabajo se realizan comúnmente para compensar herramientas inadecuadas?`
+                    ],
+                    barrierQuestions: [
+                        `¿Qué salvaguardas independientes de la voluntad humana existían para interrumpir el flujo de energía peligrosa?`,
+                        `¿Qué canales de comunicación fluidos existen para advertir a la gerencia sobre normas que no se adaptan al terreno?`
+                    ]
+                };
+                renderSandboxResults(fallback);
+                showToast("Error en API de Gemini. Se utilizó un análisis heurístico local estructurado.", "warning");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="send" class="w-3.5 h-3.5"></i> Deconstruir`;
+                lucide.createIcons();
             }
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP Error: ${response.status}`);
         }
 
-        const data = await response.json();
-        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        
-        if (!responseText) {
-          throw new Error("Empty model response");
+        function renderSandboxResults(res) {
+            const block = document.getElementById('sandboxResultBlock');
+            block.classList.remove('hidden');
+
+            document.getElementById('sandboxBias').textContent = res.biasIdentified;
+            document.getElementById('sandboxConsequence').textContent = res.consequenceExplanation;
+
+            // Render lists of questions
+            const perfContainer = document.getElementById('sandboxPerformanceQuestions');
+            perfContainer.innerHTML = '';
+            res.performanceQuestions.forEach((q, idx) => {
+                const item = document.createElement('div');
+                item.className = "flex gap-2.5 bg-slate-900/60 p-3 rounded-lg border border-slate-800/40 hover:border-emerald-500/20 transition-all";
+                item.innerHTML = `
+                    <span class="text-xs font-bold text-emerald-400 font-mono">0${idx + 1}</span>
+                    <p class="text-xs text-slate-200 leading-normal font-medium">${q}</p>
+                `;
+                perfContainer.appendChild(item);
+            });
+
+            const barrContainer = document.getElementById('sandboxBarrierQuestions');
+            barrContainer.innerHTML = '';
+            res.barrierQuestions.forEach((q, idx) => {
+                const item = document.createElement('div');
+                item.className = "flex gap-2.5 bg-slate-900/60 p-3 rounded-lg border border-slate-800/40 hover:border-blue-500/20 transition-all";
+                item.innerHTML = `
+                    <span class="text-xs font-bold text-blue-400 font-mono">0${idx + 1}</span>
+                    <p class="text-xs text-slate-200 leading-normal font-medium">${q}</p>
+                `;
+                barrContainer.appendChild(item);
+            });
+
+            // Smooth scroll to sandbox panel
+            block.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
-        return JSON.parse(responseText.replace(/```json/g, '').replace(/```/g, '').trim());
-      } catch (error) {
-        if (retries > 0) {
-          await new Promise(resolve => setTimeout(resolve, delay));
-          return fetchWithRetry(retries - 1, delay * 2);
-        } else {
-          throw error;
-        }
-      }
-    };
+        // ==========================================
+        // EQUIVALENCES LIBRARY GENERATOR
+        // ==========================================
+        function buildEquivalencesLibrary() {
+            const container = document.getElementById('equivalencesGrid');
+            container.innerHTML = '';
 
-    try {
-      const parsedData = await fetchWithRetry();
-      setSandboxResult(parsedData);
-      showToast("Frase deconstruida exitosamente con Inteligencia Artificial.", "success");
-    } catch (err) {
-      console.error(err);
-      // fallback
-      const fallback = {
-        biasIdentified: "Error de Atribución Fundamental. Se juzga el carácter del operador omitiendo las poderosas variables de contexto operacional.",
-        consequenceExplanation: "Culpar de forma directa esconde la falta de robustez del sistema y condena a otros a fallar por la misma causa.",
-        performanceQuestions: [
-          `¿De qué información en tiempo real disponía el operador antes de la maniobra?`,
-          `¿Cómo se priorizaban los objetivos operativos versus las tolerancias de seguridad en esa jornada?`,
-          `¿Qué adaptaciones cotidianas de trabajo se realizan comúnmente para compensar herramientas inadecuadas?`
-        ],
-        barrierQuestions: [
-          `¿Qué salvaguardas independientes de la voluntad humana existían para interrumpir el flujo de energía peligrosa?`,
-          `¿Qué canales de comunicación fluidos existen para advertir a la gerencia sobre normas que no se adaptan al terreno?`
-        ]
-      };
-      setSandboxResult(fallback);
-      showToast("Error en API de Gemini. Se utilizó un análisis heurístico local estructurado.", "warning");
-    } finally {
-      setIsAnalyzingSandbox(false);
-    }
-  };
-
-  const currentScenario = SCENARIOS[selectedScenarioIndex];
-
-  return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-900">
-      
-      {/* HEADER BAR */}
-      <header className="border-b border-slate-800 bg-slate-950 px-6 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-40 shadow-md">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg border border-emerald-500/20">
-            <ShieldAlert className="w-6 h-6 animate-pulse" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-              InvestigaConSentido <span className="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded">Metodología HOP</span>
-            </h1>
-            <p className="text-xs text-slate-400">Entrenamiento Lingüístico y Metodológico para Seguridad Industrial</p>
-          </div>
-        </div>
-
-        {/* API Key Controller Header */}
-        <div className="flex items-center space-x-2">
-          <button 
-            onClick={() => setShowApiKeyModal(true)}
-            className={`text-xs px-3 py-1.5 rounded-md border flex items-center gap-1.5 transition-all ${
-              customApiKey 
-                ? 'bg-emerald-950/40 text-emerald-300 border-emerald-700 hover:bg-emerald-950/60' 
-                : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
-            }`}
-          >
-            <Sparkles className={`w-3.5 h-3.5 ${customApiKey ? 'text-emerald-400 animate-spin-slow' : 'text-slate-400'}`} />
-            {customApiKey ? "API de Gemini Conectada" : "Configurar Gemini API (Opcional)"}
-          </button>
-        </div>
-      </header>
-
-      {/* TOAST SYSTEM */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-lg border shadow-xl animate-bounce-short max-w-sm transition-all duration-300 bg-slate-950 border-slate-800">
-          {toastMessage.type === 'success' && <CheckCircle2 className="w-5 h-5 text-emerald-400" />}
-          {toastMessage.type === 'warning' && <AlertTriangle className="w-5 h-5 text-amber-400" />}
-          {toastMessage.type === 'info' && <Info className="w-5 h-5 text-blue-400" />}
-          <p className="text-sm text-slate-200 font-medium">{toastMessage.message}</p>
-        </div>
-      )}
-
-      {/* API KEY CONFIGURATION MODAL */}
-      {showApiKeyModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-md w-full p-6 shadow-2xl">
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Sparkles className="text-emerald-400 w-5 h-5" /> Configurar API de Google Gemini
-              </h3>
-              <button 
-                onClick={() => setShowApiKeyModal(false)}
-                className="text-slate-400 hover:text-white text-lg font-bold"
-              >
-                &times;
-              </button>
-            </div>
-            
-            <p className="text-sm text-slate-400 mb-4 leading-relaxed">
-              Esta aplicación puede conectarse directamente con el modelo de lenguaje de última generación <strong className="text-emerald-400">gemini-2.5-flash-preview-09-2025</strong> para darte una evaluación pedagógica altamente personalizada de tus preguntas.
-            </p>
-
-            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3 mb-4">
-              <p className="text-xs text-emerald-300 leading-snug">
-                <strong>¿No tienes API Key?</strong> ¡No te preocupes! Déjala en blanco. La aplicación incluye un robusto motor heurístico local que simula con alta precisión el análisis técnico metodológico para todos los casos de estudio.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400">Tu Clave API de Google AI</label>
-              <input 
-                type="password" 
-                placeholder="AIzaSy..." 
-                value={customApiKey}
-                onChange={(e) => setCustomApiKey(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-md py-2 px-3 text-sm font-mono text-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-              />
-              <p className="text-[11px] text-slate-500 italic">La API Key se almacena únicamente en la memoria de ejecución de tu navegador y no es enviada a servidores de terceros que no sean Google.</p>
-            </div>
-
-            <div className="mt-6 flex justify-end gap-2">
-              {customApiKey && (
-                <button
-                  onClick={() => {
-                    setCustomApiKey('');
-                    showToast("API Key eliminada.", "info");
-                  }}
-                  className="px-3 py-1.5 rounded-md text-xs bg-red-950/40 text-red-400 border border-red-900/40 hover:bg-red-950/60"
-                >
-                  Limpiar Key
-                </button>
-              )}
-              <button
-                onClick={() => {
-                  setShowApiKeyModal(false);
-                  showToast("Configuración guardada.", "success");
-                }}
-                className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-1.5 rounded-md text-xs transition-colors"
-              >
-                Guardar y Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TOP NAVIGATION TABS */}
-      <nav className="bg-slate-950/80 backdrop-blur px-6 border-b border-slate-800 flex overflow-x-auto space-x-1 scrollbar-hide py-1">
-        <button 
-          onClick={() => { setActiveTab('theory'); setEvaluationResult(null); }}
-          className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${
-            activeTab === 'theory' 
-              ? 'border-emerald-500 text-emerald-400 bg-emerald-500/5' 
-              : 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-800'
-          }`}
-        >
-          <BookOpen className="w-4 h-4" />
-          Metodología & Fundamento
-        </button>
-
-        <button 
-          onClick={() => { setActiveTab('workshop'); setEvaluationResult(null); }}
-          className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${
-            activeTab === 'workshop' 
-              ? 'border-emerald-500 text-emerald-400 bg-emerald-500/5' 
-              : 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-800'
-          }`}
-        >
-          <Compass className="w-4 h-4" />
-          Taller de Práctica
-        </button>
-
-        <button 
-          onClick={() => { setActiveTab('sandbox'); setSandboxResult(null); }}
-          className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${
-            activeTab === 'sandbox' 
-              ? 'border-emerald-500 text-emerald-400 bg-emerald-500/5' 
-              : 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-800'
-          }`}
-        >
-          <MessageSquare className="w-4 h-4" />
-          Laboratorio Libre (Deconstructor AI)
-        </button>
-
-        <button 
-          onClick={() => { setActiveTab('library'); }}
-          className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${
-            activeTab === 'library' 
-              ? 'border-emerald-500 text-emerald-400 bg-emerald-500/5' 
-              : 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-800'
-          }`}
-        >
-          <Sliders className="w-4 h-4" />
-          Biblioteca de Equivalencias
-        </button>
-      </nav>
-
-      {/* CORE LAYOUT */}
-      <main className="flex-1 overflow-y-auto p-6 max-w-7xl mx-full w-full mx-auto">
-        
-        {/* ========================================== */}
-        {/* TAB 1: THEORY & METHODOLOGY */}
-        {/* ========================================== */}
-        {activeTab === 'theory' && (
-          <div className="space-y-8 animate-fadeIn">
-            
-            {/* HERO INTRODUCTION */}
-            <div className="bg-gradient-to-r from-slate-900 via-slate-950 to-emerald-950 border border-slate-800 rounded-xl p-8 shadow-xl relative overflow-hidden">
-              <div className="absolute right-0 top-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
-              
-              <div className="max-w-3xl space-y-4">
-                <span className="text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full uppercase tracking-wider">
-                  El Poder de la Pregunta en HOP (Factores Humanos)
-                </span>
-                <h2 className="text-3xl font-extrabold text-white tracking-tight sm:text-4xl">
-                  La calidad de una investigación depende de la calidad de sus preguntas.
-                </h2>
-                <p className="text-slate-300 text-base leading-relaxed">
-                  Si la pregunta es pobre y cerrada, la acción de respuesta será pobre y meramente punitiva. Cuando culpamos a un trabajador diciendo que <em>“se distrajo”</em> o <em>“no cumplió”</em>, cerramos el aprendizaje. Cuando preguntamos por los <strong>mecanismos del entorno físico y cognitivo</strong> que guiaron sus acciones en tiempo real, abrimos la puerta para rediseñar sistemas intrínsecamente más seguros.
-                </p>
-                <div className="flex flex-wrap gap-4 pt-4">
-                  <button 
-                    onClick={() => setActiveTab('workshop')}
-                    className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-5 py-2.5 rounded-lg text-sm flex items-center gap-2 transition-all shadow-lg hover:shadow-emerald-500/10"
-                  >
-                    Ir al Taller Práctico <ArrowRight className="w-4 h-4" />
-                  </button>
-                  <button 
-                    onClick={() => setActiveTab('sandbox')}
-                    className="bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold px-5 py-2.5 rounded-lg text-sm border border-slate-700 transition-all"
-                  >
-                    Deconstruir mis propias frases
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* THE METODOLOGY TRANSITION MODEL */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              
-              {/* CARD 1: CONDUCTA OBSERVABLE */}
-              <div className="bg-slate-950/60 border border-red-500/20 rounded-xl p-6 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-red-500/40"></div>
-                <div className="flex justify-between items-start mb-4">
-                  <span className="text-xs bg-red-500/10 text-red-400 border border-red-500/20 px-2.5 py-1 rounded-md font-bold uppercase">
-                    Paso 1: Lo que vimos
-                  </span>
-                  <XCircle className="w-5 h-5 text-red-400" />
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">Conducta Observable</h3>
-                <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-                  Es la superficie del problema. Lo que las cámaras grabaron o lo que dice el reporte preliminar.
-                </p>
-                <div className="bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-slate-300 italic mb-4">
-                  &quot;El operador ingresó a la línea sin guantes protectores.&quot;
-                </div>
-                <div className="text-xs text-red-300 bg-red-950/20 border border-red-900/30 p-3 rounded-lg flex items-start gap-2">
-                  <AlertTriangle className="w-4 h-4 shrink-0" />
-                  <span><strong>Error común:</strong> Preguntar <em>¿Por qué no usó los guantes?</em> asumiendo desprecio deliberado por la seguridad.</span>
-                </div>
-              </div>
-
-              {/* CARD 2: MECANISMO DE DESEMPEÑO */}
-              <div className="bg-slate-950/60 border border-emerald-500/20 rounded-xl p-6 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500/40"></div>
-                <div className="flex justify-between items-start mb-4">
-                  <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-md font-bold uppercase">
-                    Paso 2: Cómo se produjo
-                  </span>
-                  <Sliders className="w-5 h-5 text-emerald-400" />
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">Mecanismo de Desempeño</h3>
-                <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-                  El puente cognitivo y físico. Las demandas operativas que competían por la atención y las herramientas disponibles.
-                </p>
-                <div className="bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-emerald-300 italic mb-4">
-                  &quot;¿Qué demandas de destreza física o disponibilidad de equipos afectaron la elección del tipo de guante?&quot;
-                </div>
-                <div className="text-xs text-emerald-300 bg-emerald-950/20 border border-emerald-900/30 p-3 rounded-lg flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 shrink-0" />
-                  <span><strong>Aporte:</strong> Revela que los guantes asignados no permiten manejar micro-componentes y el operador requería alta sensibilidad táctil.</span>
-                </div>
-              </div>
-
-              {/* CARD 3: BARRERA ORGANIZACIONAL */}
-              <div className="bg-slate-950/60 border border-blue-500/20 rounded-xl p-6 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-blue-500/40"></div>
-                <div className="flex justify-between items-start mb-4">
-                  <span className="text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-md font-bold uppercase">
-                    Paso 3: Qué debió protegernos
-                  </span>
-                  <ShieldAlert className="w-5 h-5 text-blue-400" />
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">Barrera Organizacional</h3>
-                <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-                  Las salvaguardas de diseño que el sistema debió proveer para mitigar las consecuencias de la acción humana libre o errada.
-                </p>
-                <div className="bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-blue-300 italic mb-4">
-                  &quot;¿De qué manera los procesos de compras de PPE integran la retroalimentación de los técnicos en campo?&quot;
-                </div>
-                <div className="text-xs text-blue-300 bg-blue-950/20 border border-blue-900/30 p-3 rounded-lg flex items-start gap-2">
-                  <Lightbulb className="w-4 h-4 shrink-0" />
-                  <span><strong>Resultado sistémico:</strong> Se implementa un canal ágil para homologar diferentes tipos de guantes especializados con compras corporativas.</span>
-                </div>
-              </div>
-
-            </div>
-
-            {/* VISUAL CONTRAST BOXES */}
-            <div className="bg-slate-950 border border-slate-800 rounded-xl p-6">
-              <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                <Info className="text-emerald-400 w-5 h-5" /> Contraste Filosófico: De la Culpa al Entendimiento
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <div className="space-y-4">
-                  <h4 className="text-sm font-bold text-red-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-red-950/40 pb-2">
-                    <XCircle className="w-4 h-4" /> Lenguaje de Cierre (Atribuciones Individuales)
-                  </h4>
-                  <ul className="space-y-3">
-                    <li className="flex gap-2 text-sm text-slate-300">
-                      <span className="font-bold text-red-500">&bull;</span>
-                      <div>
-                        <strong>&quot;Se distrajo&quot;</strong>
-                        <p className="text-xs text-slate-500">Asume desatención consciente. Genera defensividad inmediata.</p>
-                      </div>
-                    </li>
-                    <li className="flex gap-2 text-sm text-slate-300">
-                      <span className="font-bold text-red-500">&bull;</span>
-                      <div>
-                        <strong>&quot;No tuvo cuidado&quot;</strong>
-                        <p className="text-xs text-slate-500">Omite la trampa física que la interfaz gráfica o las señales físicas tendieron.</p>
-                      </div>
-                    </li>
-                    <li className="flex gap-2 text-sm text-slate-300">
-                      <span className="font-bold text-red-500">&bull;</span>
-                      <div>
-                        <strong>&quot;No cumplió el procedimiento&quot;</strong>
-                        <p className="text-xs text-slate-500">Asume que el procedimiento escrito representaba fielmente la forma óptima de ejecutar la tarea.</p>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="space-y-4">
-                  <h4 className="text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-emerald-950/40 pb-2">
-                    <CheckCircle2 className="w-4 h-4" /> Lenguaje Abierto (Mecanismo y Sistema)
-                  </h4>
-                  <ul className="space-y-3">
-                    <li className="flex gap-2 text-sm text-slate-300">
-                      <span className="font-bold text-emerald-400">&bull;</span>
-                      <div>
-                        <strong>&quot;¿Qué demandas competían por su atención?&quot;</strong>
-                        <p className="text-xs text-emerald-400/80">Abre un mapa de procesos paralelos, radios, fatiga o presiones operativas.</p>
-                      </div>
-                    </li>
-                    <li className="flex gap-2 text-sm text-slate-300">
-                      <span className="font-bold text-emerald-400">&bull;</span>
-                      <div>
-                        <strong>&quot;¿Qué información estaba disponible y cuál no se interpretó?&quot;</strong>
-                        <p className="text-xs text-emerald-400/80">Enfocado en el diseño ergonómico de los sensores y la claridad del canal comunicativo.</p>
-                      </div>
-                    </li>
-                    <li className="flex gap-2 text-sm text-slate-300">
-                      <span className="font-bold text-emerald-400">&bull;</span>
-                      <div>
-                        <strong>&quot;¿Qué condiciones dificultaron seguir el procedimiento escrito?&quot;</strong>
-                        <p className="text-xs text-emerald-400/80">Busca discrepancias entre el trabajo &quot;prescrito&quot; y el trabajo &quot;real&quot;.</p>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-
-              </div>
-            </div>
-
-            {/* INSTRUCTIONAL TIP */}
-            <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-6 flex flex-col sm:flex-row gap-4 items-center sm:items-start text-center sm:text-left">
-              <div className="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg shrink-0">
-                <Users className="w-6 h-6" />
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-bold text-white text-base">La Práctica hace al Investigador Moderno</h4>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Para asimilar de verdad este método, te recomendamos ingresar al <strong>Taller de Práctica</strong>. Allí encontrarás situaciones críticas reales de seguridad laboral donde tendrás que reescribir la pregunta sesgada y someterla a nuestra IA metodológica para retroalimentación instantánea.
-                </p>
-                <button 
-                  onClick={() => setActiveTab('workshop')}
-                  className="text-emerald-400 hover:text-emerald-300 text-xs font-bold flex items-center gap-1 mt-2 inline-flex"
-                >
-                  Ir al Taller ahora <ChevronRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-
-          </div>
-        )}
-
-        {/* ========================================== */}
-        {/* TAB 2: INTERACTIVE WORKSHOP (TALLER) */}
-        {/* ========================================== */}
-        {activeTab === 'workshop' && (
-          <div className="space-y-8 animate-fadeIn">
-            
-            {/* SCENARIOS SELECTION */}
-            <div>
-              <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider block mb-2">Escoge un escenario para entrenar</span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                {SCENARIOS.map((scenario, index) => (
-                  <button
-                    key={scenario.id}
-                    onClick={() => {
-                      setSelectedScenarioIndex(index);
-                      setUserFormulation('');
-                      setEvaluationResult(null);
-                    }}
-                    className={`p-4 rounded-xl border text-left transition-all relative ${
-                      selectedScenarioIndex === index 
-                        ? 'bg-slate-950 border-emerald-500 ring-1 ring-emerald-500' 
-                        : 'bg-slate-950/40 border-slate-800 hover:border-slate-700 hover:bg-slate-950/60'
-                    }`}
-                  >
-                    <span className="text-[10px] font-bold tracking-wider uppercase text-slate-500 bg-slate-900 border border-slate-800 px-2 py-0.5 rounded-full mb-2 inline-block">
-                      {scenario.category}
-                    </span>
-                    <h4 className="font-bold text-sm text-white mb-1 line-clamp-1">{scenario.title}</h4>
-                    <p className="text-xs text-slate-400 line-clamp-2">{scenario.description}</p>
-                    
-                    {selectedScenarioIndex === index && (
-                      <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-400"></div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* SCENARIO DETAILED PANEL */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              
-              {/* LEFT COLUMN: SCENARIO INFO */}
-              <div className="lg:col-span-5 space-y-4">
-                <div className="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 className="text-base font-bold text-white flex items-center gap-2">
-                      <FileText className="text-emerald-400 w-4.5 h-4.5" /> Detalles de la Situación
-                    </h3>
-                    <span className="text-xs text-slate-500 font-mono">Caso #{currentScenario.id}</span>
-                  </div>
-
-                  <div>
-                    <h4 className="text-sm font-semibold text-slate-300 mb-1">El Suceso</h4>
-                    <p className="text-xs text-slate-400 leading-relaxed bg-slate-900/60 p-3 rounded-lg border border-slate-900">
-                      {currentScenario.description}
-                    </p>
-                  </div>
-
-                  <div>
-                    <h4 className="text-xs font-semibold text-red-400 tracking-wider uppercase flex items-center gap-1">
-                      <XCircle className="w-3.5 h-3.5" /> Pensamiento de Culpa Cerrado
-                    </h4>
-                    <p className="text-xs text-slate-400 leading-relaxed mt-1">
-                      <em>&quot;{currentScenario.closedStatement}&quot;</em>
-                    </p>
-                  </div>
-
-                  <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-                    <h4 className="text-xs font-semibold text-red-400 flex items-center gap-1.5 mb-1">
-                      <AlertTriangle className="w-3.5 h-3.5" /> Pregunta Deficiente a Reformular:
-                    </h4>
-                    <p className="text-sm text-slate-200 font-medium italic">
-                      &quot;{currentScenario.closedQuestion}&quot;
-                    </p>
-                    <p className="text-[10px] text-red-300 mt-2 leading-snug">
-                      Esta pregunta centra todo el análisis en el trabajador, orillándolo a defenderse o a excusarse. Tu misión es superarla.
-                    </p>
-                  </div>
-                </div>
-
-                {/* HELP CARD: COGNITIVE TRIGGERS */}
-                <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-5 space-y-3">
-                  <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <Lightbulb className="w-4 h-4" /> Pistas de Contexto (HOP)
-                  </h4>
-                  <p className="text-xs text-slate-400">Para una excelente pregunta, intenta apuntar a cualquiera de estas dos variables:</p>
-                  
-                  <div className="space-y-2">
-                    <div className="bg-slate-900/60 p-2.5 rounded border border-slate-800">
-                      <span className="text-[11px] font-bold text-emerald-300 block mb-0.5">Mecanismo de Desempeño:</span>
-                      <p className="text-[11px] text-slate-400 leading-snug">{currentScenario.contextTips.performanceMechanisms}</p>
-                    </div>
-                    <div className="bg-slate-900/60 p-2.5 rounded border border-slate-800">
-                      <span className="text-[11px] font-bold text-blue-300 block mb-0.5">Barrera Organizacional:</span>
-                      <p className="text-[11px] text-slate-400 leading-snug">{currentScenario.contextTips.organizationalBarriers}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* RIGHT COLUMN: REFORMULATION WORK BENCH */}
-              <div className="lg:col-span-7 space-y-4">
-                
-                <div className="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 className="text-base font-bold text-white flex items-center gap-2">
-                      <Compass className="text-emerald-400 w-4.5 h-4.5 animate-spin-slow" /> Tu Banco de Reformulación
-                    </h3>
-                    <span className="text-[11px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded">Entrenamiento en Vivo</span>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                      Escribe tu pregunta investigable, abierta y sistémica:
-                    </label>
-                    <textarea
-                      rows={4}
-                      placeholder="Ej: ¿Qué demandas o alarmas en el tablero competían por la atención visual del técnico en ese preciso instante?..."
-                      value={userFormulation}
-                      onChange={(e) => setUserFormulation(e.target.value)}
-                      disabled={isEvaluating}
-                      className="w-full bg-slate-900 border border-slate-800 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 placeholder-slate-600 disabled:opacity-50"
-                    />
-                    <div className="flex justify-between items-center text-[11px] text-slate-500">
-                      <span>Evita palabras acusadoras como &quot;Por qué&quot;, &quot;Negligente&quot;, o &quot;Cuidado&quot;.</span>
-                      <span>{userFormulation.length} caracteres</span>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 justify-end">
-                    <button
-                      onClick={() => {
-                        setUserFormulation('');
-                        setEvaluationResult(null);
-                      }}
-                      disabled={isEvaluating}
-                      className="px-4 py-2 rounded-lg text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-all"
-                    >
-                      Limpiar
-                    </button>
-                    <button
-                      onClick={() => evaluateQuestionWithAI(userFormulation, currentScenario)}
-                      disabled={isEvaluating || !userFormulation.trim()}
-                      className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-5 py-2.5 rounded-lg text-xs flex items-center gap-1.5 transition-all disabled:opacity-50"
-                    >
-                      {isEvaluating ? (
-                        <>
-                          <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Evaluando con {customApiKey ? "IA de Gemini..." : "Heurística local..."}
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Someter a Evaluación
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {/* EVALUATION RESULTS PANEL */}
-                {evaluationResult && (
-                  <div className="bg-slate-950 border border-emerald-500/20 rounded-xl p-5 space-y-4 animate-fadeIn">
-                    
-                    <div className="flex flex-wrap items-center justify-between border-b border-slate-800 pb-3 gap-2">
-                      <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-emerald-500/10 text-emerald-400 rounded">
-                          <Award className="w-4 h-4" />
+            TRANSFORMATION_LIBRARY.forEach((item) => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-4 hover:border-slate-700 transition-all";
+                card.innerHTML = `
+                    <!-- TOP BANNER -->
+                    <div class="flex items-start justify-between gap-3 border-b border-slate-800 pb-3">
+                        <div>
+                            <span class="text-[10px] text-red-400 font-semibold bg-red-950/20 border border-red-900/30 px-2 py-0.5 rounded uppercase">
+                                Frase acusatoria típica
+                            </span>
+                            <h4 class="font-extrabold text-base text-white mt-1">
+                                "${item.original}"
+                            </h4>
                         </div>
-                        <h4 className="font-bold text-sm text-white">Resultado del Análisis</h4>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold bg-slate-900 border border-slate-800 px-2 py-0.5 rounded">
-                          {evaluationResult.type}
+                        <i data-lucide="x-circle" class="w-5 h-5 text-red-400 shrink-0"></i>
+                    </div>
+
+                    <!-- ANALYSIS OF BIAS -->
+                    <div class="text-xs bg-slate-900/40 p-2.5 rounded border border-slate-900">
+                        <span class="font-semibold text-slate-400 text-[11px] block mb-0.5">El error metodológico de la frase:</span>
+                        <p class="text-slate-300 leading-relaxed text-[11px]">${item.error}</p>
+                    </div>
+
+                    <!-- THE REFORMULATED PROPOSAL -->
+                    <div class="space-y-1">
+                        <span class="text-[10px] text-emerald-400 font-semibold bg-emerald-950/20 border border-emerald-900/30 px-2 py-0.5 rounded uppercase inline-block">
+                            Pregunta de Reemplazo (Abierta)
                         </span>
-                        <div className={`text-base font-extrabold px-3 py-1 rounded ${
-                          evaluationResult.score >= 80 
-                            ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-700/40' 
-                            : evaluationResult.score >= 55 
-                              ? 'bg-amber-950/60 text-amber-400 border border-amber-700/40' 
-                              : 'bg-red-950/60 text-red-400 border border-red-700/40'
-                        }`}>
-                          {evaluationResult.score}/100 pts
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      
-                      <div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Crítica Constructiva:</span>
-                        <p className="text-xs text-slate-300 leading-relaxed bg-slate-900/40 p-3 rounded-lg border border-slate-900">
-                          {evaluationResult.critique}
+                        <p class="text-sm text-slate-200 font-bold leading-normal mt-1 text-emerald-300">
+                            ${item.openQuestion}
                         </p>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div className="bg-slate-900/60 p-3 rounded-lg border border-slate-800/60">
-                          <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block mb-1">Mecanismo Identificado:</span>
-                          <p className="text-xs text-slate-300 leading-snug">
-                            {evaluationResult.mechanism_identified || "Indagación de presiones situacionales directas."}
-                          </p>
-                        </div>
-
-                        <div className="bg-slate-900/60 p-3 rounded-lg border border-slate-800/60">
-                          <span className="text-[10px] font-bold text-blue-400 uppercase tracking-wider block mb-1">Mejor opción sugerida:</span>
-                          <p className="text-xs text-slate-300 leading-snug italic">
-                            &quot;{evaluationResult.alternative}&quot;
-                          </p>
-                        </div>
-                      </div>
-
                     </div>
 
-                    <div className="bg-slate-900/60 p-3 rounded-lg border border-slate-800/40 flex items-start gap-2">
-                      <Info className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                      <p className="text-[11px] text-slate-400 leading-snug">
-                        <strong>Recuerda:</strong> El objetivo no es obtener la pregunta perfecta, sino erradicar los sesgos de culpa y entrenar la agudeza mental de que un error en el trabajo es casi siempre consecuencia de un entorno mal equilibrado.
-                      </p>
+                    <!-- DISCOVERY AREA -->
+                    <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-800/60">
+                        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                            ¿Qué solemos descubrir con esta pregunta?
+                        </span>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            ${item.discovery}
+                        </p>
                     </div>
-
-                  </div>
-                )}
-
-              </div>
-
-            </div>
-
-          </div>
-        )}
-
-        {/* ========================================== */}
-        {/* TAB 3: FREE DECONSTRUCTOR (SANDBOX) */}
-        {/* ========================================== */}
-        {activeTab === 'sandbox' && (
-          <div className="space-y-6 animate-fadeIn">
-            
-            <div className="bg-slate-950 border border-slate-800 rounded-xl p-6 relative overflow-hidden">
-              <div className="absolute right-0 top-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none"></div>
-              
-              <div className="max-w-3xl space-y-2 mb-6">
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                  <MessageSquare className="text-emerald-400 w-5 h-5 animate-pulse" /> Laboratorio Libre (Deconstructor AI de Frases)
-                </h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  ¿Tienes una frase de un reporte real de tu empresa que suene acusatoria o cerrada? Escríbela a continuación. Nuestro Co-piloto de IA identificará los sesgos y la desmenuzará para entregarte un abanico de preguntas investigables sobre mecanismos de desempeño e infraestructura organizacional.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                    Frase culpabilizadora de origen (Ej: &quot;El operario no revisó el nivel de gas por estar apurado&quot;):
-                  </label>
-                  <div className="flex gap-2">
-                    <input 
-                      type="text" 
-                      placeholder="Escribe aquí tu frase sesgada..." 
-                      value={sandboxClosedPhrase}
-                      onChange={(e) => setSandboxClosedPhrase(e.target.value)}
-                      disabled={isAnalyzingSandbox}
-                      className="flex-1 bg-slate-900 border border-slate-800 rounded-lg py-2.5 px-3 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 placeholder-slate-600 disabled:opacity-50"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') analyzeSandboxPhraseWithAI(sandboxClosedPhrase);
-                      }}
-                    />
-                    <button
-                      onClick={() => analyzeSandboxPhraseWithAI(sandboxClosedPhrase)}
-                      disabled={isAnalyzingSandbox || !sandboxClosedPhrase.trim()}
-                      className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2.5 rounded-lg text-xs flex items-center gap-1.5 transition-all disabled:opacity-50 whitespace-nowrap"
-                    >
-                      {isAnalyzingSandbox ? (
-                        <>
-                          <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Procesando...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-3.5 h-3.5" /> Deconstruir
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2 pt-1">
-                  <span className="text-[10px] text-slate-500">Ejemplos para probar:</span>
-                  <button 
-                    onClick={() => {
-                      setSandboxClosedPhrase("Se cayó porque caminaba distraído con el celular.");
-                      setSandboxResult(null);
-                    }}
-                    className="text-[10px] bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 px-2 py-0.5 rounded transition-all"
-                  >
-                    &quot;Caminaba distraído con el celular&quot;
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setSandboxClosedPhrase("No utilizó la guarda de seguridad debido a un exceso de confianza.");
-                      setSandboxResult(null);
-                    }}
-                    className="text-[10px] bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 px-2 py-0.5 rounded transition-all"
-                  >
-                    &quot;Exceso de confianza&quot;
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setSandboxClosedPhrase("El supervisor no rellenó la matriz de riesgo por flojera.");
-                      setSandboxResult(null);
-                    }}
-                    className="text-[10px] bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 px-2 py-0.5 rounded transition-all"
-                  >
-                    &quot;No rellenó la matriz por flojera&quot;
-                  </button>
-                </div>
-              </div>
-
-            </div>
-
-            {/* SANDBOX OUTCOME GRAPHICS */}
-            {sandboxResult && (
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fadeIn">
-                
-                {/* DECONSTRUCTION EXPLANATION */}
-                <div className="lg:col-span-4 bg-slate-950 border border-red-500/20 rounded-xl p-5 space-y-4">
-                  <h4 className="text-sm font-bold text-red-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
-                    <AlertTriangle className="w-4 h-4" /> Anatomía del Sesgo Detectado
-                  </h4>
-
-                  <div className="space-y-3 text-xs">
-                    <div>
-                      <span className="font-semibold text-slate-300 block mb-0.5">Tipo de Sesgo:</span>
-                      <p className="text-slate-400 leading-relaxed bg-slate-900/40 p-2.5 rounded border border-slate-900">
-                        {sandboxResult.biasIdentified}
-                      </p>
-                    </div>
-
-                    <div>
-                      <span className="font-semibold text-slate-300 block mb-0.5">Consecuencia Organizacional:</span>
-                      <p className="text-slate-400 leading-relaxed bg-slate-900/40 p-2.5 rounded border border-slate-900">
-                        {sandboxResult.consequenceExplanation}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="text-[10px] text-slate-500 bg-slate-900 p-2 rounded-lg leading-snug italic">
-                    &quot;Cuando culpamos a la persona, detenemos la investigación. Solo cuando aceptamos que su error es el síntoma de un problema sistémico comenzamos a aprender.&quot;
-                  </div>
-                </div>
-
-                {/* THE SYSTEM QUESTIONS */}
-                <div className="lg:col-span-8 space-y-4">
-                  
-                  {/* Performance questions */}
-                  <div className="bg-slate-950 border border-emerald-500/20 rounded-xl p-5">
-                    <h4 className="text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2 mb-3">
-                      <Compass className="w-4 h-4" /> Preguntas del Mecanismo de Desempeño
-                    </h4>
-                    <p className="text-xs text-slate-400 mb-3 leading-relaxed">
-                      Utiliza estas preguntas abiertas durante las entrevistas de campo para desenterrar las trampas cognitivas del entorno real:
-                    </p>
-                    <div className="space-y-2">
-                      {sandboxResult.performanceQuestions.map((q, idx) => (
-                        <div key={idx} className="flex gap-2.5 bg-slate-900/60 p-3 rounded-lg border border-slate-800/40 hover:border-emerald-500/20 transition-all">
-                          <span className="text-xs font-bold text-emerald-400 font-mono">0{idx + 1}</span>
-                          <p className="text-xs text-slate-200 leading-normal font-medium">{q}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Barrier questions */}
-                  <div className="bg-slate-950 border border-blue-500/20 rounded-xl p-5">
-                    <h4 className="text-sm font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2 mb-3">
-                      <ShieldAlert className="w-4 h-4" /> Preguntas de Barreras Organizacionales
-                    </h4>
-                    <p className="text-xs text-slate-400 mb-3 leading-relaxed">
-                      Utiliza estas preguntas para analizar las defensas que debieron proteger la tarea de los errores típicos inevitables de las personas:
-                    </p>
-                    <div className="space-y-2">
-                      {sandboxResult.barrierQuestions.map((q, idx) => (
-                        <div key={idx} className="flex gap-2.5 bg-slate-900/60 p-3 rounded-lg border border-slate-800/40 hover:border-blue-500/20 transition-all">
-                          <span className="text-xs font-bold text-blue-400 font-mono">0{idx + 1}</span>
-                          <p className="text-xs text-slate-200 leading-normal font-medium">{q}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                </div>
-
-              </div>
-            )}
-
-          </div>
-        )}
-
-        {/* ========================================== */}
-        {/* TAB 4: LIBRARY OF EQUIVALENCES */}
-        {/* ========================================== */}
-        {activeTab === 'library' && (
-          <div className="space-y-6 animate-fadeIn">
-            
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
-              <div>
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                  <Sliders className="text-emerald-400 w-5 h-5" /> Diccionario Metodológico: Frases vs Preguntas
-                </h3>
-                <p className="text-xs text-slate-400">Guía de referencia rápida para redactar reportes modernos y conducir entrevistas.</p>
-              </div>
-              <span className="text-xs font-mono bg-slate-950 text-slate-500 border border-slate-800 px-2.5 py-1 rounded">
-                HOP Framework v2.1
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {TRANSFORMATION_LIBRARY.map((item, index) => (
-                <div key={index} className="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-4 hover:border-slate-700 transition-all">
-                  
-                  {/* TOP BANNER */}
-                  <div className="flex items-start justify-between gap-3 border-b border-slate-800 pb-3">
-                    <div>
-                      <span className="text-[10px] text-red-400 font-semibold bg-red-950/20 border border-red-900/30 px-2 py-0.5 rounded uppercase">
-                        Frase acusatoria típica
-                      </span>
-                      <h4 className="font-extrabold text-base text-white mt-1">
-                        &quot;{item.original}&quot;
-                      </h4>
-                    </div>
-                    <XCircle className="w-5 h-5 text-red-400 shrink-0" />
-                  </div>
-
-                  {/* ANALYSIS OF BIAS */}
-                  <div className="text-xs bg-slate-900/40 p-2.5 rounded border border-slate-900">
-                    <span className="font-semibold text-slate-400 text-[11px] block mb-0.5">El error metodológico de la frase:</span>
-                    <p className="text-slate-300 leading-relaxed text-[11px]">{item.error}</p>
-                  </div>
-
-                  {/* THE REFORMULATED PROPOSAL */}
-                  <div className="space-y-1">
-                    <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-950/20 border border-emerald-900/30 px-2 py-0.5 rounded uppercase inline-block">
-                      Pregunta de Reemplazo (Abierta)
-                    </span>
-                    <p className="text-sm text-slate-200 font-bold leading-normal mt-1 text-emerald-300">
-                      {item.openQuestion}
-                    </p>
-                  </div>
-
-                  {/* DISCOVERY AREA */}
-                  <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-800/60">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                      ¿Qué solemos descubrir con esta pregunta?
-                    </span>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                      {item.discovery}
-                    </p>
-                  </div>
-
-                </div>
-              ))}
-            </div>
-
-            {/* FINAL SYSTEMIC CALLOUT */}
-            <div className="bg-slate-950 border border-slate-800 rounded-xl p-6 text-center space-y-4 max-w-2xl mx-auto">
-              <Compass className="w-12 h-12 text-emerald-400 mx-auto animate-spin-slow" />
-              <h4 className="text-lg font-bold text-white">¿Quieres cambiar la cultura de tu equipo?</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Exporta esta filosofía de preguntas en tus plantillas diarias de análisis de riesgo pre-tarea (AST, IPERC, Take-5). Cambiar las preguntas obliga a los líderes operacionales a buscar soluciones técnicas en lugar de culpar a las personas de primera línea.
-              </p>
-              <div className="flex gap-2 justify-center">
-                <button 
-                  onClick={() => setActiveTab('workshop')}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs transition-all"
-                >
-                  Volver al taller de práctica
-                </button>
-              </div>
-            </div>
-
-          </div>
-        )}
-
-      </main>
-
-      {/* FOOTER BAR */}
-      <footer className="bg-slate-950 border-t border-slate-800 px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-3 text-slate-500 text-xs">
-        <p>&copy; 2026 InvestigaConSentido - Seguridad Resiliente & Factores Humanos.</p>
-        <div className="flex space-x-4">
-          <span className="hover:text-slate-400 transition-colors">Normativa HOP (Human & Organizational Performance)</span>
-          <span>&bull;</span>
-          <span className="hover:text-slate-400 transition-colors">Principios de Safety-II</span>
-        </div>
-      </footer>
-
-    </div>
-  );
-}
+                `;
+                container.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
