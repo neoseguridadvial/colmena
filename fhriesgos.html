@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colmena Seguros - Análisis Técnico de Factores Humanos Vial</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            colmenaTeal: '#008296',
+            colmenaGold: '#FDB913',
+            colmenaNavy: '#0F2C59',
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Google Fonts for premium look -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+    .flip-card-inner {
+      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .flipped .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+    /* Hide scrollbar utility */
+    .scrollbar-none::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-none {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- HEADER CORPORATIVO (Estilo Colmena Seguros) -->
+  <header class="bg-[#008296] text-white shadow-lg sticky top-0 z-50 border-b-4 border-[#FDB913]">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <!-- Logotipo simulado -->
+        <div class="w-10 h-10 bg-[#FDB913] rounded-xl flex items-center justify-center font-bold text-[#0F2C59] text-xl shadow-inner border border-white">
+          C
+        </div>
+        <div>
+          <h1 class="font-bold text-lg md:text-xl tracking-tight leading-tight">Colmena Seguros</h1>
+          <p class="text-xs text-teal-100 font-medium">Análisis Técnico de Factores Humanos Vial</p>
+        </div>
+      </div>
+      <div class="text-xs text-right hidden lg:block border-l border-teal-600 pl-4">
+        <span class="block font-bold text-[#FDB913]">UNA EMPRESA DE</span>
+        <span class="font-semibold tracking-wider text-white">FUNDACIÓN GRUPO SOCIAL</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO BANNER & INTRODUCCIÓN -->
+  <section class="bg-gradient-to-r from-[#0F2C59] via-[#008296] to-teal-800 text-white py-12 px-4 shadow-md">
+    <div class="max-w-6xl mx-auto text-center md:text-left grid md:grid-cols-12 gap-8 items-center">
+      <div class="md:col-span-7 space-y-4">
+        <span class="bg-[#FDB913] text-[#0F2C59] font-bold text-xs px-3 py-1 rounded-full uppercase tracking-widest inline-block">
+          Enfoque Biopsicosocial y Organizacional
+        </span>
+        <h2 class="text-3xl md:text-4xl font-extrabold leading-tight">
+          Modelo Técnico Avanzado de Factores Humanos
+        </h2>
+        <p class="text-teal-100 text-sm md:text-base leading-relaxed">
+          Superemos el reduccionismo de culpabilizar al conductor. Este modelo desglosa cómo las condiciones biológicas, corporales, neurocognitivas y organizacionales del sistema configuran el verdadero perfil de riesgo vial laboral.
+        </p>
+        <div class="flex flex-wrap gap-2 pt-2 justify-center md:justify-start">
+          <span class="bg-[#008296]/60 text-xs px-3 py-1.5 rounded-lg border border-teal-400">#MatrizDeHaddon</span>
+          <span class="bg-[#008296]/60 text-xs px-3 py-1.5 rounded-lg border border-teal-400">#ErgonomíaVial</span>
+          <span class="bg-[#008296]/60 text-xs px-3 py-1.5 rounded-lg border border-teal-400">#CargaNeurocognitiva</span>
+        </div>
+      </div>
+
+      <!-- FLIP CARD CONCEPTO TRADICIONAL VS AVANZADO -->
+      <div class="md:col-span-5 flex flex-col items-center justify-center">
+        <span class="text-xs text-teal-200 mb-2 font-semibold">Toca la tarjeta para cambiar de enfoque</span>
+        <div id="concept-card" class="w-full max-w-sm h-64 flip-card cursor-pointer perspective-1000">
+          <div class="w-full h-full relative duration-700 transform-style-3d flip-card-inner">
+            <!-- FRONT: Tradicional -->
+            <div class="absolute w-full h-full p-6 rounded-2xl bg-[#0F2C59] border-2 border-[#FDB913]/30 flex flex-col justify-between backface-hidden shadow-xl text-left">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs uppercase tracking-widest text-[#FDB913] font-bold">Enfoque Tradicional</span>
+                  <span class="bg-red-500/20 text-red-400 text-xs px-2 py-0.5 rounded border border-red-500/30">Reduccionista</span>
+                </div>
+                <h3 class="text-xl font-bold mb-2 text-white">¿Qué hizo mal la persona?</h3>
+                <p class="text-slate-300 text-xs leading-relaxed">
+                  Se enfoca en culpar de forma moral al conductor por distracciones, exceso de velocidad o imprudencias, ocultando las presiones sistémicas.
+                </p>
+              </div>
+              <div class="bg-[#008296]/20 p-2.5 rounded-lg border border-teal-800/50 flex justify-between items-center">
+                <span class="text-[11px] text-[#FDB913] font-medium">Ver capa sistémica profunda</span>
+                <span class="text-sm">🔄</span>
+              </div>
+            </div>
+
+            <!-- BACK: Avanzado -->
+            <div class="absolute w-full h-full p-6 rounded-2xl bg-gradient-to-br from-teal-900 to-[#008296] border-2 border-[#FDB913] flex flex-col justify-between backface-hidden rotate-y-180 shadow-xl text-left">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs uppercase tracking-widest text-amber-300 font-bold">Enfoque Avanzado Colmena</span>
+                  <span class="bg-emerald-500/20 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/30">Sistémico</span>
+                </div>
+                <h3 class="text-xl font-bold mb-2 text-white">¿Qué condiciones hicieron probable esa conducta?</h3>
+                <p class="text-teal-50 text-xs leading-relaxed">
+                  Evalúa demandas cognitivas del cargo, fatiga acumulada, incentivos de productividad incompatibles y controles que no anticiparon el siniestro.
+                </p>
+              </div>
+              <div class="bg-amber-500/15 p-2.5 rounded-lg border border-amber-500/30 flex justify-between items-center">
+                <span class="text-[11px] text-[#FDB913] font-bold">El sistema diseña la conducta</span>
+                <span class="text-sm">🔄</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TABS DE NAVEGACIÓN PRINCIPAL -->
+  <nav class="bg-white border-b border-slate-200 sticky top-[68px] z-40 shadow-sm">
+    <div class="max-w-6xl mx-auto flex overflow-x-auto justify-start md:justify-center">
+      <button data-tab="layers" class="tab-btn px-5 py-4 font-semibold text-sm border-b-2 whitespace-nowrap transition-colors flex items-center gap-2 border-[#008296] text-[#008296] bg-teal-50/50">
+        🕵️‍♂️ Capas del Riesgo
+      </button>
+      <button data-tab="simulator" class="tab-btn px-5 py-4 font-semibold text-sm border-b-2 whitespace-nowrap transition-colors flex items-center gap-2 border-transparent text-slate-500 hover:text-slate-800">
+        📊 Simulador de Perfil vial
+      </button>
+      <button data-tab="clinic" class="tab-btn px-5 py-4 font-semibold text-sm border-b-2 whitespace-nowrap transition-colors flex items-center gap-2 border-transparent text-slate-500 hover:text-slate-800">
+        🔧 Clínica de Casos
+      </button>
+      <button data-tab="dashboard" class="tab-btn px-5 py-4 font-semibold text-sm border-b-2 whitespace-nowrap transition-colors flex items-center gap-2 border-transparent text-slate-500 hover:text-slate-800">
+        📋 Haddon & Procesos
+      </button>
+    </div>
+  </nav>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="max-w-6xl mx-auto p-4 md:p-6 pb-20 flex-grow">
+
+    <!-- 1. SECCIÓN CAPAS DEL RIESGO -->
+    <section id="tab-layers" class="tab-content space-y-8 animate-fadeIn">
+      <div class="text-center max-w-2xl mx-auto">
+        <h3 class="text-2xl font-bold text-[#0F2C59]">Explorador de las 7 Capas de Factores Humanos</h3>
+        <p class="text-slate-600 text-sm mt-1">
+          Haz clic en una capa para profundizar en sus riesgos ocultos, su lectura organizacional real y los controles recomendados por el equipo de prevención vial de Colmena Seguros.
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-12 gap-8 items-start">
+        <!-- Navegador vertical -->
+        <div id="layers-navigator" class="lg:col-span-4 flex lg:flex-col gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-none">
+          <!-- Dinámico en JS -->
+        </div>
+
+        <!-- Panel de detalles interactivo (Flip Card) -->
+        <div class="lg:col-span-8 flex flex-col items-center">
+          <span class="text-xs text-slate-500 mb-2 font-medium">🔄 Presiona la tarjeta para ver los CONTROLES organizacionales</span>
+          
+          <div id="layer-flip-card" class="w-full h-[520px] md:h-[420px] flip-card cursor-pointer perspective-1000">
+            <div class="w-full h-full relative duration-700 transform-style-3d flip-card-inner">
+              
+              <!-- CARA FRONT: Riesgos y Vulnerabilidades -->
+              <div id="layer-card-front" class="absolute w-full h-full p-6 md:p-8 rounded-3xl border-3 bg-white flex flex-col justify-between backface-hidden shadow-xl border-teal-600 bg-teal-50">
+                <!-- Se inyecta dinámicamente -->
+              </div>
+
+              <!-- CARA BACK: Lectura de la Empresa y Controles -->
+              <div id="layer-card-back" class="absolute w-full h-full p-6 md:p-8 rounded-3xl bg-[#0F2C59] border-3 border-[#FDB913] text-white flex flex-col justify-between backface-hidden rotate-y-180 shadow-xl">
+                <!-- Se inyecta dinámicamente -->
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. SECCIÓN SIMULADOR DE PERFIL DE RIESGO -->
+    <section id="tab-simulator" class="tab-content hidden space-y-6 max-w-4xl mx-auto animate-fadeIn">
+      <div class="bg-white rounded-3xl p-6 md:p-8 shadow-md border border-slate-100">
+        
+        <!-- Pantalla de Inicio del Quiz -->
+        <div id="quiz-start" class="text-center space-y-6 py-8">
+          <div class="w-16 h-16 bg-teal-50 text-[#008296] rounded-full flex items-center justify-center mx-auto border-2 border-[#008296]">
+            <!-- Brain SVG -->
+            <svg class="w-8 h-8 text-amber-400 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+          </div>
+          <div class="space-y-2">
+            <h3 class="text-2xl md:text-3xl font-black text-[#0F2C59]">Simulador de Perfil de Riesgo Vial</h3>
+            <p class="text-slate-600 text-sm max-w-md mx-auto">
+              Evalúa preventivamente si las condiciones de tu sistema o cargo están exponiendo al error humano vial de acuerdo a las variables del instrumento de perfilamiento técnico.
+            </p>
+          </div>
+          <button id="btn-start-quiz" class="bg-[#008296] text-white hover:bg-teal-700 font-bold px-8 py-3.5 rounded-2xl shadow-lg transition-transform hover:scale-105 inline-block">
+            Iniciar Autoevaluación Operativa
+          </button>
+          <p class="text-[11px] text-slate-400 uppercase tracking-widest font-semibold block">Prueba de perfilamiento rápido (5 Preguntas clave)</p>
+        </div>
+
+        <!-- Pantalla de Preguntas del Quiz -->
+        <div id="quiz-questions" class="hidden space-y-6">
+          <div>
+            <div class="flex justify-between text-xs font-bold text-slate-400 uppercase mb-2">
+              <span id="quiz-progress-text">Pregunta 1 de 5</span>
+              <span id="quiz-progress-percent">20% Completado</span>
+            </div>
+            <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+              <div id="quiz-progress-bar" class="h-full bg-gradient-to-r from-[#008296] to-[#FDB913] transition-all duration-300" style="width: 20%"></div>
+            </div>
+          </div>
+
+          <div class="bg-teal-50/50 p-4 rounded-2xl border border-teal-100/50">
+            <h4 id="quiz-question-title" class="text-lg font-bold text-[#0F2C59] leading-snug">
+              ¿Cómo se planifican los tiempos de viaje o entrega en su organización?
+            </h4>
+          </div>
+
+          <div id="quiz-options" class="space-y-3">
+            <!-- Dinámico -->
+          </div>
+        </div>
+
+        <!-- Pantalla de Resultados del Quiz -->
+        <div id="quiz-results" class="hidden space-y-6 py-4">
+          <div class="text-center space-y-2">
+            <span class="text-xs uppercase tracking-widest text-[#008296] font-bold">Diagnóstico Preventivo de Exposición</span>
+            <h4 class="text-2xl font-black text-[#0F2C59]">Resultado del Perfil de Riesgo</h4>
+          </div>
+
+          <div id="quiz-result-box" class="p-6 rounded-3xl border-2 flex flex-col md:flex-row items-center gap-4 md:gap-6">
+            <div class="p-3 bg-white rounded-2xl shadow-sm shrink-0" id="quiz-result-icon">
+              <!-- SVG Icon -->
+            </div>
+            <div class="space-y-1 text-center md:text-left">
+              <span id="quiz-result-level" class="text-xl font-black block">Nivel x: Perfil...</span>
+              <p id="quiz-result-desc" class="text-sm leading-relaxed max-w-xl">Descripción...</p>
+            </div>
+            <div class="shrink-0 bg-white/60 px-4 py-2 rounded-2xl border border-slate-200/50 font-black text-2xl text-slate-800">
+              <span id="quiz-result-score">0</span> <span class="text-xs text-slate-500 font-normal">/ 20 pts</span>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <span class="text-xs font-bold text-slate-500 uppercase block tracking-wider">Plan de Acción Recomendado por Colmena:</span>
+            <div class="grid md:grid-cols-3 gap-3">
+              <div class="bg-white p-4 rounded-2xl border border-slate-200 flex gap-3">
+                <span class="text-xl">🩺</span>
+                <div>
+                  <h5 class="font-bold text-sm text-[#0F2C59]">Dimensión Funcional</h5>
+                  <p class="text-xs text-slate-600 mt-1">Implementar tamizajes de agudeza visual, fatiga previa y control del consumo de medicamentos no formulados.</p>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded-2xl border border-slate-200 flex gap-3">
+                <span class="text-xl">🕰️</span>
+                <div>
+                  <h5 class="font-bold text-sm text-[#0F2C59]">Carga Operativa</h5>
+                  <p class="text-xs text-slate-600 mt-1">Revisar de inmediato los esquemas logísticos que fuercen la fatiga o prioricen la velocidad sobre el cuidado.</p>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded-2xl border border-slate-200 flex gap-3">
+                <span class="text-xl">🎛️</span>
+                <div>
+                  <h5 class="font-bold text-sm text-[#0F2C59]">Controles Tecnológicos</h5>
+                  <p class="text-xs text-slate-600 mt-1">Desplegar tecnología de asistencia (ADAS), telemetría no punitiva y bloqueo automático de aplicaciones en ruta.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-center pt-4">
+            <button id="btn-restart-quiz" class="bg-slate-800 text-white hover:bg-slate-900 font-bold px-6 py-3 rounded-2xl shadow transition-colors text-sm">
+              Repetir Diagnóstico
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. CLÍNICA DE CASOS (Simulador Interactivo de Ajustes de Control) -->
+    <section id="tab-clinic" class="tab-content hidden space-y-6 animate-fadeIn">
+      <div class="text-center max-w-2xl mx-auto space-y-2">
+        <span class="bg-[#FDB913]/20 text-[#0F2C59] font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider inline-block">Simulador de Decisiones Organizacionales</span>
+        <h3 class="text-2xl font-black text-[#0F2C59]">Clínica de Casos: Ajusta el Sistema</h3>
+        <p class="text-slate-600 text-sm">
+          Un siniestro vial no ocurre por un conductor defectuoso de forma aislada. Activa las "palancas" de control corporativo para cambiar el perfil de riesgo de los casos clínicos de la empresa.
+        </p>
+      </div>
+
+      <!-- Caso selector -->
+      <div class="flex justify-center gap-4">
+        <button id="btn-case-1" class="case-btn px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all border bg-[#0F2C59] text-[#FDB913] border-[#0F2C59] shadow-md">
+          Caso 1: El celular indispensable
+        </button>
+        <button id="btn-case-2" class="case-btn px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all border bg-white text-slate-600 border-slate-200 hover:bg-slate-50">
+          Caso 2: El transportador nocturno cansado
+        </button>
+      </div>
+
+      <!-- Scenario Grid -->
+      <div class="grid md:grid-cols-12 gap-6 items-stretch">
+        
+        <!-- Scenario Context -->
+        <div class="md:col-span-5 bg-white rounded-3xl p-6 border border-slate-100 flex flex-col justify-between space-y-4 shadow-sm">
+          <div id="case-diagnoses-content">
+            <!-- Se actualiza por JS -->
+          </div>
+
+          <!-- Risk Gauge -->
+          <div class="border-t border-slate-100 pt-4">
+            <div class="flex justify-between items-center mb-1">
+              <span class="text-xs font-bold text-slate-400 uppercase">Probabilidad de Siniestro Vial</span>
+              <span id="case-risk-label" class="text-sm font-black text-red-500">
+                100% (Crítico)
+              </span>
+            </div>
+            <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+              <div id="case-risk-bar" class="h-full bg-red-500 transition-all duration-300" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls Panel -->
+        <div class="md:col-span-7 bg-[#0F2C59] text-white rounded-3xl p-6 md:p-8 flex flex-col justify-between shadow-lg border border-[#FDB913]/20">
+          <div class="space-y-4">
+            <div>
+              <span class="text-xs uppercase tracking-wider text-[#FDB913] font-bold block">Tablero de Gestión Organizacional</span>
+              <h4 class="text-xl font-bold">Activa los Controles Sistémicos</h4>
+            </div>
+
+            <div id="case-controls-list" class="space-y-3 pt-2">
+              <!-- Se actualiza por JS -->
+            </div>
+
+            <!-- Feedback Message -->
+            <div class="pt-4 border-t border-teal-800 flex items-center justify-between text-xs">
+              <span class="text-[#FDB913] font-bold">Estado final del viaje:</span>
+              <span id="case-feedback" class="font-black">💥 Siniestro Seguro</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 4. HADDON & PROCESOS -->
+    <section id="tab-dashboard" class="tab-content hidden space-y-12 animate-fadeIn">
+      
+      <!-- HADDON MATRIX SEGMENT -->
+      <div class="space-y-6">
+        <div class="text-center max-w-2xl mx-auto">
+          <h3 class="text-2xl font-bold text-[#0F2C59]">Asociación con la Matriz de Haddon</h3>
+          <p class="text-slate-600 text-sm mt-1">
+            El riesgo vial laboral debe integrarse con el modelo clásico de Haddon, redefiniendo las 3 fases clave para entender cómo los factores sistémicos impactan la vía.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+          <!-- Antes del Evento -->
+          <div class="bg-white rounded-3xl p-6 border-t-4 border-[#008296] shadow-sm flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">🕒</span>
+                <h4 class="font-bold text-[#0F2C59] text-base">Antes: Configuración del Riesgo</h4>
+              </div>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                Fase vital donde se consolida el perfil biológico, anatómico y laboral. Aquí se construyen las bases preventivas o se tolera la degradación silenciosa del control.
+              </p>
+              <div class="space-y-2">
+                <span class="text-[10px] font-bold text-teal-600 uppercase block tracking-wider">Factores Críticos en Vía:</span>
+                <ul class="space-y-1 text-xs text-slate-600">
+                  <li>• Sueño insuficiente por mala programación.</li>
+                  <li>• Baja compatibilidad con el vehículo o cabina.</li>
+                  <li>• EPPs no testeados o incómodos.</li>
+                  <li>• Rutas diseñadas sin márgenes de seguridad.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Durante el Evento -->
+          <div class="bg-white rounded-3xl p-6 border-t-4 border-[#FDB913] shadow-sm flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">⚡</span>
+                <h4 class="font-bold text-[#0F2C59] text-base">Durante: Respuesta y Absorción</h4>
+              </div>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                El instante del incidente donde el cuerpo, la mente, la ergonomía del vehículo y los sistemas de seguridad actúan para absorber el error humano.
+              </p>
+              <div class="space-y-2">
+                <span class="text-[10px] font-bold text-amber-600 uppercase block tracking-wider">Factores Críticos en Vía:</span>
+                <ul class="space-y-1 text-xs text-slate-600">
+                  <li>• Capacidad de maniobra y tiempos de reacción.</li>
+                  <li>• Calidad biomecánica del calzado y guantes.</li>
+                  <li>• Funcionamiento de sistemas activos (ABS/ADAS).</li>
+                  <li>• Resiliencia neurocognitiva ante el pánico.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Después del Evento -->
+          <div class="bg-white rounded-3xl p-6 border-t-4 border-[#0F2C59] shadow-sm flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">🩹</span>
+                <h4 class="font-bold text-[#0F2C59] text-base">Después: Recuperación y Aprendizaje</h4>
+              </div>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                Estudio y mitigación de consecuencias posteriores. El enfoque de Colmena evita la caza de brujas y prioriza la investigación sistémica y el cuidado.
+              </p>
+              <div class="space-y-2">
+                <span class="text-[10px] font-bold text-teal-950 uppercase block tracking-wider">Factores Críticos en Vía:</span>
+                <ul class="space-y-1 text-xs text-slate-600">
+                  <li>• Primeros auxilios psicológicos y emocionales.</li>
+                  <li>• Reportes transparentes sin represalias corporativas.</li>
+                  <li>• Análisis sistémico del siniestro, no culpar.</li>
+                  <li>• Reincorporación laboral con soporte médico.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE CAROUSEL: PROCESSES -->
+      <div class="space-y-6 bg-slate-100 p-6 md:p-8 rounded-3xl border border-slate-200">
+        <div class="text-center max-w-2xl mx-auto">
+          <h3 class="text-2xl font-bold text-[#0F2C59]">Procesos Organizacionales Implicados</h3>
+          <p class="text-slate-600 text-sm mt-1">
+            Explora las áreas corporativas clave que configuran el riesgo vial laboral. Utiliza las flechas de navegación para examinar los riesgos que genera cada proceso y los controles requeridos.
+          </p>
+        </div>
+
+        <!-- Slider UI -->
+        <div class="relative max-w-3xl mx-auto">
+          
+          <!-- Active Slide Box -->
+          <div class="bg-white p-6 md:p-8 rounded-2xl shadow-md border border-slate-200/50 flex flex-col justify-between h-[360px] md:h-[260px] transition-all duration-300">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span id="carousel-badge" class="bg-[#008296] text-[#FDB913] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                  Área Operativa 1 de 6
+                </span>
+              </div>
+              <h4 id="carousel-title" class="text-xl font-black text-[#0F2C59]">
+                Dirección y Gerencia
+              </h4>
+              <div class="grid md:grid-cols-2 gap-4 pt-2">
+                <div>
+                  <span class="text-[10px] font-bold text-red-500 uppercase block tracking-widest">Riesgos que genera:</span>
+                  <p id="carousel-risks" class="text-xs text-slate-600 leading-relaxed mt-0.5">Riesgos...</p>
+                </div>
+                <div>
+                  <span class="text-[10px] font-bold text-emerald-600 uppercase block tracking-widest">Controles requeridos:</span>
+                  <p id="carousel-controls" class="text-xs text-slate-600 leading-relaxed mt-0.5">Controles...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Left Arrow -->
+          <button id="carousel-prev" class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 md:-translate-x-5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-800 p-2 rounded-full shadow-lg transition-transform hover:scale-105" aria-label="Anterior diapositiva">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          <!-- Right Arrow -->
+          <button id="carousel-next" class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 md:translate-x-5 bg-white border border-slate-300 hover:bg-slate-100 text-slate-800 p-2 rounded-full shadow-lg transition-transform hover:scale-105" aria-label="Siguiente diapositiva">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+        </div>
+
+        <!-- Indicator dots -->
+        <div id="carousel-dots" class="flex justify-center gap-1.5 pt-2">
+          <!-- Dinámico -->
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER CORPORATIVO -->
+  <footer class="bg-[#0f2c59] text-white py-12 px-4 border-t-8 border-[#FDB913]">
+    <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 text-center md:text-left">
+      
+      <div class="space-y-3">
+        <div class="flex items-center justify-center md:justify-start gap-2">
+          <div class="w-8 h-8 bg-[#FDB913] rounded-lg flex items-center justify-center font-bold text-[#0F2C59] text-base">
+            C
+          </div>
+          <span class="font-bold text-lg tracking-wider text-white">Colmena Seguros</span>
+        </div>
+        <p class="text-slate-400 text-xs leading-relaxed">
+          Trabajamos incansablemente por una cultura de la prevención vial corporativa que entienda al ser humano de forma holística y proteja la vida en cada trayecto laboral.
+        </p>
+      </div>
+
+      <div class="space-y-3">
+        <h5 class="font-bold text-sm text-[#FDB913] uppercase tracking-wider">Metodología Técnica</h5>
+        <p class="text-slate-400 text-xs leading-relaxed">
+          Basado en el enfoque biopsicosocial y la matriz de Haddon. Priorizando la ergonomía de conducción, la salud neuromuscular y la reducción sistémica de la carga neurocognitiva en la operación de flotas.
+        </p>
+      </div>
+
+      <div class="space-y-3">
+        <h5 class="font-bold text-sm text-[#FDB913] uppercase tracking-wider">Contacto y Soporte</h5>
+        <p class="text-slate-400 text-xs">
+          Equipo de Prevención e Ingeniería de Riesgos Viales Laborales.<br>
+          <span class="block mt-1 font-bold text-white">Colmena Seguros S.A.</span>
+          <span class="block text-[11px] opacity-75">Fundación Grupo Social - 2026</span>
+        </p>
+      </div>
+
+    </div>
+    <div class="max-w-6xl mx-auto mt-8 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
+      © 2026 Colmena Seguros. Todos los derechos reservados. Diseñado para un ecosistema de seguridad vial proactivo, sistémico y no punitivo.
+    </div>
+  </footer>
+
+  <!-- SCRIPT LOGIC (Interactive features & data) -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      
+      // ---------------- DATA STRUCTURES ----------------
+      const layersData = [
+        {
+          id: 1,
+          name: "Capa Biológica",
+          icon: `<svg class="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+          color: "border-teal-600 bg-teal-50",
+          definition: "Condiciones fisiológicas esenciales: sueño, fatiga acumulada, ritmos circadianos, metabolismo, estado visual, auditivo o alteraciones neurológicas.",
+          vulnerabilities: [
+            "Somnolencia y microsueños imprevistos.",
+            "Hipoglucemias o deshidratación en ruta.",
+            "Dolor físico persistente que inhibe la atención.",
+            "Efectos secundarios de fármacos no reportados."
+          ],
+          orgReading: "La empresa diseña esta vulnerabilidad al programar rutas sin márgenes de descanso real, turnos rotativos extremos o exigir disponibilidad inmediata posterior al turno.",
+          controls: [
+            "Evaluación médica con perfil de cargo vial específico.",
+            "Programa científico de fatiga y sueño con telemetría.",
+            "Pausas activas obligatorias georreferenciadas.",
+            "Protocolo estricto de no-conducción temporal preventiva."
+          ]
+        },
+        {
+          id: 2,
+          name: "Capa Anatómica y Funcional",
+          icon: `<svg class="w-8 h-8 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4a4 4 0 100 8 4 4 0 000-8zM2 20v-2a4 4 0 014-4h12a4 4 0 014 4v2" /></svg>`,
+          color: "border-cyan-600 bg-cyan-50",
+          definition: "Condiciones corporales, rango de movilidad muscular, fuerza, visión periférica, ergonomía, compatibilidad física entre conductor, vehículo y su EPP.",
+          vulnerabilities: [
+            "Limitación en giros cervicales críticos (puntos ciegos).",
+            "Adormecimiento de extremidades por vibración.",
+            "Fatiga muscular por mala postura prolongada.",
+            "EPPs que restringen campo visual u oído funcional."
+          ],
+          orgReading: "Ocurre cuando compras equipos basados en costos mínimos o estandarizados sin testear compatibilidad ergonómica real con la antropometría del colaborador.",
+          controls: [
+            "Estudio ergonómico de puestos de conducción y cabinas.",
+            "Especificaciones técnicas robustas para compra de EPP.",
+            "Pruebas dinámicas previas de ajuste persona-vehículo-tarea.",
+            "Monitoreo sistemático de molestias de origen osteomuscular."
+          ]
+        },
+        {
+          id: 3,
+          name: "Capa Neurocognitiva",
+          icon: `<svg class="w-8 h-8 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>`,
+          color: "border-amber-600 bg-amber-50",
+          definition: "Procesos de toma de decisiones, atención dividida, velocidad de procesamiento mental, cálculo de distancias y memoria operativa bajo estrés.",
+          vulnerabilities: [
+            "Efecto de 'piloto automático' (pérdida de alerta).",
+            "Focalización atencional extrema en una sola variable.",
+            "Sobrecarga mental que bloquea la respuesta en emergencias.",
+            "Distracción cognitiva por el uso de tecnologías operativas."
+          ],
+          orgReading: "Muchas empresas prohíben el celular pero diseñan una operación 'celular-dependiente' mediante apps corporativas que exigen reportes constantes en movimiento.",
+          controls: [
+            "Prohibición absoluta de llamadas y reportes en movimiento.",
+            "Aplicaciones corporativas con bloqueo automático de velocidad.",
+            "Entrenamiento de toma de decisiones críticas mediante simuladores.",
+            "Evaluaciones de carga mental por rol operativo vial."
+          ]
+        },
+        {
+          id: 4,
+          name: "Capa Emocional y Psicofisiológica",
+          icon: `<svg class="w-8 h-8 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>`,
+          color: "border-rose-600 bg-rose-50",
+          definition: "Estresores directos, ansiedad por cumplimiento, ira vial, temor al despido o frustración interpersonal que estrechan el campo atencional.",
+          vulnerabilities: [
+            "Conducción a la defensiva o agresiva.",
+            "Baja tolerancia ante la congestión y demoras.",
+            "Frenados bruscos o aceleraciones temerarias.",
+            "Omisión de protocolos por afán acumulado."
+          ],
+          orgReading: "Cuando la organización lidera mediante amenazas o metas imposibles, el conductor no viaja solo: transporta la presión directa del supervisor en la cabina.",
+          controls: [
+            "Políticas de detención segura ante alteración emocional.",
+            "Canales seguros y confidenciales para reporte de presiones.",
+            "Entrenamiento específico en autorregulación y manejo de ira vial.",
+            "Supervisión basada en el respeto y liderazgo preventivo."
+          ]
+        },
+        {
+          id: 5,
+          name: "Capa Socioeconómica",
+          icon: `<svg class="w-8 h-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
+          color: "border-green-600 bg-green-50",
+          definition: "Entorno extra-laboral del trabajador: endeudamiento crítico, dobles empleos por subsistencia, tiempos excesivos de trayecto hogar-trabajo y calidad de descanso.",
+          vulnerabilities: [
+            "Aceptación sumisa de turnos de alta exposición.",
+            "Ocultamiento deliberado de síntomas de fatiga extrema.",
+            "Normalización del riesgo como estrategia de supervivencia.",
+            "No reporte de fallas mecánicas para evitar suspensión de pagos."
+          ],
+          orgReading: "Los modelos de pago basados exclusivamente en rendimiento, entregas completadas, viajes hechos o comisiones rápidas 'compran' e incentivan el riesgo vial directo.",
+          controls: [
+            "Garantizar base salarial digna e incentivos no ligados a la velocidad.",
+            "Análisis socioeconómico periódico no sancionatorio.",
+            "Programas de apoyo social, financiero y bienestar integral.",
+            "Declaración formal de actividades secundarias para cálculo real de fatiga."
+          ]
+        },
+        {
+          id: 6,
+          name: "Capa Social y Cultural",
+          icon: `<svg class="w-8 h-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>`,
+          color: "border-indigo-600 bg-indigo-50",
+          definition: "Normas no escritas del grupo de pares, la cultura del gremio, rituales informales y mitos sobre la destreza o invulnerabilidad vial.",
+          vulnerabilities: [
+            "Creencia de que 'el conductor experto maniobra lo que sea'.",
+            "Presión grupal que etiqueta como 'débiles' a quienes piden pausas.",
+            "Transmisión informal de atajos peligrosos a trabajadores nuevos.",
+            "Evasión coordinada de controles mediante alertas internas."
+          ],
+          orgReading: "La cultura real es lo que ocurre cuando el supervisor no vigila. Las inducciones teóricas fallan si la cultura informal premia la imprudencia y tolera el desvío.",
+          controls: [
+            "Mapeo de líderes informales de riesgo para convertirlos en promotores.",
+            "Talleres vivenciales de deconstrucción del 'conductor invulnerable'.",
+            "Reconocimiento público y tangible a conductas preventivas.",
+            "Capacitaciones contextualizadas lideradas por veteranos del gremio."
+          ]
+        },
+        {
+          id: 7,
+          name: "Capa Contractual y Organizacional",
+          icon: `<svg class="w-8 h-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>`,
+          color: "border-purple-600 bg-purple-50",
+          definition: "Tipo de vinculación, tercerización de riesgos, control operativo a contratistas, coherencia directiva, inducción efectiva y reglas operacionales.",
+          vulnerabilities: [
+            "Inducción documental sin práctica, 'por cumplir requisitos'.",
+            "Inestabilidad percibida que empuja al silencio ante fallas sistémicas.",
+            "Capacitaciones desconectadas del nivel de exposición real.",
+            "Desviación masiva de contratistas que operan sin supervisión."
+          ],
+          orgReading: "El siniestro ocurre en la carretera, pero casi siempre se planea, se tolera o se autoriza por acción u omisión en las oficinas de administración y compras.",
+          controls: [
+            "Auditoría rigurosa y estandarizada a la operación de contratistas.",
+            "Inducción práctica y situada enfocada en escenarios críticos.",
+            "Política vinculante de cero represalias por reportes de seguridad.",
+            "Asignación de responsabilidad directa de la alta gerencia en el PESV."
+          ]
+        }
+      ];
+
+      const processesData = [
+        {
+          title: "Dirección y Gerencia",
+          risks: "Establece metas de productividad extremas sin balancear la seguridad vial. No destina presupuestos reales, asumiendo que el riesgo vial es puramente conductual.",
+          controls: "Diseñar KPIs gerenciales vinculados a la siniestralidad. Política estricta de 'Cero Presión' que autorice retrasos por seguridad."
+        },
+        {
+          title: "Talento Humano y Selección",
+          risks: "Contratar conductores validando solo licencias de tránsito y documentos formales, sin mapear hábitos de conducción o restricciones psicofísicas reales.",
+          controls: "Exigir pruebas prácticas detalladas en escenarios críticos. Integrar evaluaciones médicas centradas en las exigencias viales."
+        },
+        {
+          title: "Inducción y Capacitación",
+          risks: "Limitarse a charlas pasivas sobre normas viales generales que no modifican hábitos ni abordan las dinámicas de presión real en la ruta.",
+          controls: "Metodologías de clínica de casos prácticos. Simulaciones dinámicas de fatiga y toma de decisiones en momentos críticos."
+        },
+        {
+          title: "Operaciones y Logística",
+          risks: "Planificar rutas sin calcular tiempos de contingencia, forzando velocidades altas. Exigir dobles turnos o disponibilidad continua.",
+          controls: "Planificación algorítmica de rutas con buffers de seguridad. Reglas estrictas y georreferenciadas de parada por fatiga."
+        },
+        {
+          title: "Compras y Mantenimiento",
+          risks: "Adquirir cascos, vehículos y EPPs guiados únicamente por cotizaciones bajas, omitiendo compatibilidad anatómica o tecnologías de seguridad activa.",
+          controls: "Fichas técnicas rígidas con requisitos de seguridad premium (ABS, ADAS). Mantenimiento preventivo basado en el kilometraje real."
+        },
+        {
+          title: "Supervisión de Campo",
+          risks: "Supervisión orientada exclusivamente a los tiempos de entrega. Tolerancia silenciosa a comportamientos inseguros con tal de cumplir la meta.",
+          controls: "Entrenamiento a supervisores en gestión conductual preventiva. Auditorías aleatorias de fatiga y reportes operativos sin castigos."
+        }
+      ];
+
+      const quizQuestions = [
+        {
+          question: "¿Cómo se planifican los tiempos de viaje o entrega en su organización?",
+          options: [
+            { text: "Tiempos flexibles con amplios márgenes de seguridad para contingencias viales.", score: 0 },
+            { text: "Tiempos justos. Cualquier retraso imprevisto en vía obliga a presionar la operación.", score: 2 },
+            { text: "Tiempos imposibles. Los conductores deben omitir pausas o exceder límites para cumplir.", score: 4 }
+          ]
+        },
+        {
+          question: "¿Cuál es el protocolo real frente a la fatiga y las horas de descanso?",
+          options: [
+            { text: "Control científico del sueño, pausas mandatorias y monitoreo estricto de dobles jornadas.", score: 0 },
+            { text: "Se asume que descansan. Solo se interviene si el conductor reporta estar muy cansado.", score: 2 },
+            { text: "Jornadas prolongadas frecuentes, horarios rotativos inestables o sobretiempos normalizados.", score: 4 }
+          ]
+        },
+        {
+          question: "¿Cómo funciona la comunicación corporativa mientras el personal está en movimiento?",
+          options: [
+            { text: "Totalmente prohibida. Aplicaciones bloqueadas en movimiento o políticas severas de no uso.", score: 0 },
+            { text: "Se permiten llamadas de coordinación con dispositivos de manos libres autorizados.", score: 2 },
+            { text: "Se exigen reportes constantes de ubicación, fotos de carga o chats inmediatos por WhatsApp.", score: 4 }
+          ]
+        },
+        {
+          question: "¿Qué tipo de incentivos rigen el esquema de remuneración de la actividad vial?",
+          options: [
+            { text: "Salario fijo digno. Incentivos enfocados netamente en la conducción segura y autocuidado.", score: 0 },
+            { text: "Salario base con pequeños bonos por rapidez de entrega, sin control riguroso de velocidad.", score: 2 },
+            { text: "Pago 100% variable por entrega realizada, viaje terminado o comisión directa por velocidad.", score: 4 }
+          ]
+        },
+        {
+          question: "¿Cómo se gestiona la ergonomía y compatibilidad de los vehículos y elementos de protección?",
+          options: [
+            { text: "Vehículos y EPPs adaptados a la persona tras evaluaciones anatómicas y técnicas previas.", score: 0 },
+            { text: "Adquisiciones estandarizadas por costos. No se realizan adaptaciones ergonómicas individuales.", score: 2 },
+            { text: "Elementos incómodos, desajustados o vehículos con fallas menores reiteradas sin corregir.", score: 4 }
+          ]
+        }
+      ];
+
+
+      // ---------------- TAB NAVIGATION ----------------
+      const tabButtons = document.querySelectorAll(".tab-btn");
+      const tabContents = document.querySelectorAll(".tab-content");
+
+      tabButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const targetTab = btn.getAttribute("data-tab");
+          
+          tabButtons.forEach(b => {
+            b.classList.remove("border-[#008296]", "text-[#008296]", "bg-teal-50/50");
+            b.classList.add("border-transparent", "text-slate-500", "hover:text-slate-800");
+          });
+          btn.classList.add("border-[#008296]", "text-[#008296]", "bg-teal-50/50");
+          btn.classList.remove("border-transparent", "text-slate-500");
+
+          tabContents.forEach(content => {
+            if (content.id === `tab-${targetTab}`) {
+              content.classList.remove("hidden");
+            } else {
+              content.classList.add("hidden");
+            }
+          });
+        });
+      });
+
+
+      // ---------------- HERO FLIP CARD ----------------
+      const conceptCard = document.getElementById("concept-card");
+      conceptCard.addEventListener("click", () => {
+        conceptCard.classList.toggle("flipped");
+      });
+
+
+      // ---------------- SECCIÓN 1: CAPAS DEL RIESGO ----------------
+      const navigatorContainer = document.getElementById("layers-navigator");
+      const layerFlipCard = document.getElementById("layer-flip-card");
+      const layerCardFront = document.getElementById("layer-card-front");
+      const layerCardBack = document.getElementById("layer-card-back");
+      let selectedLayerIndex = 0;
+
+      // Render vertical navigation buttons
+      function renderLayerButtons() {
+        navigatorContainer.innerHTML = layersData.map((layer, index) => {
+          const isSelected = index === selectedLayerIndex;
+          return `
+            <button
+              data-index="${index}"
+              class="layer-nav-btn w-full text-left p-3.5 rounded-xl border-2 transition-all flex items-center gap-3 shrink-0 lg:shrink max-w-[280px] lg:max-w-none ${isSelected ? 'bg-[#008296] border-[#008296] text-white shadow-md transform translate-x-1' : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'}"
+            >
+              <div class="p-1.5 rounded-lg ${isSelected ? 'bg-white/20' : 'bg-slate-100'}">
+                ${layer.icon}
+              </div>
+              <div class="truncate">
+                <span class="text-[10px] block ${isSelected ? 'opacity-75' : 'text-slate-400'} font-semibold">Capa ${layer.id}</span>
+                <span class="font-bold text-sm block">${layer.name}</span>
+              </div>
+            </button>
+          `;
+        }).join("");
+
+        // Attach event listeners
+        document.querySelectorAll(".layer-nav-btn").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            const idx = parseInt(btn.getAttribute("data-index"));
+            selectedLayerIndex = idx;
+            layerFlipCard.classList.remove("flipped");
+            renderLayerButtons();
+            renderActiveLayerDetails();
+          });
+        });
+      }
+
+      // Render Active Layer details (Front & Back)
+      function renderActiveLayerDetails() {
+        const layer = layersData[selectedLayerIndex];
+        
+        // Color modifiers for front card border/bg
+        layerCardFront.className = `absolute w-full h-full p-6 md:p-8 rounded-3xl border-3 flex flex-col justify-between backface-hidden shadow-xl ${layer.color} bg-white`;
+
+        // Render front
+        layerCardFront.innerHTML = `
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <div class="p-3 bg-white rounded-2xl shadow-sm border border-slate-100">
+                ${layer.icon}
+              </div>
+              <div>
+                <span class="text-xs font-bold text-[#008296] tracking-wider uppercase">VULNERABILIDADES DE LA CAPA ${layer.id}</span>
+                <h4 class="text-xl md:text-2xl font-black text-[#0F2C59]">${layer.name}</h4>
+              </div>
+            </div>
+
+            <p class="text-slate-700 text-sm italic border-l-4 border-[#008296] pl-3 mb-5">
+              ${layer.definition}
+            </p>
+
+            <div class="space-y-2.5">
+              <span class="text-xs font-bold text-red-600 block uppercase tracking-wider">Manifestaciones Críticas de Riesgo:</span>
+              <div class="grid md:grid-cols-2 gap-2">
+                ${layer.vulnerabilities.map(vuln => `
+                  <div class="flex items-start gap-2 bg-red-50/50 p-2 rounded-lg border border-red-100/50">
+                    <span class="text-red-500 text-sm mt-0.5">⚠️</span>
+                    <span class="text-xs text-slate-700 leading-snug font-medium">${vuln}</span>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-[#008296]/5 p-3 rounded-xl flex items-center justify-between border border-[#008296]/20">
+            <span class="text-xs text-[#008296] font-bold">Ver Lectura Organizacional y Controles</span>
+            <span class="text-xs text-[#FDB913] bg-[#0F2C59] px-2.5 py-1 rounded-md font-bold">GIRAR TARJETA</span>
+          </div>
+        `;
+
+        // Render back
+        layerCardBack.innerHTML = `
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <div class="p-3 bg-teal-900 rounded-2xl shadow-sm">
+                ${layer.icon}
+              </div>
+              <div>
+                <span class="text-xs font-bold text-[#FDB913] tracking-wider uppercase">MITIGACIÓN ORGANIZACIONAL</span>
+                <h4 class="text-xl md:text-2xl font-black text-white">${layer.name}</h4>
+              </div>
+            </div>
+
+            <!-- Lectura Organizacional -->
+            <div class="bg-teal-950/60 p-3 rounded-xl border border-teal-800/60 mb-4">
+              <span class="text-[10px] font-bold text-[#FDB913] block uppercase tracking-widest mb-1">🔍 ¿Cómo induce el riesgo la empresa?</span>
+              <p class="text-slate-200 text-xs leading-relaxed">
+                ${layer.orgReading}
+              </p>
+            </div>
+
+            <!-- Controles Corporativos -->
+            <div class="space-y-2">
+              <span class="text-xs font-bold text-emerald-400 block uppercase tracking-wider">Barreras y Controles Recomendados:</span>
+              <div class="grid md:grid-cols-2 gap-2">
+                ${layer.controls.map(control => `
+                  <div class="flex items-start gap-2 bg-emerald-950/40 p-2 rounded-lg border border-emerald-800/40">
+                    <span class="text-emerald-400 text-sm mt-0.5">🛡️</span>
+                    <span class="text-xs text-slate-200 leading-snug">${control}</span>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-emerald-500/10 p-3 rounded-xl flex items-center justify-between border border-emerald-500/20">
+            <span class="text-xs text-emerald-300 font-bold">Sistemas que protegen cerebros y cuerpos</span>
+            <span class="text-xs text-slate-300 bg-slate-800 px-2.5 py-1 rounded-md font-bold">VOLVER</span>
+          </div>
+        `;
+      }
+
+      layerFlipCard.addEventListener("click", () => {
+        layerFlipCard.classList.toggle("flipped");
+      });
+
+      // Initial Layer Rendering
+      renderLayerButtons();
+      renderActiveLayerDetails();
+
+
+      // ---------------- SECCIÓN 2: SIMULADOR DE PERFIL ----------------
+      const quizStartDiv = document.getElementById("quiz-start");
+      const quizQuestionsDiv = document.getElementById("quiz-questions");
+      const quizResultsDiv = document.getElementById("quiz-results");
+      const btnStartQuiz = document.getElementById("btn-start-quiz");
+      const btnRestartQuiz = document.getElementById("btn-restart-quiz");
+
+      const progressText = document.getElementById("quiz-progress-text");
+      const progressPercent = document.getElementById("quiz-progress-percent");
+      const progressBar = document.getElementById("quiz-progress-bar");
+      const questionTitle = document.getElementById("quiz-question-title");
+      const optionsContainer = document.getElementById("quiz-options");
+
+      const resultScore = document.getElementById("quiz-result-score");
+      const resultLevel = document.getElementById("quiz-result-level");
+      const resultDesc = document.getElementById("quiz-result-desc");
+      const resultBox = document.getElementById("quiz-result-box");
+      const resultIcon = document.getElementById("quiz-result-icon");
+
+      let currentStep = 0;
+      let quizAnswers = {};
+
+      btnStartQuiz.addEventListener("click", () => {
+        quizStartDiv.classList.add("hidden");
+        quizQuestionsDiv.classList.remove("hidden");
+        currentStep = 0;
+        quizAnswers = {};
+        renderQuizQuestion();
+      });
+
+      btnRestartQuiz.addEventListener("click", () => {
+        quizResultsDiv.classList.add("hidden");
+        quizQuestionsDiv.classList.remove("hidden");
+        currentStep = 0;
+        quizAnswers = {};
+        renderQuizQuestion();
+      });
+
+      function renderQuizQuestion() {
+        const qData = quizQuestions[currentStep];
+        
+        // Progress Updates
+        const currentProgress = Math.round(((currentStep + 1) / quizQuestions.length) * 100);
+        progressText.innerText = `Pregunta ${currentStep + 1} de ${quizQuestions.length}`;
+        progressPercent.innerText = `${currentProgress}% Completado`;
+        progressBar.style.width = `${currentProgress}%`;
+
+        // Content
+        questionTitle.innerText = qData.question;
+        
+        optionsContainer.innerHTML = qData.options.map((opt, idx) => `
+          <button
+            data-score="${opt.score}"
+            class="quiz-opt-btn w-full text-left p-4 rounded-2xl border-2 border-slate-200 hover:border-[#008296] hover:bg-teal-50/30 transition-all flex items-center gap-4 group"
+          >
+            <div class="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-[#008296] group-hover:text-white flex items-center justify-center font-bold text-slate-600 text-sm transition-colors shrink-0">
+              ${String.fromCharCode(65 + idx)}
+            </div>
+            <span class="text-sm font-semibold text-slate-700 group-hover:text-slate-900 leading-snug">
+              ${opt.text}
+            </span>
+          </button>
+        `).join("");
+
+        // Add event listeners
+        document.querySelectorAll(".quiz-opt-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const score = parseInt(btn.getAttribute("data-score"));
+            quizAnswers[currentStep] = score;
+
+            if (currentStep < quizQuestions.length - 1) {
+              currentStep++;
+              renderQuizQuestion();
+            } else {
+              calculateAndShowQuizResults();
+            }
+          });
+        });
+      }
+
+      function calculateAndShowQuizResults() {
+        quizQuestionsDiv.classList.add("hidden");
+        quizResultsDiv.classList.remove("hidden");
+
+        const totalScore = Object.values(quizAnswers).reduce((a, b) => a + b, 0);
+        resultScore.innerText = totalScore;
+
+        let resultData = {};
+        if (totalScore <= 5) {
+          resultData = {
+            level: "Nivel 1: Perfil Controlado",
+            color: "text-emerald-600 bg-emerald-50 border-emerald-500",
+            desc: "Excelente articulación organizacional. Sus dinámicas minimizan de forma efectiva la vulnerabilidad del factor humano. Siga con el monitoreo continuo.",
+            icon: `<svg class="w-8 h-8 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`
+          };
+        } else if (totalScore <= 11) {
+          resultData = {
+            level: "Nivel 2: Perfil Sensible",
+            color: "text-amber-600 bg-amber-50 border-amber-500",
+            desc: "Alerta latente. Existen presiones logísticas o vacíos de control ergonómico/biológico que pueden generar siniestros ante condiciones críticas. Requiere ajustes preventivos.",
+            icon: `<svg class="w-8 h-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>`
+          };
+        } else if (totalScore <= 16) {
+          resultData = {
+            level: "Nivel 3: Perfil Crítico",
+            color: "text-orange-600 bg-orange-50 border-orange-500",
+            desc: "Urgente intervención. La presión por productividad, la comunicación insegura o la fatiga están descompensando activamente la capacidad del conductor. Requiere control inmediato.",
+            icon: `<svg class="w-8 h-8 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>`
+          };
+        } else {
+          resultData = {
+            level: "Nivel 4: Perfil No Controlado",
+            color: "text-rose-600 bg-rose-50 border-rose-500",
+            desc: "Peligro inminente. El diseño organizacional está induciendo al error de manera sistémica. Se recomienda detener las operaciones viales de inmediato hasta reestructurar la seguridad.",
+            icon: `<svg class="w-8 h-8 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>`
+          };
+        }
+
+        resultBox.className = `p-6 rounded-3xl border-2 flex flex-col md:flex-row items-center gap-4 md:gap-6 ${resultData.color}`;
+        resultLevel.innerText = resultData.level;
+        resultDesc.innerText = resultData.desc;
+        resultIcon.innerHTML = resultData.icon;
+      }
+
+
+      // ---------------- SECCIÓN 3: CLÍNICA DE CASOS ----------------
+      const btnCase1 = document.getElementById("btn-case-1");
+      const btnCase2 = document.getElementById("btn-case-2");
+      const diagnosisContent = document.getElementById("case-diagnoses-content");
+      const riskLabel = document.getElementById("case-risk-label");
+      const riskBar = document.getElementById("case-risk-bar");
+      const controlsListContainer = document.getElementById("case-controls-list");
+      const feedbackLabel = document.getElementById("case-feedback");
+
+      let activeScenario = 1;
+      let appliedControls = {
+        scen1_comms: false,
+        scen1_ops: false,
+        scen1_incentives: false,
+        scen2_health: false,
+        scen2_ergonomics: false,
+        scen2_schedule: false
+      };
+
+      btnCase1.addEventListener("click", () => {
+        activeScenario = 1;
+        btnCase1.className = "case-btn px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all border bg-[#0F2C59] text-[#FDB913] border-[#0F2C59] shadow-md";
+        btnCase2.className = "case-btn px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all border bg-white text-slate-600 border-slate-200 hover:bg-slate-50";
+        renderScenario();
+      });
+
+      btnCase2.addEventListener("click", () => {
+        activeScenario = 2;
+        btnCase2.className = "case-btn px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all border bg-[#0F2C59] text-[#FDB913] border-[#0F2C59] shadow-md";
+        btnCase1.className = "case-btn px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider transition-all border bg-white text-slate-600 border-slate-200 hover:bg-slate-50";
+        renderScenario();
+      });
+
+      function calculateScenarioRisk() {
+        let score = 100;
+        if (activeScenario === 1) {
+          if (appliedControls.scen1_comms) score -= 40;
+          if (appliedControls.scen1_ops) score -= 30;
+          if (appliedControls.scen1_incentives) score -= 25;
+        } else {
+          if (appliedControls.scen2_health) score -= 35;
+          if (appliedControls.scen2_ergonomics) score -= 25;
+          if (appliedControls.scen2_schedule) score -= 35;
+        }
+
+        // Update UI Gauge
+        riskBar.style.width = `${score}%`;
+        
+        let labelColor = "text-red-500";
+        let barColor = "bg-red-500";
+        let feedback = "💥 Siniestro Seguro";
+
+        if (score <= 30) {
+          labelColor = "text-emerald-500";
+          barColor = "bg-emerald-500";
+          feedback = "✅ Viaje Exitoso y Controlado";
+        } else if (score < 100) {
+          labelColor = "text-amber-500";
+          barColor = "bg-amber-500";
+          feedback = "⚠️ Viaje inestable de alta vulnerabilidad";
+        }
+
+        riskBar.className = `h-full transition-all duration-300 ${barColor}`;
+        riskLabel.className = `text-sm font-black ${labelColor}`;
+        riskLabel.innerText = `${score}% (${score > 60 ? 'Crítico' : score > 30 ? 'Sensible' : 'Controlado'})`;
+        feedbackLabel.innerText = feedback;
+      }
+
+      function renderScenario() {
+        if (activeScenario === 1) {
+          diagnosisContent.innerHTML = `
+            <div class="space-y-4">
+              <div class="flex items-center gap-2 text-red-500 font-bold text-sm uppercase">
+                <span>🚨</span>
+                <span>DIAGNÓSTICO DEL CASO 1</span>
+              </div>
+              <h4 class="text-lg font-bold text-[#0F2C59]">Mensajeros bajo alta presión</h4>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                "Para optimizar las entregas, los mensajeros en moto reciben órdenes y reajustes de ruta continuos mediante una aplicación móvil. El conductor que no responda en menos de 5 minutos es penalizado en su indicador diario de productividad y pierde el bono semanal por entrega rápida."
+              </p>
+              <div class="bg-red-50 p-3 rounded-xl border border-red-100">
+                <span class="text-xs font-bold text-red-700 block">Consecuencia del Sistema Sin Controles:</span>
+                <p class="text-xs text-red-800 italic mt-1">"El mensajero responde un chat crítico del despachador en plena marcha con lluvia, pierde el balance y colisiona con un peatón."</p>
+              </div>
+            </div>
+          `;
+
+          controlsListContainer.innerHTML = `
+            <!-- Control 1 -->
+            <button id="ctrl-scen1-comms" class="w-full text-left p-3.5 rounded-2xl border-2 transition-all flex items-start gap-3 ${appliedControls.scen1_comms ? 'bg-teal-900 border-emerald-400' : 'bg-[#0F2C59] border-slate-700 hover:border-teal-700'}">
+              <div class="p-1 rounded-full shrink-0 ${appliedControls.scen1_comms ? 'bg-emerald-400 text-slate-950' : 'bg-slate-800 text-slate-400'}">
+                ${appliedControls.scen1_comms ? '✓' : '＋'}
+              </div>
+              <div>
+                <h5 class="font-bold text-xs uppercase tracking-wide text-white">Bloqueo de Apps y Canales Seguros (-40% Riesgo)</h5>
+                <p class="text-[11px] text-slate-300 mt-0.5">La app bloquea notificaciones si detecta velocidad > 5km/h. Cero llamadas del supervisor en ruta.</p>
+              </div>
+            </button>
+
+            <!-- Control 2 -->
+            <button id="ctrl-scen1-ops" class="w-full text-left p-3.5 rounded-2xl border-2 transition-all flex items-start gap-3 ${appliedControls.scen1_ops ? 'bg-teal-900 border-emerald-400' : 'bg-[#0F2C59] border-slate-700 hover:border-teal-700'}">
+              <div class="p-1 rounded-full shrink-0 ${appliedControls.scen1_ops ? 'bg-emerald-400 text-slate-950' : 'bg-slate-800 text-slate-400'}">
+                ${appliedControls.scen1_ops ? '✓' : '＋'}
+              </div>
+              <div>
+                <h5 class="font-bold text-xs uppercase tracking-wide text-white">Programación de Tiempos con Colchones de Viaje (-30% Riesgo)</h5>
+                <p class="text-[11px] text-slate-300 mt-0.5">Se adicionan de manera algorítmica 15 minutos obligatorios para tolerar tacos o mal clima en la vía.</p>
+              </div>
+            </button>
+
+            <!-- Control 3 -->
+            <button id="ctrl-scen1-incentives" class="w-full text-left p-3.5 rounded-2xl border-2 transition-all flex items-start gap-3 ${appliedControls.scen1_incentives ? 'bg-teal-900 border-emerald-400' : 'bg-[#0F2C59] border-slate-700 hover:border-teal-700'}">
+              <div class="p-1 rounded-full shrink-0 ${appliedControls.scen1_incentives ? 'bg-emerald-400 text-slate-950' : 'bg-slate-800 text-slate-400'}">
+                ${appliedControls.scen1_incentives ? '✓' : '＋'}
+              </div>
+              <div>
+                <h5 class="font-bold text-xs uppercase tracking-wide text-white">Alineación de Incentivos de Pago (-25% Riesgo)</h5>
+                <p class="text-[11px] text-slate-300 mt-0.5">Se remueve el bono por entrega veloz y se introduce un bono estructural basado en la conducción sin incidentes.</p>
+              </div>
+            </button>
+          `;
+
+          // Event Listeners for Case 1 controls
+          document.getElementById("ctrl-scen1-comms").addEventListener("click", () => {
+            appliedControls.scen1_comms = !appliedControls.scen1_comms;
+            renderScenario();
+          });
+          document.getElementById("ctrl-scen1-ops").addEventListener("click", () => {
+            appliedControls.scen1_ops = !appliedControls.scen1_ops;
+            renderScenario();
+          });
+          document.getElementById("ctrl-scen1-incentives").addEventListener("click", () => {
+            appliedControls.scen1_incentives = !appliedControls.scen1_incentives;
+            renderScenario();
+          });
+
+        } else {
+          diagnosisContent.innerHTML = `
+            <div class="space-y-4">
+              <div class="flex items-center gap-2 text-red-500 font-bold text-sm uppercase">
+                <span>🚨</span>
+                <span>DIAGNÓSTICO DEL CASO 2</span>
+              </div>
+              <h4 class="text-lg font-bold text-[#0F2C59]">El transportador nocturno cansado</h4>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                "Un conductor de carga pesada con doble empleo no declarado reporta fatiga y dolor lumbar severo. El vehículo cuenta con un asiento deteriorado que incrementa la vibración corporal y no posee asistencia tecnológica en frenado o monitoreo de fatiga."
+              </p>
+              <div class="bg-red-50 p-3 rounded-xl border border-red-100">
+                <span class="text-xs font-bold text-red-700 block">Consecuencia del Sistema Sin Controles:</span>
+                <p class="text-xs text-red-800 italic mt-1">"El conductor sufre un microsueño de 4 segundos a 80 km/h al final de un turno nocturno de 12 horas."</p>
+              </div>
+            </div>
+          `;
+
+          controlsListContainer.innerHTML = `
+            <!-- Control 1 -->
+            <button id="ctrl-scen2-health" class="w-full text-left p-3.5 rounded-2xl border-2 transition-all flex items-start gap-3 ${appliedControls.scen2_health ? 'bg-teal-900 border-emerald-400' : 'bg-[#0F2C59] border-slate-700 hover:border-teal-700'}">
+              <div class="p-1 rounded-full shrink-0 ${appliedControls.scen2_health ? 'bg-emerald-400 text-slate-950' : 'bg-slate-800 text-slate-400'}">
+                ${appliedControls.scen2_health ? '✓' : '＋'}
+              </div>
+              <div>
+                <h5 class="font-bold text-xs uppercase tracking-wide text-white">Control de Fatiga y Declaración de Multitrabajo (-35% Riesgo)</h5>
+                <p class="text-[11px] text-slate-300 mt-0.5">Identificación sistemática de descanso extralaboral mediante acuerdo preventivo. Prohibición de jornadas duplicadas.</p>
+              </div>
+            </button>
+
+            <!-- Control 2 -->
+            <button id="ctrl-scen2-ergonomics" class="w-full text-left p-3.5 rounded-2xl border-2 transition-all flex items-start gap-3 ${appliedControls.scen2_ergonomics ? 'bg-teal-900 border-emerald-400' : 'bg-[#0F2C59] border-slate-700 hover:border-teal-700'}">
+              <div class="p-1 rounded-full shrink-0 ${appliedControls.scen2_ergonomics ? 'bg-emerald-400 text-slate-950' : 'bg-slate-800 text-slate-400'}">
+                ${appliedControls.scen2_ergonomics ? '✓' : '＋'}
+              </div>
+              <div>
+                <h5 class="font-bold text-xs uppercase tracking-wide text-white">Ergonomía de Puesto y Asiento Neumático (-25% Riesgo)</h5>
+                <p class="text-[11px] text-slate-300 mt-0.5">Sustitución inmediata del asiento para disminuir vibración lumbar y evitar fatiga neuromuscular en hombros.</p>
+              </div>
+            </button>
+
+            <!-- Control 3 -->
+            <button id="ctrl-scen2-schedule" class="w-full text-left p-3.5 rounded-2xl border-2 transition-all flex items-start gap-3 ${appliedControls.scen2_schedule ? 'bg-teal-900 border-emerald-400' : 'bg-[#0F2C59] border-slate-700 hover:border-teal-700'}">
+              <div class="p-1 rounded-full shrink-0 ${appliedControls.scen2_schedule ? 'bg-emerald-400 text-slate-950' : 'bg-slate-800 text-slate-400'}">
+                ${appliedControls.scen2_schedule ? '✓' : '＋'}
+              </div>
+              <div>
+                <h5 class="font-bold text-xs uppercase tracking-wide text-white">Reestructuración del Turno Nocturno y Monitoreo ADAS (-35% Riesgo)</h5>
+                <p class="text-[11px] text-slate-300 mt-0.5">Máximo 8 horas en turnos rotativos nocturnos y telemetría avanzada que alerta distracción o microsueño en tiempo real.</p>
+              </div>
+            </button>
+          `;
+
+          // Event Listeners for Case 2 controls
+          document.getElementById("ctrl-scen2-health").addEventListener("click", () => {
+            appliedControls.scen2_health = !appliedControls.scen2_health;
+            renderScenario();
+          });
+          document.getElementById("ctrl-scen2-ergonomics").addEventListener("click", () => {
+            appliedControls.scen2_ergonomics = !appliedControls.scen2_ergonomics;
+            renderScenario();
+          });
+          document.getElementById("ctrl-scen2-schedule").addEventListener("click", () => {
+            appliedControls.scen2_schedule = !appliedControls.scen2_schedule;
+            renderScenario();
+          });
+        }
+
+        calculateScenarioRisk();
+      }
+
+      // Initial scenario render
+      renderScenario();
+
+
+      // ---------------- SECCIÓN 4: CAROUSEL ----------------
+      const carouselBadge = document.getElementById("carousel-badge");
+      const carouselTitle = document.getElementById("carousel-title");
+      const carouselRisks = document.getElementById("carousel-risks");
+      const carouselControls = document.getElementById("carousel-controls");
+      const carouselPrev = document.getElementById("carousel-prev");
+      const carouselNext = document.getElementById("carousel-next");
+      const carouselDotsContainer = document.getElementById("carousel-dots");
+
+      let currentCarouselIndex = 0;
+
+      function renderCarousel() {
+        const item = processesData[currentCarouselIndex];
+        carouselBadge.innerText = `Área Operativa ${currentCarouselIndex + 1} de ${processesData.length}`;
+        carouselTitle.innerText = item.title;
+        carouselRisks.innerText = item.risks;
+        carouselControls.innerText = item.controls;
+
+        // Render Dots
+        carouselDotsContainer.innerHTML = processesData.map((_, idx) => `
+          <button
+            data-index="${idx}"
+            class="carousel-dot-btn w-2.5 h-2.5 rounded-full transition-all ${currentCarouselIndex === idx ? 'bg-[#008296] w-6' : 'bg-slate-300'}"
+          ></button>
+        `).join("");
+
+        // Dot listeners
+        document.querySelectorAll(".carousel-dot-btn").forEach(dot => {
+          dot.addEventListener("click", () => {
+            currentCarouselIndex = parseInt(dot.getAttribute("data-index"));
+            renderCarousel();
+          });
+        });
+      }
+
+      carouselPrev.addEventListener("click", () => {
+        currentCarouselIndex = (currentCarouselIndex - 1 + processesData.length) % processesData.length;
+        renderCarousel();
+      });
+
+      carouselNext.addEventListener("click", () => {
+        currentCarouselIndex = (currentCarouselIndex + 1) % processesData.length;
+        renderCarousel();
+      });
+
+      // Initial Carousel Render
+      renderCarousel();
+
+    });
+  </script>
+</body>
+</html>
