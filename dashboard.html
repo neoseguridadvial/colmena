@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard WhatsApp · Diplomado TAR PESV</title>
+  <style>
+    :root {
+      --bg: #080b12;
+      --panel: #101827;
+      --panel2: #0d1422;
+      --line: #263246;
+      --text: #edf3ff;
+      --muted: #9aa8bd;
+      --blue: #38bdf8;
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --red2: #7f1d1d;
+      --purple: #a78bfa;
+      --chip: #172033;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 20% -10%, rgba(56,189,248,.18), transparent 33%),
+        radial-gradient(circle at 80% 0%, rgba(239,68,68,.12), transparent 30%),
+        linear-gradient(180deg, #080b12 0%, #0b1020 100%);
+      color: var(--text);
+    }
+    header {
+      padding: 28px 24px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      backdrop-filter: blur(14px);
+      background: rgba(8, 11, 18, .86);
+    }
+    .title {
+      display:flex;
+      gap: 18px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .logo {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(56,189,248,.22), rgba(239,68,68,.18));
+      border: 1px solid rgba(255,255,255,.14);
+      font-size: 25px;
+      box-shadow: 0 18px 45px rgba(0,0,0,.35);
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(1.55rem, 3vw, 2.45rem);
+      letter-spacing: -.03em;
+    }
+    .subtitle {
+      color: var(--muted);
+      margin-top: 6px;
+      max-width: 1100px;
+      line-height: 1.45;
+    }
+    main {
+      padding: 22px 24px 44px;
+      max-width: 1500px;
+      margin: 0 auto;
+    }
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .filter, .panel, .kpi {
+      background: linear-gradient(180deg, rgba(16,24,39,.96), rgba(13,20,34,.96));
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 18px;
+      box-shadow: 0 18px 55px rgba(0,0,0,.22);
+    }
+    .filter {
+      padding: 12px;
+    }
+    .filter label {
+      display:block;
+      color: var(--muted);
+      font-size: .78rem;
+      margin-bottom: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    select, input[type="search"], input[type="date"] {
+      width:100%;
+      border: 1px solid rgba(255,255,255,.12);
+      background: #0a1020;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 11px;
+      outline: none;
+    }
+    .checkline {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      height: 42px;
+      color: var(--text);
+    }
+    input[type="checkbox"] { transform: scale(1.1); accent-color: var(--red); }
+    .kpis {
+      display:grid;
+      grid-template-columns: repeat(4, minmax(160px,1fr));
+      gap:14px;
+      margin-bottom: 16px;
+    }
+    .kpi {
+      padding: 18px;
+      min-height: 120px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi:after {
+      content:"";
+      position:absolute;
+      inset:auto -35px -45px auto;
+      width:110px;
+      height:110px;
+      border-radius:50%;
+      background: rgba(56,189,248,.10);
+    }
+    .kpi.red:after { background: rgba(239,68,68,.18); }
+    .kpi .label {
+      color: var(--muted);
+      font-size:.79rem;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      font-weight: 800;
+    }
+    .kpi .value {
+      font-size: clamp(1.8rem, 3.2vw, 3rem);
+      line-height: 1;
+      margin: 12px 0 8px;
+      font-weight: 900;
+      letter-spacing: -.04em;
+    }
+    .kpi .note {
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.35;
+    }
+    .grid {
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .grid3 {
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .panel {
+      padding: 17px;
+      min-height: 310px;
+      overflow: hidden;
+    }
+    .panel h2 {
+      margin: 0 0 6px;
+      font-size: 1.05rem;
+      letter-spacing: -.01em;
+    }
+    .panel .desc {
+      color: var(--muted);
+      font-size: .88rem;
+      margin: 0 0 15px;
+      line-height: 1.45;
+    }
+    .bars {
+      display:flex;
+      align-items:end;
+      gap: 8px;
+      min-height: 235px;
+      border-left: 1px solid rgba(255,255,255,.08);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      padding: 8px 6px 0 10px;
+      overflow-x: auto;
+    }
+    .barwrap {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-end;
+      min-width: 70px;
+      height: 225px;
+    }
+    .bar {
+      width: 48px;
+      min-height: 2px;
+      border-radius: 11px 11px 5px 5px;
+      background: linear-gradient(180deg, rgba(56,189,248,.95), rgba(56,189,248,.30));
+      border: 1px solid rgba(255,255,255,.18);
+      position: relative;
+      cursor: pointer;
+      transition: transform .15s ease, filter .15s ease;
+    }
+    .bar:hover { transform: translateY(-4px); filter: brightness(1.18); }
+    .bar.redbar {
+      background: linear-gradient(180deg, rgba(239,68,68,.95), rgba(127,29,29,.40));
+    }
+    .barval {
+      font-size: .76rem;
+      color: var(--text);
+      margin-bottom: 6px;
+      font-weight: 800;
+    }
+    .barlabel {
+      color: var(--muted);
+      font-size: .72rem;
+      margin-top: 8px;
+      text-align:center;
+      line-height: 1.15;
+    }
+    .hbarrow {
+      display:grid;
+      grid-template-columns: minmax(120px, 165px) 1fr 42px;
+      gap: 10px;
+      align-items:center;
+      margin: 9px 0;
+    }
+    .hbarlabel {
+      color: var(--muted);
+      font-size: .83rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .hbartrack {
+      height: 13px;
+      background: rgba(255,255,255,.07);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .hbarfill {
+      height:100%;
+      border-radius:999px;
+      background: linear-gradient(90deg, rgba(56,189,248,.35), rgba(56,189,248,.92));
+    }
+    .hbarfill.redfill {
+      background: linear-gradient(90deg, rgba(239,68,68,.35), rgba(239,68,68,.95));
+    }
+    .hbarvalue {
+      font-weight: 800;
+      text-align:right;
+      font-size:.85rem;
+    }
+    .heatmap {
+      overflow:auto;
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 14px;
+      padding: 10px;
+      background: rgba(0,0,0,.12);
+    }
+    .heatgrid {
+      display:grid;
+      gap: 5px;
+      min-width: 760px;
+    }
+    .heatcell {
+      min-height: 36px;
+      border-radius: 10px;
+      display:grid;
+      place-items:center;
+      font-size:.75rem;
+      color: rgba(255,255,255,.9);
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+      cursor: default;
+    }
+    .heatcell.header {
+      background: transparent;
+      border: 0;
+      color: var(--muted);
+      font-weight:800;
+      font-size:.72rem;
+    }
+    .heatcell.hourlate {
+      outline: 1px solid rgba(239,68,68,.45);
+      color: #fecaca;
+    }
+    .heatcell.lateactive {
+      background: linear-gradient(135deg, rgba(239,68,68,.88), rgba(127,29,29,.55)) !important;
+      color: white;
+      font-weight: 900;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 0 20px rgba(239,68,68,.25);
+    }
+    .heatcell.active {
+      background: linear-gradient(135deg, rgba(56,189,248,.22), rgba(56,189,248,.72));
+      color: white;
+      font-weight: 900;
+    }
+    .legend {
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      color: var(--muted);
+      font-size:.82rem;
+      margin-top:12px;
+      align-items:center;
+    }
+    .legend span {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background: rgba(255,255,255,.06);
+      padding: 6px 9px;
+      border-radius:999px;
+      border: 1px solid rgba(255,255,255,.07);
+    }
+    .dot {
+      width:10px;height:10px;border-radius:50%;
+      background: var(--blue);
+    }
+    .dot.red { background: var(--red); }
+    .insights {
+      display:grid;
+      gap: 10px;
+    }
+    .insight {
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.045);
+      color: #dbeafe;
+      line-height: 1.42;
+      font-size:.93rem;
+    }
+    .insight strong { color: white; }
+    .tablepanel {
+      min-height: 420px;
+    }
+    .tabletools {
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin: 10px 0 12px;
+    }
+    button {
+      cursor:pointer;
+      background: rgba(56,189,248,.13);
+      color: #e0f2fe;
+      border: 1px solid rgba(56,189,248,.35);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 800;
+    }
+    button:hover { filter: brightness(1.14); }
+    table {
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+      font-size: .86rem;
+    }
+    th {
+      color: var(--muted);
+      text-align:left;
+      font-size:.75rem;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      padding: 0 10px 5px;
+    }
+    td {
+      background: rgba(255,255,255,.045);
+      border-top: 1px solid rgba(255,255,255,.07);
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      padding: 10px;
+      vertical-align: top;
+    }
+    td:first-child {
+      border-left: 1px solid rgba(255,255,255,.07);
+      border-radius: 12px 0 0 12px;
+    }
+    td:last-child {
+      border-right: 1px solid rgba(255,255,255,.07);
+      border-radius: 0 12px 12px 0;
+    }
+    tr.after5 td {
+      background: linear-gradient(90deg, rgba(127,29,29,.55), rgba(239,68,68,.13));
+      border-color: rgba(239,68,68,.32);
+    }
+    .tag {
+      display:inline-flex;
+      align-items:center;
+      border: 1px solid rgba(255,255,255,.10);
+      background: var(--chip);
+      border-radius:999px;
+      padding: 5px 8px;
+      color: #dbeafe;
+      font-weight:700;
+      font-size:.76rem;
+      white-space: nowrap;
+    }
+    .tag.red {
+      background: rgba(239,68,68,.16);
+      color: #fecaca;
+      border-color: rgba(239,68,68,.35);
+    }
+    .muted { color: var(--muted); }
+    .footer {
+      color: var(--muted);
+      font-size:.82rem;
+      margin-top:20px;
+      line-height:1.5;
+    }
+    @media (max-width: 1050px) {
+      .filters { grid-template-columns: repeat(2, 1fr); }
+      .kpis { grid-template-columns: repeat(2, 1fr); }
+      .grid, .grid3 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      header, main { padding-left: 14px; padding-right: 14px; }
+      .filters { grid-template-columns: 1fr; }
+      .kpis { grid-template-columns: 1fr; }
+      table { font-size: .78rem; }
+      th:nth-child(5), td:nth-child(5) { display:none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">
+      <div class="logo">🚚</div>
+      <div>
+        <h1>Dashboard interactivo · WhatsApp Diplomado TAR PESV</h1>
+        <div class="subtitle">Análisis de tendencias, franjas horarias, tipos de mensajes y trazabilidad operativa. Los mensajes desde las <strong>5:00 p. m.</strong> se resaltan en rojo. Datos de participantes anonimizados para proteger cédulas, teléfonos y nombres.</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="filters">
+      <div class="filter">
+        <label for="typeFilter">Tipo de mensaje</label>
+        <select id="typeFilter"></select>
+      </div>
+      <div class="filter">
+        <label for="senderFilter">Emisor</label>
+        <select id="senderFilter"></select>
+      </div>
+      <div class="filter">
+        <label for="dateFrom">Desde</label>
+        <input type="date" id="dateFrom">
+      </div>
+      <div class="filter">
+        <label for="dateTo">Hasta</label>
+        <input type="date" id="dateTo">
+      </div>
+      <div class="filter">
+        <label for="searchBox">Buscar</label>
+        <input type="search" id="searchBox" placeholder="taller, Teams, formulario...">
+      </div>
+      <div class="filter">
+        <label>Control</label>
+        <div class="checkline"><input type="checkbox" id="includeSystem"> <span>Incluir eventos del sistema</span></div>
+      </div>
+    </section>
+
+    <section class="kpis">
+      <div class="kpi">
+        <div class="label">Mensajes filtrados</div>
+        <div class="value" id="kpiTotal">0</div>
+        <div class="note" id="kpiTotalNote">Sin eventos del sistema por defecto.</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Días con actividad</div>
+        <div class="value" id="kpiDays">0</div>
+        <div class="note">Permite leer recurrencia y concentración académica.</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Pico de actividad</div>
+        <div class="value" id="kpiPeak">0</div>
+        <div class="note" id="kpiPeakNote">Día de mayor volumen.</div>
+      </div>
+      <div class="kpi red">
+        <div class="label">Después de 5:00 p. m.</div>
+        <div class="value" id="kpiAfter">0%</div>
+        <div class="note" id="kpiAfterNote">Franja crítica resaltada en rojo.</div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="panel">
+        <h2>Tendencia por día</h2>
+        <p class="desc">Volumen de mensajes por fecha. Útil para ver picos asociados a sesiones, entregas y cierres.</p>
+        <div class="bars" id="dateBars"></div>
+      </div>
+      <div class="panel">
+        <h2>Lectura ejecutiva</h2>
+        <p class="desc">Hallazgos dinámicos del filtro aplicado.</p>
+        <div class="insights" id="insights"></div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="panel">
+        <h2>Mapa de calor por fecha y hora</h2>
+        <p class="desc">Las celdas rojas corresponden a franjas desde las 17:00. La intensidad indica más mensajes.</p>
+        <div class="heatmap">
+          <div class="heatgrid" id="heatgrid"></div>
+        </div>
+        <div class="legend"><span><i class="dot"></i> Actividad antes de 5 p. m.</span><span><i class="dot red"></i> Actividad desde 5 p. m.</span></div>
+      </div>
+      <div class="panel">
+        <h2>Distribución horaria</h2>
+        <p class="desc">Barras por hora. Después de las 17:00 se fuerza color rojo para control de límites comunicacionales.</p>
+        <div id="hourBars"></div>
+      </div>
+    </section>
+
+    <section class="grid3">
+      <div class="panel">
+        <h2>Tipos de mensaje</h2>
+        <p class="desc">Clasificación automática del contenido enviado por el grupo.</p>
+        <div id="typeBars"></div>
+      </div>
+      <div class="panel">
+        <h2>Participación por rol</h2>
+        <p class="desc">Emisores anonimizados y agrupados por función.</p>
+        <div id="senderGroupBars"></div>
+      </div>
+      <div class="panel">
+        <h2>Indicadores de canal</h2>
+        <p class="desc">Señales de madurez operativa, trazabilidad y riesgo de saturación.</p>
+        <div id="channelIndicators"></div>
+      </div>
+    </section>
+
+    <section class="panel tablepanel">
+      <h2>Bitácora filtrada</h2>
+      <p class="desc">Vista limpia, anonimizada y navegable. Las filas rojas son mensajes desde las 5:00 p. m.</p>
+      <div class="tabletools">
+        <div class="muted" id="tableCount">0 registros</div>
+        <button id="downloadCsv">Descargar CSV filtrado</button>
+      </div>
+      <div style="overflow:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Emisor</th>
+              <th>Tipo</th>
+              <th>Dominio / enlace</th>
+              <th>Resumen</th>
+            </tr>
+          </thead>
+          <tbody id="logTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="footer">
+      Base: exportación de WhatsApp del grupo “DIPLOMADO TAR - PESV”. La clasificación es automática y debe usarse como apoyo de análisis, no como auditoría probatoria única. Para protección de datos personales, se enmascaran identificaciones, correos y URLs en la bitácora.
+    </div>
+  </main>
+
+<script>
+const DATA = [{"datetime": "2026-04-22T08:52:00", "date": "2026-04-22", "date_label": "22/04/2026", "weekday": "miércoles", "hour": 8, "minute": 52, "time": "08:52", "sender": "Sistema", "sender_group": "Sistema", "type": "Evento del sistema", "after5pm": false, "system": true, "domains": "", "snippet": "~ Aja creó el grupo \"DIPLOMADO TAR - RIESGO ELÉCTRICO ⚡⚡\".", "length": 58, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-05-30T08:01:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 8, "minute": 1, "time": "08:01", "sender": "Sistema", "sender_group": "Sistema", "type": "Evento del sistema", "after5pm": false, "system": true, "domains": "", "snippet": "Los mensajes y las llamadas están cifrados de extremo a extremo. Solo las personas en este chat pueden leerlos, escucharlos o compartirlos. *Más información*", "length": 157, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-05-30T08:01:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 8, "minute": 1, "time": "08:01", "sender": "Sistema", "sender_group": "Sistema", "type": "Evento del sistema", "after5pm": false, "system": true, "domains": "", "snippet": "~ Aja te añadió", "length": 15, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-05-30T08:01:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 8, "minute": 1, "time": "08:01", "sender": "Sistema", "sender_group": "Sistema", "type": "Evento del sistema", "after5pm": false, "system": true, "domains": "", "snippet": "Cambió tu código de seguridad con ~ Ana. Toca para obtener más información.", "length": 75, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-05-30T08:02:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 8, "minute": 2, "time": "08:02", "sender": "Sistema", "sender_group": "Sistema", "type": "Evento del sistema", "after5pm": false, "system": true, "domains": "", "snippet": "Ahora eres admin. del grupo.", "length": 28, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-05-30T08:10:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 8, "minute": 10, "time": "08:10", "sender": "Sistema", "sender_group": "Sistema", "type": "Evento del sistema", "after5pm": false, "system": true, "domains": "", "snippet": "~ Aja cambió el nombre del grupo de \"DIPLOMADO TAR - RIESGO ELÉCTRICO ⚡⚡\" a \"DIPLOMADO TAR - PESV 🚚🛻🚗\".", "length": 103, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-05-30T08:41:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 8, "minute": 41, "time": "08:41", "sender": "Sistema", "sender_group": "Sistema", "type": "Evento del sistema", "after5pm": false, "system": true, "domains": "", "snippet": "~ Miguel velez se unió con el enlace del grupo.", "length": 47, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-05-30T08:41:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 8, "minute": 41, "time": "08:41", "sender": "Sistema", "sender_group": "Sistema", "type": "Evento del sistema", "after5pm": false, "system": true, "domains": "", "snippet": "Cualquier persona en este grupo puede invitar a nuevos miembros con un enlace del grupo.", "length": 88, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-05-30T09:07:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 9, "minute": 7, "time": "09:07", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Encuesta", "after5pm": false, "system": false, "domains": "", "snippet": "ENCUESTA: | Los recesos de la sesión | OPCIÓN: Dos recesos (de 10 min) (0 votos) | OPCIÓN: Un receso (de 20 min) (35 votos)", "length": 117, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-05-30T09:08:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 9, "minute": 8, "time": "09:08", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Encuesta", "after5pm": false, "system": false, "domains": "", "snippet": "ENCUESTA: | El taller | OPCIÓN: Entregado en la siguiente sesión (durante la semana) (34 votos) | OPCIÓN: Al final de la sesión (0 votos)", "length": 131, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-05-30T09:46:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 9, "minute": 46, "time": "09:46", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "gemini.google.com", "snippet": "[URL]", "length": 44, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-05-30T09:53:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 9, "minute": 53, "time": "09:53", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Recurso pedagógico", "after5pm": false, "system": false, "domains": "neoseguridadvial.github.io", "snippet": "[URL]", "length": 43, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-05-30T10:07:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 10, "minute": 7, "time": "10:07", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "gemini.google.com", "snippet": "[URL]", "length": 44, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-05-30T10:09:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 10, "minute": 9, "time": "10:09", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Recurso pedagógico", "after5pm": false, "system": false, "domains": "neoseguridadvial.github.io", "snippet": "[URL]", "length": 57, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-05-30T10:46:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 10, "minute": 46, "time": "10:46", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "gemini.google.com", "snippet": "[URL]", "length": 44, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-05-30T10:52:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 10, "minute": 52, "time": "10:52", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "gemini.google.com", "snippet": "[URL]", "length": 44, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-05-30T11:33:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 11, "minute": 33, "time": "11:33", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Formulario / novedades", "after5pm": false, "system": false, "domains": "forms.cloud.microsoft", "snippet": "[URL]", "length": 42, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-05-30T11:59:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 11, "minute": 59, "time": "11:59", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Multimedia / evidencia", "after5pm": false, "system": false, "domains": "", "snippet": "<Multimedia omitido>", "length": 20, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-05-30T16:27:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 16, "minute": 27, "time": "16:27", "sender": "Apoyo académico", "sender_group": "Apoyo / coordinación", "type": "Correo / entrega", "after5pm": false, "system": false, "domains": "", "snippet": "Buenas tardes Jovenes, espero que se encuentren muy bien | Avisos parroquiales: | -Muchas gracias a todos por la disposición de asistir a las clases realizar el Quiz y enviar la…", "length": 582, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-05-30T17:00:00", "date": "2026-05-30", "date_label": "30/05/2026", "weekday": "sábado", "hour": 17, "minute": 0, "time": "17:00", "sender": "Sistema", "sender_group": "Sistema", "type": "Evento del sistema", "after5pm": true, "system": true, "domains": "", "snippet": "Cambió tu código de seguridad con ~ Alejandro Mesa. Toca para obtener más información.", "length": 86, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-05T14:32:00", "date": "2026-06-05", "date_label": "05/06/2026", "weekday": "viernes", "hour": 14, "minute": 32, "time": "14:32", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Saludo / motivación", "after5pm": false, "system": false, "domains": "", "snippet": "Maravillosa tarde estimados estudiantes", "length": 39, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-05T14:34:00", "date": "2026-06-05", "date_label": "05/06/2026", "weekday": "viernes", "hour": 14, "minute": 34, "time": "14:34", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Correo / entrega", "after5pm": false, "system": false, "domains": "", "snippet": "por favor remitir los trabajos al siguiente correo:[CORREO]", "length": 77, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-05T14:34:00", "date": "2026-06-05", "date_label": "05/06/2026", "weekday": "viernes", "hour": 14, "minute": 34, "time": "14:34", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Saludo / motivación", "after5pm": false, "system": false, "domains": "", "snippet": "Nos vemos mañana :D", "length": 19, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-05T16:13:00", "date": "2026-06-05", "date_label": "05/06/2026", "weekday": "viernes", "hour": 16, "minute": 13, "time": "16:13", "sender": "Apoyo académico", "sender_group": "Apoyo / coordinación", "type": "Saludo / motivación", "after5pm": false, "system": false, "domains": "", "snippet": "Buenas tardes, comparto el link de la carpeta compartida en DRIVE para el seguimiento de las notas y presentaciones del diplomado.", "length": 130, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-05T16:13:00", "date": "2026-06-05", "date_label": "05/06/2026", "weekday": "viernes", "hour": 16, "minute": 13, "time": "16:13", "sender": "Apoyo académico", "sender_group": "Apoyo / coordinación", "type": "Drive / repositorio", "after5pm": false, "system": false, "domains": "drive.google.com", "snippet": "[URL]", "length": 87, "has_url": true, "url_count": 1, "is_neo": false}, {"datetime": "2026-06-05T16:13:00", "date": "2026-06-05", "date_label": "05/06/2026", "weekday": "viernes", "hour": 16, "minute": 13, "time": "16:13", "sender": "Sistema", "sender_group": "Sistema", "type": "Evento del sistema", "after5pm": false, "system": true, "domains": "", "snippet": "~ Aja fijó un mensaje.", "length": 22, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-06T07:47:00", "date": "2026-06-06", "date_label": "06/06/2026", "weekday": "sábado", "hour": 7, "minute": 47, "time": "07:47", "sender": "Sistema", "sender_group": "Sistema", "type": "Evento del sistema", "after5pm": false, "system": true, "domains": "", "snippet": "~ GERMAN ANDRES GRANADOS CA se unió con el enlace del grupo.", "length": 60, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-06T08:04:00", "date": "2026-06-06", "date_label": "06/06/2026", "weekday": "sábado", "hour": 8, "minute": 4, "time": "08:04", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Enlace de clase / Teams", "after5pm": false, "system": false, "domains": "teams.microsoft.com", "snippet": "Maravilloso día, ya vamos a iniciar, los espero en: [URL]", "length": 121, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-06-06T08:07:00", "date": "2026-06-06", "date_label": "06/06/2026", "weekday": "sábado", "hour": 8, "minute": 7, "time": "08:07", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Interacción operativa", "after5pm": false, "system": false, "domains": "", "snippet": "me escuchan?", "length": 12, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-06T08:13:00", "date": "2026-06-06", "date_label": "06/06/2026", "weekday": "sábado", "hour": 8, "minute": 13, "time": "08:13", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Drive / repositorio", "after5pm": false, "system": false, "domains": "drive.google.com", "snippet": "[URL]", "length": 84, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-06-06T08:15:00", "date": "2026-06-06", "date_label": "06/06/2026", "weekday": "sábado", "hour": 8, "minute": 15, "time": "08:15", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Correo / entrega", "after5pm": false, "system": false, "domains": "", "snippet": "Correo electronico de envio de talleres: [CORREO]", "length": 67, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-06T08:21:00", "date": "2026-06-06", "date_label": "06/06/2026", "weekday": "sábado", "hour": 8, "minute": 21, "time": "08:21", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Recurso pedagógico", "after5pm": false, "system": false, "domains": "neoseguridadvial.github.io", "snippet": "[URL]", "length": 55, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-06-06T10:44:00", "date": "2026-06-06", "date_label": "06/06/2026", "weekday": "sábado", "hour": 10, "minute": 44, "time": "10:44", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Recurso pedagógico", "after5pm": false, "system": false, "domains": "neoseguridadvial.github.io", "snippet": "[URL]", "length": 60, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-06-06T11:24:00", "date": "2026-06-06", "date_label": "06/06/2026", "weekday": "sábado", "hour": 11, "minute": 24, "time": "11:24", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Recurso pedagógico", "after5pm": false, "system": false, "domains": "neoseguridadvial.github.io", "snippet": "[URL]", "length": 56, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-06-09T08:51:00", "date": "2026-06-09", "date_label": "09/06/2026", "weekday": "martes", "hour": 8, "minute": 51, "time": "08:51", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Saludo / motivación", "after5pm": false, "system": false, "domains": "", "snippet": "Maravilloso día, deseandoles una semana exitosa y confiando que ninguna tragedia se haya dado en vuestras vidas y menos tragedias en el tránsito.", "length": 145, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-09T08:54:00", "date": "2026-06-09", "date_label": "09/06/2026", "weekday": "martes", "hour": 8, "minute": 54, "time": "08:54", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Multimedia / evidencia", "after5pm": false, "system": false, "domains": "", "snippet": "<Multimedia omitido>", "length": 20, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-09T08:54:00", "date": "2026-06-09", "date_label": "09/06/2026", "weekday": "martes", "hour": 8, "minute": 54, "time": "08:54", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Saludo / motivación", "after5pm": false, "system": false, "domains": "", "snippet": "Exitos y una semana segura.", "length": 27, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-09T08:56:00", "date": "2026-06-09", "date_label": "09/06/2026", "weekday": "martes", "hour": 8, "minute": 56, "time": "08:56", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Interacción operativa", "after5pm": false, "system": false, "domains": "", "snippet": "recuerden que los archivos los debemos nombrar como venían con el anterior dcente", "length": 81, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-09T09:31:00", "date": "2026-06-09", "date_label": "09/06/2026", "weekday": "martes", "hour": 9, "minute": 31, "time": "09:31", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Identificación / registro", "after5pm": false, "system": false, "domains": "", "snippet": "y les recuerdo que era Nombres  Apellidos Tipo de documento de Identidad  Número de documento de identidad", "length": 106, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-09T09:31:00", "date": "2026-06-09", "date_label": "09/06/2026", "weekday": "martes", "hour": 9, "minute": 31, "time": "09:31", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Saludo / motivación", "after5pm": false, "system": false, "domains": "", "snippet": "Gracias :D", "length": 10, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-13T08:04:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 8, "minute": 4, "time": "08:04", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Enlace de clase / Teams", "after5pm": false, "system": false, "domains": "teams.microsoft.com", "snippet": "Maravillo día, vamos a dar inicio en minutos: [URL]", "length": 115, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-06-13T08:04:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 8, "minute": 4, "time": "08:04", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Saludo / motivación", "after5pm": false, "system": false, "domains": "", "snippet": "Vete conectando :D", "length": 18, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-13T08:18:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 8, "minute": 18, "time": "08:18", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Recurso pedagógico", "after5pm": false, "system": false, "domains": "neoseguridadvial.github.io", "snippet": "Taller en clase evaluable: [URL]", "length": 83, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-06-13T09:31:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 9, "minute": 31, "time": "09:31", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Recurso pedagógico", "after5pm": false, "system": false, "domains": "neoseguridadvial.github.io", "snippet": "[URL]", "length": 54, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-06-13T09:59:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 9, "minute": 59, "time": "09:59", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Recurso pedagógico", "after5pm": false, "system": false, "domains": "neoseguridadvial.github.io", "snippet": "[URL]", "length": 59, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-06-13T10:45:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 10, "minute": 45, "time": "10:45", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Recurso pedagógico", "after5pm": false, "system": false, "domains": "www.dgt.es", "snippet": "[URL]", "length": 89, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-06-13T11:42:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 42, "time": "11:42", "sender": "Participante 01", "sender_group": "Participante", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "g.co", "snippet": "[URL]", "length": 38, "has_url": true, "url_count": 1, "is_neo": false}, {"datetime": "2026-06-13T11:42:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 42, "time": "11:42", "sender": "Sistema", "sender_group": "Sistema", "type": "Evento del sistema", "after5pm": false, "system": true, "domains": "", "snippet": "Cambiaste los ajustes de este grupo para permitir que todos los miembros puedan enviar mensajes al grupo.", "length": 105, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T11:43:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 43, "time": "11:43", "sender": "Participante 01", "sender_group": "Participante", "type": "Identificación / registro", "after5pm": false, "system": false, "domains": "", "snippet": "Julián Andrés Nieto Herrera  | C.c. [NÚMERO] | ENECON s.a.s", "length": 54, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T11:46:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 46, "time": "11:46", "sender": "Participante 02", "sender_group": "Participante", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "gemini.google.com", "snippet": "[URL]", "length": 44, "has_url": true, "url_count": 1, "is_neo": false}, {"datetime": "2026-06-13T11:46:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 46, "time": "11:46", "sender": "Participante 02", "sender_group": "Participante", "type": "Interacción operativa", "after5pm": false, "system": false, "domains": "", "snippet": "Sebastián Osorio Alvaran 1.060.652.460", "length": 38, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T11:47:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 47, "time": "11:47", "sender": "Participante 03", "sender_group": "Participante", "type": "Multimedia / evidencia", "after5pm": false, "system": false, "domains": "", "snippet": "<Multimedia omitido>", "length": 20, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T11:47:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 47, "time": "11:47", "sender": "Participante 03", "sender_group": "Participante", "type": "Identificación / registro", "after5pm": false, "system": false, "domains": "", "snippet": "Leisly Ramirez Giraldo  | [NÚMERO]", "length": 34, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T11:47:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 47, "time": "11:47", "sender": "Participante 04", "sender_group": "Participante", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "file:", "snippet": "[ARCHIVO LOCAL]", "length": 71, "has_url": true, "url_count": 1, "is_neo": false}, {"datetime": "2026-06-13T11:47:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 47, "time": "11:47", "sender": "Participante 04", "sender_group": "Participante", "type": "Identificación / registro", "after5pm": false, "system": false, "domains": "", "snippet": "Juan Gabriel Chavarria Madrid  | cc [NÚMERO] | Enecon", "length": 51, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T11:49:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 49, "time": "11:49", "sender": "Participante 05", "sender_group": "Participante", "type": "Multimedia / evidencia", "after5pm": false, "system": false, "domains": "", "snippet": "<Multimedia omitido>", "length": 20, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T11:50:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 50, "time": "11:50", "sender": "Participante 07", "sender_group": "Participante", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "g.co", "snippet": "[URL] |  | Liceth Carolina Fuentes Morales  | [NÚMERO]", "length": 83, "has_url": true, "url_count": 1, "is_neo": false}, {"datetime": "2026-06-13T11:50:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 50, "time": "11:50", "sender": "Participante 06", "sender_group": "Participante", "type": "Identificación / registro", "after5pm": false, "system": false, "domains": "", "snippet": "Manuela Barrientos  | [NÚMERO]", "length": 30, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T11:50:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 50, "time": "11:50", "sender": "Participante 06", "sender_group": "Participante", "type": "Multimedia / evidencia", "after5pm": false, "system": false, "domains": "", "snippet": "<Multimedia omitido>", "length": 20, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T11:51:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 51, "time": "11:51", "sender": "Participante 08", "sender_group": "Participante", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "", "snippet": "ile:///D:/usuarios/usuario004/Descargas009/Qwen_html_20260613_1qezhaf3n.html", "length": 76, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T11:51:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 51, "time": "11:51", "sender": "Participante 08", "sender_group": "Participante", "type": "Interacción operativa", "after5pm": false, "system": false, "domains": "", "snippet": "lina marcela aguirre taborda", "length": 28, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T11:51:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 51, "time": "11:51", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "app.coworker.ai", "snippet": "[URL]", "length": 111, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-06-13T11:51:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 51, "time": "11:51", "sender": "Participante 09", "sender_group": "Participante", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "chatgpt.com", "snippet": "[URL]", "length": 58, "has_url": true, "url_count": 1, "is_neo": false}, {"datetime": "2026-06-13T11:51:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 51, "time": "11:51", "sender": "Participante 10", "sender_group": "Participante", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "app.coworker.ai", "snippet": "[URL] |  | Wilder Jacob Siado Weber", "length": 137, "has_url": true, "url_count": 1, "is_neo": false}, {"datetime": "2026-06-13T11:53:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 53, "time": "11:53", "sender": "Participante 11", "sender_group": "Participante", "type": "Multimedia / evidencia", "after5pm": false, "system": false, "domains": "", "snippet": "<Multimedia omitido>", "length": 20, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T11:53:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 53, "time": "11:53", "sender": "Participante 11", "sender_group": "Participante", "type": "Interacción operativa", "after5pm": false, "system": false, "domains": "", "snippet": "Jhon Jairo vides", "length": 16, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T11:54:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 54, "time": "11:54", "sender": "Participante 12", "sender_group": "Participante", "type": "Código / desarrollo", "after5pm": false, "system": false, "domains": "cdn.tailwindcss.com\"><, cdnjs.cloudflare.com, fonts.googleapis.com\">", "snippet": "<!DOCTYPE html> | <html lang=\"es\"> | <head> |     <meta charset=\"UTF-8\"> |     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> |     <title>Simulador de C…", "length": 40263, "has_url": true, "url_count": 5, "is_neo": false}, {"datetime": "2026-06-13T11:56:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 56, "time": "11:56", "sender": "Participante 13", "sender_group": "Participante", "type": "Multimedia / evidencia", "after5pm": false, "system": false, "domains": "", "snippet": "<Multimedia omitido>", "length": 20, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T11:57:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 57, "time": "11:57", "sender": "Participante 13", "sender_group": "Participante", "type": "Interacción operativa", "after5pm": false, "system": false, "domains": "", "snippet": "Profe, Fredy Duran, está bien asi ?", "length": 35, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T11:58:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 58, "time": "11:58", "sender": "Participante 14", "sender_group": "Participante", "type": "Mensaje eliminado", "after5pm": false, "system": false, "domains": "", "snippet": "Se eliminó este mensaje.", "length": 24, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T11:58:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 58, "time": "11:58", "sender": "Participante 15", "sender_group": "Participante", "type": "Multimedia / evidencia", "after5pm": false, "system": false, "domains": "", "snippet": "<Multimedia omitido>", "length": 20, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T11:59:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 11, "minute": 59, "time": "11:59", "sender": "Participante 14", "sender_group": "Participante", "type": "Código / desarrollo", "after5pm": false, "system": false, "domains": "", "snippet": "<h1>Simulador de Fatiga y Distracción al Conducir</h1> |  | <p>Presione \"Iniciar\" y responda las señales lo más rápido posible.</p> |  | <button onclick=\"iniciar()\">Iniciar Simu…", "length": 212, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:03:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 3, "time": "12:03", "sender": "Participante 16", "sender_group": "Participante", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "gemini.google.com", "snippet": "[URL]", "length": 44, "has_url": true, "url_count": 1, "is_neo": false}, {"datetime": "2026-06-13T12:03:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 3, "time": "12:03", "sender": "Participante 14", "sender_group": "Participante", "type": "Multimedia / evidencia", "after5pm": false, "system": false, "domains": "", "snippet": "<Multimedia omitido>", "length": 20, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:03:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 3, "time": "12:03", "sender": "Participante 14", "sender_group": "Participante", "type": "Identificación / registro", "after5pm": false, "system": false, "domains": "", "snippet": "Luis Alberto Díaz Suárez  | [NÚMERO]", "length": 36, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:03:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 3, "time": "12:03", "sender": "Participante 17", "sender_group": "Participante", "type": "Multimedia / evidencia", "after5pm": false, "system": false, "domains": "", "snippet": "<Multimedia omitido>", "length": 20, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:03:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 3, "time": "12:03", "sender": "Participante 17", "sender_group": "Participante", "type": "Identificación / registro", "after5pm": false, "system": false, "domains": "", "snippet": "Estefania Calderon - [NÚMERO]", "length": 31, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:04:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 4, "time": "12:04", "sender": "Participante 16", "sender_group": "Participante", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "gemini.google.com", "snippet": "[URL]", "length": 44, "has_url": true, "url_count": 1, "is_neo": false}, {"datetime": "2026-06-13T12:04:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 4, "time": "12:04", "sender": "Participante 16", "sender_group": "Participante", "type": "Identificación / registro", "after5pm": false, "system": false, "domains": "", "snippet": "ANDRES CAMILO CERQUERA PEREZ [NÚMERO]", "length": 39, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:05:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 5, "time": "12:05", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Multimedia / evidencia", "after5pm": false, "system": false, "domains": "", "snippet": "<Multimedia omitido>", "length": 20, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-13T12:07:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 7, "time": "12:07", "sender": "Participante 04", "sender_group": "Participante", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "chatgpt.com", "snippet": "[URL]", "length": 56, "has_url": true, "url_count": 1, "is_neo": false}, {"datetime": "2026-06-13T12:07:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 7, "time": "12:07", "sender": "Participante 04", "sender_group": "Participante", "type": "Identificación / registro", "after5pm": false, "system": false, "domains": "", "snippet": "Juan Gabriel Chavarría Madrid cc1037449814- Enecon", "length": 50, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:07:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 7, "time": "12:07", "sender": "Sistema", "sender_group": "Sistema", "type": "Evento del sistema", "after5pm": false, "system": true, "domains": "", "snippet": "~ Sebastián Osorio Alvarán añadió a +57 320 [NÚMERO].", "length": 52, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:07:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 7, "time": "12:07", "sender": "Sistema", "sender_group": "Sistema", "type": "Evento del sistema", "after5pm": false, "system": true, "domains": "", "snippet": "+57 320 [NÚMERO] añadió a ~ Vik SST.", "length": 35, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:09:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 9, "time": "12:09", "sender": "Participante 18", "sender_group": "Participante", "type": "Multimedia / evidencia", "after5pm": false, "system": false, "domains": "", "snippet": "<Multimedia omitido>", "length": 20, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:09:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 9, "time": "12:09", "sender": "Participante 18", "sender_group": "Participante", "type": "Identificación / registro", "after5pm": false, "system": false, "domains": "", "snippet": "Victor Hugo Patiño Henao. C.C: [NÚMERO] <Se editó este mensaje.>", "length": 66, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:14:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 14, "time": "12:14", "sender": "Participante 19", "sender_group": "Participante", "type": "Mensaje eliminado", "after5pm": false, "system": false, "domains": "", "snippet": "Se eliminó este mensaje.", "length": 24, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:16:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 16, "time": "12:16", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Interacción operativa", "after5pm": false, "system": false, "domains": "", "snippet": "estas enviando la URL nop el archivo", "length": 36, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-13T12:18:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 18, "time": "12:18", "sender": "Participante 19", "sender_group": "Participante", "type": "Multimedia / evidencia", "after5pm": false, "system": false, "domains": "", "snippet": "<Multimedia omitido>", "length": 20, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:21:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 21, "time": "12:21", "sender": "Participante 06", "sender_group": "Participante", "type": "Instrucción / seguimiento", "after5pm": false, "system": false, "domains": "", "snippet": "Jessica Mira  | Alejandro Mesa | Jan Gabriel  Chavarría O🆗revisados por chat", "length": 72, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:22:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 22, "time": "12:22", "sender": "Participante 12", "sender_group": "Participante", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "g.co", "snippet": "[URL]", "length": 38, "has_url": true, "url_count": 1, "is_neo": false}, {"datetime": "2026-06-13T12:22:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 22, "time": "12:22", "sender": "Participante 12", "sender_group": "Participante", "type": "Identificación / registro", "after5pm": false, "system": false, "domains": "", "snippet": "Lina Castro Molina  | Cc [NÚMERO]", "length": 33, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:26:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 26, "time": "12:26", "sender": "Apoyo académico", "sender_group": "Apoyo / coordinación", "type": "Multimedia / evidencia", "after5pm": false, "system": false, "domains": "", "snippet": "<Multimedia omitido>", "length": 20, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:27:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 27, "time": "12:27", "sender": "Participante 20", "sender_group": "Participante", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "chatgpt.com", "snippet": "[URL]", "length": 56, "has_url": true, "url_count": 1, "is_neo": false}, {"datetime": "2026-06-13T12:27:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 27, "time": "12:27", "sender": "Participante 20", "sender_group": "Participante", "type": "Identificación / registro", "after5pm": false, "system": false, "domains": "", "snippet": "Jessica mira Martínez  | [NÚMERO]", "length": 33, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:30:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 30, "time": "12:30", "sender": "Sistema", "sender_group": "Sistema", "type": "Evento del sistema", "after5pm": false, "system": true, "domains": "", "snippet": "+57 320 [NÚMERO] salió del grupo.", "length": 32, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-13T12:46:00", "date": "2026-06-13", "date_label": "13/06/2026", "weekday": "sábado", "hour": 12, "minute": 46, "time": "12:46", "sender": "Sistema", "sender_group": "Sistema", "type": "Evento del sistema", "after5pm": false, "system": true, "domains": "", "snippet": "Cambiaste los ajustes de este grupo para permitir que solo los administradores puedan enviar mensajes al grupo", "length": 110, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-18T12:44:00", "date": "2026-06-18", "date_label": "18/06/2026", "weekday": "jueves", "hour": 12, "minute": 44, "time": "12:44", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Mensaje eliminado", "after5pm": false, "system": false, "domains": "", "snippet": "Eliminaste este mensaje.", "length": 24, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-18T12:44:00", "date": "2026-06-18", "date_label": "18/06/2026", "weekday": "jueves", "hour": 12, "minute": 44, "time": "12:44", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Mensaje eliminado", "after5pm": false, "system": false, "domains": "", "snippet": "Eliminaste este mensaje.", "length": 24, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-18T12:45:00", "date": "2026-06-18", "date_label": "18/06/2026", "weekday": "jueves", "hour": 12, "minute": 45, "time": "12:45", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Mensaje eliminado", "after5pm": false, "system": false, "domains": "", "snippet": "Eliminaste este mensaje.", "length": 24, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-18T12:55:00", "date": "2026-06-18", "date_label": "18/06/2026", "weekday": "jueves", "hour": 12, "minute": 55, "time": "12:55", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Correo / entrega", "after5pm": false, "system": false, "domains": "", "snippet": "📩 Los talleres autónomos deben remitirse al correo: | [CORREO] |  | 📝 Si tienen fallas en la asistencia, por favor escribir por interno y presentar el soporte correspondiente. |…", "length": 543, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-18T12:55:00", "date": "2026-06-18", "date_label": "18/06/2026", "weekday": "jueves", "hour": 12, "minute": 55, "time": "12:55", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Multimedia / evidencia", "after5pm": false, "system": false, "domains": "", "snippet": "<Multimedia omitido>", "length": 20, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-18T14:41:00", "date": "2026-06-18", "date_label": "18/06/2026", "weekday": "jueves", "hour": 14, "minute": 41, "time": "14:41", "sender": "Apoyo académico", "sender_group": "Apoyo / coordinación", "type": "Multimedia / evidencia", "after5pm": false, "system": false, "domains": "", "snippet": "<Multimedia omitido>", "length": 20, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-18T17:07:00", "date": "2026-06-18", "date_label": "18/06/2026", "weekday": "jueves", "hour": 17, "minute": 7, "time": "17:07", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Formulario / novedades", "after5pm": true, "system": false, "domains": "forms.gle", "snippet": "✨✨ *REGISTRO DE NOVEDADES EN ASISTENCIAS Y TALLERES* ✨✨ |  | Para facilitar la revisión y corrección de novedades del diplomado, por favor registren sus solicitudes únicamente e…", "length": 969, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-06-18T19:57:00", "date": "2026-06-18", "date_label": "18/06/2026", "weekday": "jueves", "hour": 19, "minute": 57, "time": "19:57", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Multimedia / evidencia", "after5pm": true, "system": false, "domains": "", "snippet": "<Multimedia omitido>", "length": 20, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-19T12:14:00", "date": "2026-06-19", "date_label": "19/06/2026", "weekday": "viernes", "hour": 12, "minute": 14, "time": "12:14", "sender": "Sistema", "sender_group": "Sistema", "type": "Evento del sistema", "after5pm": false, "system": true, "domains": "", "snippet": "~ Enecon añadió a ~ Juan Andrés G SST.", "length": 38, "has_url": false, "url_count": 0, "is_neo": false}, {"datetime": "2026-06-20T08:18:00", "date": "2026-06-20", "date_label": "20/06/2026", "weekday": "sábado", "hour": 8, "minute": 18, "time": "08:18", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "IA / enlaces generativos", "after5pm": false, "system": false, "domains": "share.gemini.google", "snippet": "[URL]", "length": 40, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-06-20T08:42:00", "date": "2026-06-20", "date_label": "20/06/2026", "weekday": "sábado", "hour": 8, "minute": 42, "time": "08:42", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Recurso pedagógico", "after5pm": false, "system": false, "domains": "neoseguridadvial.github.io", "snippet": "[URL]", "length": 57, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-06-20T08:46:00", "date": "2026-06-20", "date_label": "20/06/2026", "weekday": "sábado", "hour": 8, "minute": 46, "time": "08:46", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Recurso pedagógico", "after5pm": false, "system": false, "domains": "roadrisktoolkit.com", "snippet": "[URL]", "length": 41, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-06-20T09:08:00", "date": "2026-06-20", "date_label": "20/06/2026", "weekday": "sábado", "hour": 9, "minute": 8, "time": "09:08", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Saludo / motivación", "after5pm": false, "system": false, "domains": "", "snippet": "Nos vemos 930", "length": 13, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-20T09:41:00", "date": "2026-06-20", "date_label": "20/06/2026", "weekday": "sábado", "hour": 9, "minute": 41, "time": "09:41", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Correo / entrega", "after5pm": false, "system": false, "domains": "", "snippet": "[CORREO]", "length": 26, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-20T10:00:00", "date": "2026-06-20", "date_label": "20/06/2026", "weekday": "sábado", "hour": 10, "minute": 0, "time": "10:00", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Recurso pedagógico", "after5pm": false, "system": false, "domains": "neoseguridadvial.github.io", "snippet": "[URL]", "length": 55, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-06-20T10:40:00", "date": "2026-06-20", "date_label": "20/06/2026", "weekday": "sábado", "hour": 10, "minute": 40, "time": "10:40", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Interacción operativa", "after5pm": false, "system": false, "domains": "", "snippet": "Actua como mi perfil y analiza este programa (pdf) frente a los controles criticos, para ello sigue estos pasos: Paso 1. Listar controles existentes. Paso 2. Identificar amenaza…", "length": 672, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-20T10:46:00", "date": "2026-06-20", "date_label": "20/06/2026", "weekday": "sábado", "hour": 10, "minute": 46, "time": "10:46", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Interacción operativa", "after5pm": false, "system": false, "domains": "", "snippet": "Actua como auditoría de controles críticos y analiza control XXXXXXXXXXXXX, para ello sigue estos pasos: Paso 1. Listar controles existentes. Paso 2. Identificar amenazas de alt…", "length": 664, "has_url": false, "url_count": 0, "is_neo": true}, {"datetime": "2026-06-20T10:47:00", "date": "2026-06-20", "date_label": "20/06/2026", "weekday": "sábado", "hour": 10, "minute": 47, "time": "10:47", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Formulario / novedades", "after5pm": false, "system": false, "domains": "forms.gle", "snippet": "Taller 4: [URL] <Se editó este mensaje.>", "length": 70, "has_url": true, "url_count": 1, "is_neo": true}, {"datetime": "2026-06-20T10:51:00", "date": "2026-06-20", "date_label": "20/06/2026", "weekday": "sábado", "hour": 10, "minute": 51, "time": "10:51", "sender": "NEO", "sender_group": "Docente / facilitadora", "type": "Correo / entrega", "after5pm": false, "system": false, "domains": "", "snippet": "[CORREO]", "length": 26, "has_url": false, "url_count": 0, "is_neo": true}];
+
+const dayNames = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+const fmt = new Intl.NumberFormat("es-CO");
+
+function uniq(arr) { return [...new Set(arr)]; }
+function countBy(arr, keyFn) {
+  const m = new Map();
+  arr.forEach(x => {
+    const k = keyFn(x);
+    m.set(k, (m.get(k)||0)+1);
+  });
+  return [...m.entries()].map(([key, value]) => ({key, value}));
+}
+function escapeHtml(str) {
+  return String(str ?? "").replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+
+const typeFilter = document.getElementById("typeFilter");
+const senderFilter = document.getElementById("senderFilter");
+const dateFrom = document.getElementById("dateFrom");
+const dateTo = document.getElementById("dateTo");
+const searchBox = document.getElementById("searchBox");
+const includeSystem = document.getElementById("includeSystem");
+
+function initFilters() {
+  const dates = DATA.map(d => d.date).sort();
+  dateFrom.value = dates[0];
+  dateTo.value = dates[dates.length-1];
+
+  const types = ["Todos", ...uniq(DATA.filter(d => !d.system).map(d => d.type)).sort()];
+  typeFilter.innerHTML = types.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
+
+  const senders = ["Todos", ...uniq(DATA.filter(d => !d.system).map(d => d.sender)).sort()];
+  senderFilter.innerHTML = senders.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
+}
+
+function getFiltered() {
+  const q = searchBox.value.trim().toLowerCase();
+  return DATA.filter(d => {
+    if (!includeSystem.checked && d.system) return false;
+    if (typeFilter.value !== "Todos" && d.type !== typeFilter.value) return false;
+    if (senderFilter.value !== "Todos" && d.sender !== senderFilter.value) return false;
+    if (dateFrom.value && d.date < dateFrom.value) return false;
+    if (dateTo.value && d.date > dateTo.value) return false;
+    if (q) {
+      const hay = `${d.type} ${d.sender} ${d.sender_group} ${d.domains} ${d.snippet}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function pct(n, den) { return den ? Math.round((n/den)*1000)/10 : 0; }
+function shortDate(d) {
+  const [y,m,day] = d.split("-");
+  return `${day}/${m}`;
+}
+
+function updateKpis(rows) {
+  const dates = uniq(rows.map(d => d.date));
+  const byDate = countBy(rows, d => d.date).sort((a,b) => b.value-a.value);
+  const peak = byDate[0];
+  const after = rows.filter(d => d.after5pm).length;
+  document.getElementById("kpiTotal").textContent = fmt.format(rows.length);
+  document.getElementById("kpiTotalNote").textContent = includeSystem.checked ? "Incluye mensajes del sistema." : "Eventos del sistema excluidos.";
+  document.getElementById("kpiDays").textContent = fmt.format(dates.length);
+  document.getElementById("kpiPeak").textContent = peak ? fmt.format(peak.value) : "0";
+  document.getElementById("kpiPeakNote").textContent = peak ? `${shortDate(peak.key)} concentra la mayor actividad.` : "Sin datos filtrados.";
+  document.getElementById("kpiAfter").textContent = `${pct(after, rows.length)}%`;
+  document.getElementById("kpiAfterNote").textContent = `${after} mensaje(s) desde las 5:00 p. m.`;
+}
+
+function updateDateBars(rows) {
+  const target = document.getElementById("dateBars");
+  const counts = countBy(rows, d => d.date).sort((a,b) => a.key.localeCompare(b.key));
+  const max = Math.max(1, ...counts.map(d => d.value));
+  target.innerHTML = counts.map(d => {
+    const dateRows = rows.filter(r => r.date === d.key);
+    const after = dateRows.filter(r => r.after5pm).length;
+    const height = Math.max(5, (d.value/max)*198);
+    const cls = after ? "bar redbar" : "bar";
+    const title = `${shortDate(d.key)} · ${d.value} mensajes · ${after} después de 5 p. m.`;
+    return `<div class="barwrap" title="${escapeHtml(title)}">
+      <div class="barval">${d.value}</div>
+      <div class="${cls}" style="height:${height}px"></div>
+      <div class="barlabel">${shortDate(d.key)}<br>${after ? "🔴 " + after : ""}</div>
+    </div>`;
+  }).join("") || `<div class="muted">Sin datos para graficar.</div>`;
+}
+
+function updateHourBars(rows) {
+  const target = document.getElementById("hourBars");
+  const counts = Array.from({length:24}, (_,h) => ({hour:h, count: rows.filter(d => d.hour === h).length}))
+    .filter(x => x.count > 0 || (x.hour >= 17 && x.hour <= 20));
+  const max = Math.max(1, ...counts.map(d => d.count));
+  target.innerHTML = counts.map(d => {
+    const w = Math.max(2, (d.count/max)*100);
+    const red = d.hour >= 17;
+    return `<div class="hbarrow">
+      <div class="hbarlabel">${String(d.hour).padStart(2,"0")}:00 ${red ? "🔴" : ""}</div>
+      <div class="hbartrack"><div class="hbarfill ${red ? "redfill" : ""}" style="width:${w}%"></div></div>
+      <div class="hbarvalue">${d.count}</div>
+    </div>`;
+  }).join("");
+}
+
+function updateHeatmap(rows) {
+  const target = document.getElementById("heatgrid");
+  const dates = countBy(rows, d => d.date).sort((a,b) => a.key.localeCompare(b.key)).map(x => x.key);
+  const hours = Array.from({length:14}, (_,i) => i+7); // 07:00-20:00
+  const max = Math.max(1, ...dates.flatMap(date => hours.map(h => rows.filter(d => d.date === date && d.hour === h).length)));
+  target.style.gridTemplateColumns = `96px repeat(${hours.length}, 48px)`;
+  let html = `<div class="heatcell header">Fecha</div>` + hours.map(h => `<div class="heatcell header ${h>=17 ? "hourlate" : ""}">${String(h).padStart(2,"0")}</div>`).join("");
+  dates.forEach(date => {
+    html += `<div class="heatcell header">${shortDate(date)}</div>`;
+    hours.forEach(h => {
+      const c = rows.filter(d => d.date === date && d.hour === h).length;
+      let cls = "heatcell";
+      if (h >= 17) cls += " hourlate";
+      if (c > 0 && h >= 17) cls += " lateactive";
+      else if (c > 0) cls += " active";
+      const opacity = c ? 0.18 + (c/max)*0.72 : 0;
+      const style = c && h < 17 ? `style="background:rgba(56,189,248,${opacity})"` : "";
+      const title = `${shortDate(date)} ${String(h).padStart(2,"0")}:00 · ${c} mensajes`;
+      html += `<div class="${cls}" ${style} title="${escapeHtml(title)}">${c || ""}</div>`;
+    });
+  });
+  target.innerHTML = html || "";
+}
+
+function updateTypeBars(rows) {
+  const target = document.getElementById("typeBars");
+  const counts = countBy(rows, d => d.type).sort((a,b) => b.value-a.value);
+  const max = Math.max(1, ...counts.map(x => x.value));
+  target.innerHTML = counts.map(x => {
+    const w = (x.value/max)*100;
+    return `<div class="hbarrow">
+      <div class="hbarlabel" title="${escapeHtml(x.key)}">${escapeHtml(x.key)}</div>
+      <div class="hbartrack"><div class="hbarfill" style="width:${w}%"></div></div>
+      <div class="hbarvalue">${x.value}</div>
+    </div>`;
+  }).join("") || `<div class="muted">Sin datos.</div>`;
+}
+
+function updateSenderGroupBars(rows) {
+  const target = document.getElementById("senderGroupBars");
+  const counts = countBy(rows, d => d.sender_group).sort((a,b) => b.value-a.value);
+  const max = Math.max(1, ...counts.map(x => x.value));
+  target.innerHTML = counts.map(x => {
+    const w = (x.value/max)*100;
+    return `<div class="hbarrow">
+      <div class="hbarlabel">${escapeHtml(x.key)}</div>
+      <div class="hbartrack"><div class="hbarfill" style="width:${w}%"></div></div>
+      <div class="hbarvalue">${x.value}</div>
+    </div>`;
+  }).join("") || `<div class="muted">Sin datos.</div>`;
+}
+
+function updateIndicators(rows) {
+  const target = document.getElementById("channelIndicators");
+  const total = rows.length;
+  const links = rows.filter(d => d.has_url).length;
+  const media = rows.filter(d => d.type.includes("Multimedia")).length;
+  const admin = rows.filter(d => d.sender_group.includes("Docente") || d.sender_group.includes("Apoyo")).length;
+  const after = rows.filter(d => d.after5pm).length;
+  const system = rows.filter(d => d.system).length;
+  const items = [
+    ["Trazabilidad por enlaces", `${pct(links,total)}%`, links, "Mensajes con URL o recurso externo."],
+    ["Evidencia visual", `${pct(media,total)}%`, media, "Multimedia o soportes compartidos."],
+    ["Gestión docente/apoyo", `${pct(admin,total)}%`, admin, "Mensajes originados por conducción académica."],
+    ["Franja posterior a 5 p. m.", `${pct(after,total)}%`, after, "Control de posible sobrecarga comunicacional."],
+    ["Eventos del sistema", `${pct(system,total)}%`, system, "Cambios de grupo, ingresos o ajustes."]
+  ];
+  target.innerHTML = items.map(([name, p, n, desc]) => `<div class="insight">
+    <strong>${escapeHtml(name)}:</strong> ${p} <span class="muted">(${n} registros)</span><br><span class="muted">${escapeHtml(desc)}</span>
+  </div>`).join("");
+}
+
+function topItem(counts) {
+  if (!counts.length) return null;
+  return counts.sort((a,b) => b.value-a.value)[0];
+}
+
+function updateInsights(rows) {
+  const target = document.getElementById("insights");
+  const byDate = countBy(rows, d => d.date);
+  const byHour = countBy(rows, d => d.hour);
+  const byType = countBy(rows, d => d.type);
+  const peakDate = topItem(byDate);
+  const peakHour = topItem(byHour);
+  const peakType = topItem(byType);
+  const after = rows.filter(d => d.after5pm).length;
+  const neo = rows.filter(d => d.sender === "NEO").length;
+  const parts = [
+    peakDate ? `<strong>Pico diario:</strong> ${shortDate(peakDate.key)} con ${peakDate.value} mensaje(s).` : `<strong>Pico diario:</strong> sin datos.`,
+    peakHour ? `<strong>Hora dominante:</strong> ${String(peakHour.key).padStart(2,"0")}:00 con ${peakHour.value} mensaje(s).` : `<strong>Hora dominante:</strong> sin datos.`,
+    peakType ? `<strong>Tipo predominante:</strong> ${escapeHtml(peakType.key)} con ${peakType.value} registro(s).` : `<strong>Tipo predominante:</strong> sin datos.`,
+    `<strong>Control de frontera horaria:</strong> ${after} mensaje(s) desde las 5:00 p. m.; el dashboard los marca en rojo.`,
+    `<strong>Conducción académica:</strong> NEO concentra ${pct(neo, rows.length)}% de los mensajes filtrados.`
+  ];
+  target.innerHTML = parts.map(p => `<div class="insight">${p}</div>`).join("");
+}
+
+function updateTable(rows) {
+  const tbody = document.getElementById("logTable");
+  const sorted = [...rows].sort((a,b) => a.datetime.localeCompare(b.datetime));
+  document.getElementById("tableCount").textContent = `${fmt.format(sorted.length)} registro(s) filtrado(s)`;
+  tbody.innerHTML = sorted.map(d => {
+    return `<tr class="${d.after5pm ? "after5" : ""}">
+      <td>${escapeHtml(d.date_label)}<br><span class="muted">${escapeHtml(d.weekday)}</span></td>
+      <td><span class="tag ${d.after5pm ? "red" : ""}">${escapeHtml(d.time)}${d.after5pm ? " 🔴" : ""}</span></td>
+      <td>${escapeHtml(d.sender)}<br><span class="muted">${escapeHtml(d.sender_group)}</span></td>
+      <td><span class="tag">${escapeHtml(d.type)}</span></td>
+      <td class="muted">${escapeHtml(d.domains || "—")}</td>
+      <td>${escapeHtml(d.snippet || "—")}</td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="6">Sin registros con los filtros actuales.</td></tr>`;
+}
+
+function downloadCsv(rows) {
+  const headers = ["fecha","hora","dia","emisor","rol","tipo","despues_5pm","dominios","resumen"];
+  const lines = [headers.join(",")];
+  rows.forEach(d => {
+    const vals = [d.date_label,d.time,d.weekday,d.sender,d.sender_group,d.type,d.after5pm ? "SI" : "NO",d.domains,d.snippet]
+      .map(v => `"${String(v ?? "").replaceAll('"','""')}"`);
+    lines.push(vals.join(","));
+  });
+  const blob = new Blob([lines.join("\n")], {type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "dashboard_whatsapp_diplomado_TAR_filtrado.csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function render() {
+  const rows = getFiltered();
+  updateKpis(rows);
+  updateDateBars(rows);
+  updateHourBars(rows);
+  updateHeatmap(rows);
+  updateTypeBars(rows);
+  updateSenderGroupBars(rows);
+  updateIndicators(rows);
+  updateInsights(rows);
+  updateTable(rows);
+}
+
+[typeFilter, senderFilter, dateFrom, dateTo, searchBox, includeSystem].forEach(el => el.addEventListener("input", render));
+document.getElementById("downloadCsv").addEventListener("click", () => downloadCsv(getFiltered()));
+
+initFilters();
+render();
+</script>
+</body>
+</html>
