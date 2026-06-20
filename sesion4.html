@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus de Prevención Vial - ARL Colmena</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        colmena: {
+                            teal: '#0093a6',      /* Aguamarina principal */
+                            tealdark: '#007a8c',  /* Aguamarina oscuro */
+                            tealsoft: '#f0f8f9',  /* Aguamarina suave */
+                            gold: '#ffb612',      /* Amarillo de acento */
+                            navy: '#0d3c47',      /* Azul oscuro Fundación Grupo Social */
+                            navysoft: '#e7ecef'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Estilos personalizados para impresión de certificados */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-full {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans flex flex-col min-h-screen">
+
+    <!-- HEADER CORPORATIVO (Aguamarina Colmena y Oro) -->
+    <header class="bg-colmena-teal text-white border-b-4 border-colmena-gold shadow-md sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-col sm:flex-row items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <!-- Isotipo Colmena Seguros -->
+                <div class="w-10 h-10 bg-colmena-gold rounded-xl flex items-center justify-center font-bold text-colmena-teal shadow-md transition-transform hover:scale-105">
+                    <span class="text-2xl">⬢</span>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xl font-extrabold tracking-tight">Colmena</span>
+                        <span class="text-sm font-light text-teal-100 border-l border-teal-200/50 pl-2">Seguros</span>
+                    </div>
+                    <p class="text-[9px] text-colmena-gold uppercase font-bold tracking-widest">Una empresa de Fundación Grupo Social</p>
+                </div>
+            </div>
+            <div class="mt-2 sm:mt-0">
+                <span class="text-xs bg-colmena-tealdark px-4 py-2 rounded-full border border-teal-500/30 font-semibold tracking-wide text-white">
+                    Campus de Entrenamiento en Controles Viales
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- NOTIFICADOR FLOTANTE -->
+    <div id="toast-notification" class="fixed bottom-5 right-5 bg-colmena-navy text-white px-4 py-3 rounded-2xl shadow-2xl z-50 flex items-center space-x-2 hidden border-t-2 border-colmena-gold text-xs transition-opacity duration-300">
+        <span class="text-colmena-gold">⬢</span>
+        <span id="toast-text">Notificación del sistema</span>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL CON GRID -->
+    <div class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- COLUMNA 1: PANEL LATERAL DE IDENTIFICACIÓN Y SELECCIÓN (no-print) -->
+        <aside class="lg:col-span-3 space-y-4 no-print">
+            
+            <!-- Registro de Datos del Estudiante (Nombre y Cédula agregados) -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+                <h3 class="text-xs font-bold text-colmena-teal uppercase tracking-wider flex items-center">
+                    <span class="mr-1">👤</span> Datos del Estudiante
+                </h3>
+                <div class="space-y-2.5">
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-500 block">Nombre Completo</label>
+                        <input 
+                            type="text" 
+                            id="user-name" 
+                            placeholder="Ej. Juan Pérez Medina"
+                            class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-300 focus:ring-1 focus:ring-colmena-teal focus:outline-none"
+                            oninput="updateStudentData()"
+                        />
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-500 block">Documento de Identidad (C.C.)</label>
+                        <input 
+                            type="text" 
+                            id="user-id" 
+                            placeholder="Ej. C.C. 1.092.833.000"
+                            class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-300 focus:ring-1 focus:ring-colmena-teal focus:outline-none"
+                            oninput="updateStudentData()"
+                        />
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-500 block">Empresa o Institución</label>
+                        <input 
+                            type="text" 
+                            id="user-org" 
+                            placeholder="Ej. Logística Nacional S.A."
+                            class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-300 focus:ring-1 focus:ring-colmena-teal focus:outline-none"
+                            oninput="updateStudentData()"
+                        />
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-500 block">Cargo / Área de Operaciones</label>
+                        <input 
+                            type="text" 
+                            id="user-role" 
+                            placeholder="Ej. Analista o Inspector SST"
+                            class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-300 focus:ring-1 focus:ring-colmena-teal focus:outline-none"
+                            oninput="updateStudentData()"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menú de Navegación de Talleres -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-colmena-teal text-white px-4 py-3 text-sm font-bold flex items-center justify-between">
+                    <span>Guía Metodológica</span>
+                    <span class="text-xs bg-colmena-gold text-slate-900 font-extrabold px-2.5 py-0.5 rounded-full">7 Módulos</span>
+                </div>
+                <nav class="divide-y divide-slate-100" id="workshop-navigation-menu">
+                    <!-- Inyectado por JS -->
+                </nav>
+            </div>
+
+            <!-- Caja IA -->
+            <div class="bg-colmena-tealsoft border border-colmena-teal/20 rounded-2xl p-4 space-y-2">
+                <h4 class="text-xs font-bold text-colmena-teal flex items-center">
+                    <span class="mr-1.5 animate-pulse">⚙️</span> Motor Evaluador IA
+                </h4>
+                <p class="text-[10px] text-slate-600 leading-relaxed">
+                    Si posees una clave personal de API de Gemini, agrégala aquí para habilitar retroalimentación predictiva alineada al estándar ISO 39001. De lo contrario, se usará el motor local.
+                </p>
+                <input 
+                    type="password" 
+                    id="gemini-key" 
+                    placeholder="API Key Gemini (Opcional)"
+                    class="w-full text-xs px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-colmena-teal"
+                />
+            </div>
+
+        </aside>
+
+        <!-- COLUMNA 2: ÁREA CENTRAL DE TRABAJO -->
+        <main class="lg:col-span-9 space-y-6 print-full" id="main-workspace">
+            <!-- El contenido dinámico se inyecta mediante JavaScript según el taller activo -->
+        </main>
+
+    </div>
+
+    <!-- FOOTER CORPORATIVO (no-print) -->
+    <footer class="bg-colmena-navy text-slate-400 text-xs py-6 mt-12 border-t border-slate-800 no-print">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div class="flex items-center space-x-3">
+            <span class="text-colmena-gold text-lg">⬢</span>
+            <span class="font-bold text-slate-200">Colmena Seguros</span>
+            <span class="text-slate-600">|</span>
+            <span class="text-slate-500">Unidad de Prevención Vial y Reducción del Riesgo Operacional</span>
+          </div>
+          <div>
+            <p class="text-center md:text-right text-[10px] text-slate-500">
+              © 2026 ARL Colmena. Una empresa de la Fundación Grupo Social. Todos los derechos reservados.
+            </p>
+          </div>
+        </div>
+    </footer>
+
+    <!-- LOGICA JAVASCRIPT INTEGRADA -->
+    <script>
+        // ESTADO GLOBAL DE LA APLICACIÓN
+        const appState = {
+            activeTab: 'welcome',
+            student: {
+                name: '',
+                id: '',
+                org: '',
+                role: ''
+            },
+            apiKey: '',
+            talleres: {
+                taller1: {
+                    id: 1,
+                    titulo: 'Inventario Crítico de Controles',
+                    proposito: 'Diferenciar controles existentes, controles utilizados y controles con capacidad real de prevenir fatalidades.',
+                    producto: 'Inventario inicial de controles con juicio de efectividad.',
+                    actividadVial: 'Desplazamiento operativo en motocicleta para supervisión técnica',
+                    pregTransferencia: '¿Qué control de su organización se ve fuerte en el documento pero débil en la operación real?',
+                    respTransferencia: '',
+                    completado: false,
+                    score: null,
+                    columnas: ['Control Existente', 'Amenaza Controlada', 'Tipo', 'Evidencia de Funcionamiento', '¿Es Crítico?'],
+                    filas: [
+                        { c1: 'Capacitación anual', c2: 'Distracción, velocidad, fatiga', c3: 'Administrativo', c4: 'Asistencia y evaluación', c5: 'Solo si modifica decisiones verificables' },
+                        { c1: 'GPS / telemetría', c2: 'Velocidad, frenadas, rutas', c3: 'Tecnológico / detectivo', c4: 'Alertas y reportes', c5: 'Sí, si genera acción oportuna' },
+                        { c1: 'Inspección preoperacional', c2: 'Falla vehicular', c3: 'Preventivo', c4: 'Formato y revisión', c5: 'Depende de profundidad y cierre' },
+                        { c1: 'Política no celular', c2: 'Distracción cognitiva', c3: 'Administrativo', c4: 'Regla interna', c5: 'No si no hay barrera operacional' }
+                    ]
+                },
+                taller2: {
+                    id: 2,
+                    titulo: 'Clasificación de Controles',
+                    proposito: 'Clasificar controles de riesgo vial según jerarquía y reconocer brechas de fuerza preventiva.',
+                    producto: 'Matriz de controles clasificados y oportunidades de fortalecimiento.',
+                    pregTransferencia: '¿Cuál control de su organización podría subir uno o dos niveles en la jerarquía?',
+                    respTransferencia: '',
+                    completado: false,
+                    score: null,
+                    columnas: ['Situación', 'Control Actual', 'Nivel', 'Debilidad', 'Control Más Fuerte'],
+                    filas: [
+                        { c1: 'Uso de celular en ruta', c2: 'Charla de sensibilización', c3: 'Administrativo', c4: 'Depende de recordar', c5: 'Bloqueo de llamadas, protocolo de parada segura, respuesta automática' },
+                        { c1: 'Retorno nocturno', c2: 'Recomendación de precaución', c3: 'Administrativo', c4: 'No define decisión', c5: 'Hora máxima de retorno, pernocta autorizada' },
+                        { c1: 'Motocicleta en lluvia', c2: 'Uso de impermeable', c3: 'EPP', c4: 'No reduce exposición', c5: 'Criterio de no desplazamiento o sustitución de medio' },
+                        { c1: 'Exceso de velocidad', c2: 'Campaña visual', c3: 'Administrativo', c4: 'No limita energía', c5: 'Limitador, geocerca, telemetría con intervención inmediata' }
+                    ]
+                },
+                taller3: {
+                    id: 3,
+                    titulo: 'Identificación de Controles Críticos para Velocidad, Fatiga y Motociclistas',
+                    proposito: 'Seleccionar controles realmente críticos para tres factores de alta severidad.',
+                    producto: 'Lista priorizada de controles críticos con criterios de verificación.',
+                    pregTransferencia: '¿Cuál de estos tres factores representa la brecha operacional más alarmante hoy en su flota?',
+                    respTransferencia: '',
+                    completado: false,
+                    score: null,
+                    columnas: ['Factor', 'Amenaza', 'Control Crítico', 'Verificación', 'Acción si se degrada'],
+                    filas: [
+                        { c1: 'Velocidad', c2: 'Velocidad legal pero no compatible con curva o clima', c3: 'Velocidad máxima por ruta crítica con geocerca', c4: 'Reporte semanal de alertas y reincidencias', c5: 'Retroalimentación, bloqueo de ruta o ajuste operativo' },
+                        { c1: 'Fatiga', c2: 'Retorno tras jornada extendida', c3: 'Hora máxima de conducción / retorno seguro', c4: 'Bitácora de salida-retorno y horas activas', c5: 'Reprogramar, pernoctar o asignar relevo' },
+                        { c1: 'Motocicleta', c2: 'Alta vulnerabilidad en lluvia o noche', c3: 'Criterio de no desplazamiento por condición incompatible', c4: 'Registro de autorización y motivo', c5: 'Sustituir medio o aplazar tarea' },
+                        { c1: 'Distracción', c2: 'Llamada operativa durante ruta', c3: 'Protocolo de comunicación sin conducción', c4: 'Auditoría de llamadas y reportes', c5: 'Rediseño de canal y retroalimentación al líder' }
+                    ]
+                },
+                taller4: {
+                    id: 4,
+                    titulo: 'Auditoría de Controles Documentales',
+                    proposito: 'Determinar si un control documental tiene fuerza operacional o solo valor declarativo.',
+                    producto: 'Diagnóstico de controles documentales débiles y acciones de fortalecimiento.',
+                    pregTransferencia: '¿Qué procedimiento debería dejar de ser recomendación y convertirse en restricción operacional?',
+                    respTransferencia: '',
+                    completado: false,
+                    score: null,
+                    columnas: ['Control Documental', 'Límite Claro', 'Dueño', 'Evidencia', 'Decisión si Falla'],
+                    filas: [
+                        { c1: 'Política de no celular', c2: 'No atender comunicaciones durante conducción', c3: 'Operaciones / SST', c4: 'Registros de llamadas y reportes', c5: 'Rediseñar canal y retroalimentar líderes' },
+                        { c1: 'Plan de viaje', c2: 'Ruta, horario, paradas y retorno seguro', c3: 'Supervisor', c4: 'Plan firmado y seguimiento', c5: 'No autorizar salida si falta criterio' },
+                        { c1: 'Procedimiento de fatiga', c2: 'Horas máximas y criterio de suspensión', c3: 'Jefe directo', c4: 'Bitácora y alertas', c5: 'Relevo, pernocta o reprogramación' },
+                        { c1: 'Inspección preoperacional', c2: 'Condición mínima de seguridad', c3: 'Conductor / mantenimiento', c4: 'Hallazgos cerrados', c5: 'Bloquear vehículo' }
+                    ]
+                },
+                taller5: {
+                    id: 5,
+                    titulo: 'Construcción de Bow Tie',
+                    proposito: 'Construir un Bow Tie inicial para un evento vial de alta severidad.',
+                    producto: 'Bow Tie preliminar con amenazas, evento superior, consecuencias y barreras.',
+                    pregTransferencia: '¿Qué amenaza de su operación aparece repetidamente pero todavía no tiene barrera preventiva fuerte?',
+                    respTransferencia: '',
+                    completado: false,
+                    score: null,
+                    eventoSuperior: 'Pérdida de control / Colisión vial en ruta',
+                    columnas: ['Amenaza', 'Barrera Preventiva', 'Barrera Mitigadora', 'Consecuencia'],
+                    filas: [
+                        { c1: 'Velocidad incompatible', c2: 'Geocerca / límite por ruta', c3: 'Cinturón / estructura', c4: 'Lesión grave' },
+                        { c1: 'Fatiga', c2: 'Hora máxima / relevo', c3: 'Respuesta emergencia', c4: 'Fatalidad' },
+                        { c1: 'Distracción operativa', c2: 'Protocolo no llamadas', c3: 'Airbag / atención', c4: 'Daño severo' },
+                        { c1: 'Lluvia / baja adherencia', c2: 'Criterio de suspensión', c3: 'Comunicación y rescate', c4: 'Interrupción operacional' }
+                    ]
+                },
+                taller6: {
+                    id: 6,
+                    titulo: 'Diseño de Barreras para Operación Crítica',
+                    proposito: 'Diseñar un conjunto mínimo de barreras para una actividad de alta exposición.',
+                    producto: 'Esquema inicial de barreras preventivas, detectivas y mitigadoras.',
+                    pregTransferencia: '¿Qué barrera debería implementarse antes de la próxima operación de alta exposición?',
+                    respTransferencia: '',
+                    completado: false,
+                    score: null,
+                    columnas: ['Amenaza', 'Barrera Preventiva', 'Barrera Detectiva', 'Barrera Mitigadora', 'Dueño'],
+                    filas: [
+                        { c1: 'Velocidad incompatible', c2: 'Límite por ruta', c3: 'Telemetría', c4: 'Cinturón / respuesta', c5: 'Operaciones / SST' },
+                        { c1: 'Fatiga', c2: 'Hora máxima y pausa', c3: 'Reporte de fatiga', c4: 'Relevo / pernocta', c5: 'Jefatura' },
+                        { c1: 'Distracción', c2: 'No llamadas en ruta', c3: 'Auditoría comunicaciones', c4: 'Investigación y aprendizaje', c5: 'Operaciones' },
+                        { c1: 'Motocicleta en lluvia', c2: 'No desplazamiento', c3: 'Autorización previa', c4: 'EPP certificado y atención', c5: 'Supervisor' }
+                    ]
+                },
+                taller7: {
+                    id: 7,
+                    titulo: 'Validación de Controles Críticos',
+                    proposito: 'Evaluar si los controles seleccionados tienen estándar, dueño, verificación e indicador.',
+                    producto: 'Matriz de validación de controles críticos.',
+                    pregTransferencia: '¿Qué indicador debe llegar al comité antes que el accidente?',
+                    respTransferencia: '',
+                    completado: false,
+                    score: null,
+                    columnas: ['Control Crítico', 'Estándar', 'Dueño', 'Evidencia', 'Acción si Falla'],
+                    filas: [
+                        { c1: 'Telemetría velocidad', c2: 'Alertas revisadas semanalmente', c3: 'Gestor flota', c4: 'Reporte + acciones', c5: 'Intervención conductor/ruta' },
+                        { c1: 'Hora máxima retorno', c2: 'Retorno antes de hora definida', c3: 'Supervisor', c4: 'Bitácora', c5: 'Pernocta/reprogramación' },
+                        { c1: 'No llamadas en ruta', c2: 'Cero contacto operativo', c3: 'Operaciones', c4: 'Registro comunicación', c5: 'Ajuste canal' },
+                        { c1: 'Mantenimiento llantas', c2: 'Profundidad y presión apta por ruta', c3: 'Mantenimiento', c4: 'Registro técnico', c5: 'Bloqueo vehículo' }
+                    ]
+                }
+            },
+            refuerzos: {
+                r1: { respuestas: { 0: '', 1: '', 2: '', 3: '' }, retroalimentado: false, calificacion: 0 },
+                r2: { orden: ['Charla de sensibilización', 'Uso de impermeable', 'Hora máxima de retorno', 'Criterio de no desplazamiento o geocercas'], retroalimentado: false, correcto: false },
+                r3: { casoSeleccionado: '', explicacion: '', retroalimentado: false },
+                r4: { seleccionadas: { 1: false, 2: false }, retroalimentado: false },
+                r5: { elementos: { "Geocerca de velocidad": "", "Lesión severa del ocupante": "", "Agotamiento extremo del chofer": "", "Uso reglamentario del Airbag": "" }, retroalimentado: false },
+                r6: { restricciones: { tormentaCelular: false, gpsDesconectado: false }, decision: '', retroalimentado: false },
+                r7: { opcionCritica: '', retroalimentado: false }
+            },
+            feedbacks: {}
+        };
+
+        // NOTIFICACIONES TOAST
+        function showNotification(text) {
+            const toast = document.getElementById('toast-notification');
+            const toastText = document.getElementById('toast-text');
+            toastText.textContent = text;
+            toast.classList.remove('hidden');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // GUARDADO DE DATOS DEL ALUMNO
+        function updateStudentData() {
+            appState.student.name = document.getElementById('user-name').value;
+            appState.student.id = document.getElementById('user-id').value;
+            appState.student.org = document.getElementById('user-org').value;
+            appState.student.role = document.getElementById('user-role').value;
+            renderSidebar();
+            if (appState.activeTab === 'reporte') {
+                renderReport();
+            }
+        }
+
+        // CONTROL DE TABS
+        function setTab(tabName) {
+            appState.activeTab = tabName;
+            renderSidebar();
+            renderActiveTab();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // INICIALIZACIÓN
+        window.onload = function() {
+            renderSidebar();
+            renderActiveTab();
+        };
+
+        // RENDER DE SIDEBAR (MENÚ DE NAVEGACIÓN Y PROGRESO)
+        function renderSidebar() {
+            const menu = document.getElementById('workshop-navigation-menu');
+            let html = `
+                <button onclick="setTab('welcome')" class="w-full text-left px-4 py-3 text-xs font-medium transition-all flex items-center justify-between ${appState.activeTab === 'welcome' ? 'bg-colmena-teal/10 text-colmena-teal border-l-4 border-colmena-teal font-bold' : 'hover:bg-slate-50 text-slate-600'}">
+                    <span>🌐 Inducción a Controles</span>
+                </button>
+            `;
+
+            Object.keys(appState.talleres).forEach(key => {
+                const taller = appState.talleres[key];
+                const esActivo = appState.activeTab === key;
+                const completado = taller.completado;
+                html += `
+                    <button onclick="setTab('${key}')" class="w-full text-left px-4 py-3 text-xs font-medium transition-all flex items-center justify-between ${esActivo ? 'bg-colmena-teal/10 text-colmena-teal border-l-4 border-colmena-teal font-bold' : 'hover:bg-slate-50 text-slate-600'}">
+                        <div class="flex items-center space-x-2 truncate">
+                            <span class="text-slate-400 font-bold min-w-[14px]">T${taller.id}</span>
+                            <span class="truncate">${taller.titulo}</span>
+                        </div>
+                        ${completado ? `<span class="text-emerald-600 font-bold">✓</span>` : ''}
+                    </button>
+                `;
+            });
+
+            const todosCompletos = Object.values(appState.talleres).every(t => t.completado);
+            html += `
+                <button onclick="setTab('reporte')" class="w-full text-left px-4 py-3 text-xs font-bold transition-all flex items-center justify-between ${appState.activeTab === 'reporte' ? 'bg-amber-50 text-amber-950 border-l-4 border-colmena-gold' : 'hover:bg-slate-50 text-slate-700'}">
+                    <span>🏆 Reporte y Certificación</span>
+                    ${todosCompletos ? `<span class="text-amber-500">★</span>` : ''}
+                </button>
+            `;
+
+            menu.innerHTML = html;
+        }
+
+        // RENDER DE ESPACIO DE TRABAJO ACTIVO
+        function renderActiveTab() {
+            const workspace = document.getElementById('main-workspace');
+            const tab = appState.activeTab;
+
+            if (tab === 'welcome') {
+                renderWelcomeScreen(workspace);
+            } else if (tab === 'reporte') {
+                renderReportScreen(workspace);
+            } else {
+                renderWorkshopScreen(workspace, tab);
+            }
+        }
+
+        // BIENVENIDA / INDUCCIÓN
+        function renderWelcomeScreen(container) {
+            container.innerHTML = `
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-gradient-to-r from-colmena-teal to-colmena-tealdark text-white p-6 relative">
+                        <div class="relative z-10">
+                            <span class="bg-colmena-gold text-slate-900 text-[9px] font-extrabold uppercase px-2.5 py-1 rounded-full tracking-wider">
+                                Plataforma de Aprendizaje ARL Colmena
+                            </span>
+                            <h2 class="text-2xl font-extrabold mt-3">Gestor Evaluador de Controles de Riesgo Vial</h2>
+                            <p class="text-teal-50 text-xs mt-2 max-w-2xl leading-relaxed">
+                                Plataforma técnica diseñada para capacitar a líderes de SST y prevencionistas en el análisis de barreras duras en ruta. Aprenderá a estructurar planes operativos para evitar fatalidades, erradicando los "falsos controles" que dependen enteramente de la conducta humana.
+                            </p>
+                        </div>
+                        <div class="absolute right-0 bottom-0 top-0 opacity-10 flex items-center justify-center pointer-events-none text-9xl font-bold pr-10">⬢</div>
+                    </div>
+
+                    <div class="p-6 space-y-6">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center">
+                                <span class="mr-2 text-colmena-teal">📘</span> ¿Cómo funcionan los talleres prácticos?
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                    <span class="text-xl mb-1 block">🛠️</span>
+                                    <h4 class="text-xs font-bold text-colmena-teal mb-1">Diligencia la Matriz</h4>
+                                    <p class="text-[11px] text-slate-600 leading-relaxed">
+                                        Analice los controles pre-cargados tomados del manual oficial, edítelos y personalice la tabla con los escenarios reales de su operación vial.
+                                    </p>
+                                </div>
+                                <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                    <span class="text-xl mb-1 block">🧠</span>
+                                    <h4 class="text-xs font-bold text-colmena-teal mb-1">Actividad Evaluativa</h4>
+                                    <p class="text-[11px] text-slate-600 leading-relaxed">
+                                        Cada taller tiene una simulación interactiva diseñada para desafiar su criterio técnico inmediato y consolidar los conceptos clave.
+                                    </p>
+                                </div>
+                                <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                    <span class="text-xl mb-1 block">🏆</span>
+                                    <h4 class="text-xs font-bold text-colmena-teal mb-1">Certificación Final</h4>
+                                    <p class="text-[11px] text-slate-600 leading-relaxed">
+                                        Al completar los talleres, obtendrá un informe técnico detallado listo para imprimir, firmado digitalmente para sus auditorías de Plan de Seguridad Vial (PESV).
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-colmena-gold/10 border-l-4 border-colmena-gold p-4 rounded-r-xl">
+                            <h4 class="text-xs font-bold text-amber-950 mb-1 flex items-center">
+                                💡 Fundamento de Control Crítico (ISO 39001)
+                            </h4>
+                            <p class="text-[11px] text-amber-900 leading-relaxed">
+                                Un control que depende de la voluntad o conducta de un chofer (como usar impermeable o recordar no usar el celular) es una barrera débil. Nuestra misión técnica es orientar los recursos hacia barreras de ingeniería, geocercas activas y restricciones automáticas.
+                            </p>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-slate-100 gap-3">
+                            <span class="text-xs text-slate-500 text-center sm:text-left">Comience digitando su Nombre y Documento de Identidad a la izquierda para personalizar su ruta.</span>
+                            <button onclick="setTab('taller1')" class="w-full sm:w-auto bg-colmena-teal hover:bg-colmena-tealdark text-white font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-md">
+                                Comenzar con Taller 1 ➜
+                              </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // AGREGAR FILA A TABLA
+        function addRow(tallerKey) {
+            const taller = appState.talleres[tallerKey];
+            const sampleRow = taller.filas[0];
+            const newRow = {};
+            Object.keys(sampleRow).forEach(key => {
+                newRow[key] = '';
+            });
+            taller.filas.push(newRow);
+            renderActiveTab();
+            showNotification("Registro agregado.");
+        }
+
+        // ELIMINAR FILA DE TABLA
+        function deleteRow(tallerKey, rowIndex) {
+            const taller = appState.talleres[tallerKey];
+            taller.filas.splice(rowIndex, 1);
+            renderActiveTab();
+            showNotification("Registro eliminado.");
+        }
+
+        // MANEJAR CAMBIOS EN ENTRADAS DE LA MATRIZ
+        function updateCellValue(tallerKey, rowIndex, cellKey, value) {
+            appState.talleres[tallerKey].filas[rowIndex][cellKey] = value;
+            // Si es taller 5, sincronizar el diagrama Bow Tie
+            if (tallerKey === 'taller5') {
+                renderBowTieVisualizer();
+            }
+        }
+
+        // ACTUALIZAR TRANSFERENCIA
+        function updateTransferencia(tallerKey, value) {
+            appState.talleres[tallerKey].respTransferencia = value;
+        }
+
+        // TALLER INDIVIDUAL
+        function renderWorkshopScreen(container, tallerKey) {
+            const taller = appState.talleres[tallerKey];
+            const feedback = appState.feedbacks[tallerKey];
+
+            let html = `
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-3">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-3 gap-2">
+                        <div>
+                            <span class="bg-colmena-teal/10 text-colmena-teal text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">
+                                Taller Práctico Aplicado ${taller.id}
+                            </span>
+                            <h2 class="text-xl font-extrabold text-colmena-teal mt-1">${taller.titulo}</h2>
+                        </div>
+                        <div class="text-xs md:text-right">
+                            <strong class="text-slate-700 block">Producto Esperado:</strong>
+                            <span class="text-slate-500">${taller.producto}</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        <span class="font-bold text-colmena-teal">Propósito:</span> ${taller.proposito}
+                    </p>
+
+                    ${taller.id === 1 ? `
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 mt-2">
+                            <label class="text-[11px] font-bold text-slate-700 block mb-1">Seleccione o redacte una actividad vial de alta exposición:</label>
+                            <input type="text" id="taller1-actividad" value="${taller.actividadVial}" oninput="appState.talleres.taller1.actividadVial = this.value" class="w-full text-xs px-3 py-2 bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-colmena-teal" />
+                        </div>
+                    ` : ''}
+                </div>
+
+                <!-- MATRIZ DE TRABAJO -->
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-colmena-teal text-white px-5 py-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                        <div>
+                            <h3 class="text-xs font-bold uppercase tracking-wider">Planilla de Trabajo</h3>
+                            <p class="text-[10px] text-teal-100">Edite las celdas según las necesidades de su organización</p>
+                        </div>
+                        <button onclick="addRow('${tallerKey}')" class="bg-colmena-gold hover:bg-yellow-500 text-slate-950 font-bold text-xs px-3.5 py-1.5 rounded-xl flex items-center transition-all shadow-sm">
+                            <span>＋ Agregar Registro</span>
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                                    ${taller.columnas.map(col => `<th class="p-3 font-bold">${col}</th>`).join('')}
+                                    <th class="p-3 text-center w-12">Borrar</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${taller.filas.map((row, rIdx) => {
+                                    const keys = Object.keys(row);
+                                    return `
+                                        <tr class="hover:bg-slate-50/50 transition-colors">
+                                            ${keys.map(k => `
+                                                <td class="p-2">
+                                                    <textarea 
+                                                        rows="2" 
+                                                        oninput="updateCellValue('${tallerKey}', ${rIdx}, '${k}', this.value)" 
+                                                        class="w-full text-xs px-2.5 py-1.5 bg-white border border-slate-200 focus:border-colmena-teal focus:ring-1 focus:ring-colmena-teal focus:outline-none rounded-lg resize-none transition-all"
+                                                    >${row[k]}</textarea>
+                                                </td>
+                                            `).join('')}
+                                            <td class="p-2 text-center">
+                                                <button onclick="deleteRow('${tallerKey}', ${rIdx})" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg transition-colors hover:bg-rose-50">
+                                                    🗑️
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            // ESPACIO PARA BOW TIE VISUAL EN TALLER 5
+            if (taller.id === 5) {
+                html += `
+                    <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                        <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider text-center">Representación Visual Bow Tie Dinámico</h3>
+                        <div id="bowtie-visual-container"></div>
+                    </div>
+                `;
+            }
+
+            // REFUERZO INTERACTIVO EVALUATIVO
+            html += `
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                        <h3 class="text-sm font-extrabold text-colmena-teal flex items-center">
+                            <span class="text-lg mr-2">🎯</span> Ejercicio Práctico Evaluativo de Refuerzo
+                        </h3>
+                        <span class="text-[9px] bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full border border-amber-200 font-bold">REQUERIDO</span>
+                    </div>
+                    <div id="refuerzo-container-${taller.id}"></div>
+                </div>
+            `;
+
+            // PREGUNTA DE TRANSFERENCIA
+            html += `
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-3">
+                    <div class="flex items-start space-x-3 text-slate-900">
+                        <div class="mt-1 bg-colmena-gold/20 p-1.5 rounded-lg text-colmena-teal">✏️</div>
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-wide">Pregunta de Transferencia Organizacional</h4>
+                            <p class="text-xs text-slate-700 font-medium mt-1">${taller.pregTransferencia}</p>
+                        </div>
+                    </div>
+                    <textarea 
+                        rows="3" 
+                        oninput="updateTransferencia('${tallerKey}', this.value)" 
+                        placeholder="Escriba su respuesta detallada vinculándola a la realidad de su empresa..." 
+                        class="w-full text-xs p-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-colmena-teal"
+                    >${taller.respTransferencia}</textarea>
+                </div>
+            `;
+
+            // BOTÓN EVALUAR
+            html += `
+                <div class="flex justify-between items-center gap-2">
+                    <span class="text-[10px] text-slate-400">Sus avances se resguardan de forma local.</span>
+                    <button onclick="auditarTaller(${taller.id})" id="btn-evaluar-${taller.id}" class="bg-colmena-teal hover:bg-colmena-tealdark text-white text-xs font-bold px-5 py-3 rounded-2xl shadow-md transition-all flex items-center space-x-2">
+                        <span>Calificar y Auditar Taller ➜</span>
+                    </button>
+                </div>
+
+                <!-- CONTENEDOR DE FEEDBACK -->
+                <div id="feedback-panel-${tallerKey}" class="hidden"></div>
+            `;
+
+            container.innerHTML = html;
+
+            // Inyectar subcomponentes después del render HTML inicial
+            renderRefuerzoInteractive(taller.id);
+            if (taller.id === 5) {
+                renderBowTieVisualizer();
+            }
+            if (feedback) {
+                renderFeedbackPanel(tallerKey);
+            }
+        }
+
+        // CONTROLADORES DE RENDER DE LOS JUEGOS DE REFUERZO
+
+        function renderRefuerzoInteractive(id) {
+            const wrapper = document.getElementById(`refuerzo-container-${id}`);
+            if (!wrapper) return;
+
+            if (id === 1) {
+                const resp = appState.refuerzos.r1.respuestas;
+                wrapper.innerHTML = `
+                    <div class="space-y-3 text-xs">
+                        <p class="text-slate-600 font-medium">Clasifique cada una de las medidas viales para validar si cuentan con capacidad de barrera dura frente a fatalidades:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+                            ${[
+                                { idx: 0, text: "Capacitación de manejo defensivo de 8 horas anuales" },
+                                { idx: 1, text: "Geocerca GPS activa con corte automático de energía a los 90 km/h" },
+                                { idx: 2, text: "Preoperacional diario firmado por conductor" },
+                                { idx: 3, text: "Política corporativa que restringe el uso de celulares durante el viaje" }
+                            ].map(item => `
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
+                                    <span class="font-semibold text-slate-800 mb-2">${item.text}</span>
+                                    <div class="flex space-x-2">
+                                        <button onclick="responderR1(${item.idx}, 'declarativo')" class="flex-1 py-1 px-2 rounded-lg text-[10px] font-bold border ${resp[item.idx] === 'declarativo' ? 'bg-amber-100 text-amber-800 border-amber-400' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'}">
+                                            Falso Crítico / Declarativo
+                                        </button>
+                                        <button onclick="responderR1(${item.idx}, 'critico')" class="flex-1 py-1 px-2 rounded-lg text-[10px] font-bold border ${resp[item.idx] === 'critico' ? 'bg-colmena-teal/20 text-colmena-teal border-colmena-teal' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'}">
+                                            Crítico Real
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="pt-2 flex items-center space-x-3">
+                            <button onclick="evaluarR1()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 px-4 rounded-xl transition-all">Verificar Respuestas</button>
+                            ${appState.refuerzos.r1.retroalimentado ? `
+                                <span class="font-bold text-slate-900">Resultado: ${appState.refuerzos.r1.calificacion} / 4 correctas</span>
+                            ` : ''}
+                        </div>
+                        ${appState.refuerzos.r1.retroalimentado ? `
+                            <div class="p-3 bg-slate-100 rounded-xl border border-slate-300 mt-2">
+                                <p class="text-[11px] text-slate-600 leading-relaxed">
+                                    <strong>Lección Aprendida ARL:</strong> Las capacitaciones, formatos y reglamentos dependen del comportamiento voluntario del operador (Falso Crítico). Solo el limitador/geocerca tecnológico actúa de forma autónoma limitando la fuerza destructiva física del riesgo.
+                                </p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else if (id === 2) {
+                const orden = appState.refuerzos.r2.orden;
+                wrapper.innerHTML = `
+                    <div class="space-y-3 text-xs">
+                        <p class="text-slate-600">Reordene la lista posicionando el <strong>control operacional más fuerte arriba</strong> y el más vulnerable ante fallos conductuales abajo:</p>
+                        <div class="space-y-2 max-w-xl">
+                            ${orden.map((item, index) => `
+                                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="bg-colmena-teal text-white font-extrabold px-2 py-0.5 rounded text-[10px]">${index + 1}</span>
+                                        <span class="text-slate-800 font-semibold">${item}</span>
+                                    </div>
+                                    <div class="flex space-x-1">
+                                        <button onclick="moverFilaR2(${index}, -1)" ${index === 0 ? 'disabled' : ''} class="bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 px-2 py-1 rounded-lg text-[10px] disabled:opacity-40">🔼</button>
+                                        <button onclick="moverFilaR2(${index}, 1)" ${index === orden.length - 1 ? 'disabled' : ''} class="bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 px-2 py-1 rounded-lg text-[10px] disabled:opacity-40">🔽</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="pt-2 flex items-center space-x-3">
+                            <button onclick="evaluarR2()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 px-4 rounded-xl transition-all">Verificar Jerarquía</button>
+                        </div>
+                        ${appState.refuerzos.r2.retroalimentado ? `
+                            <div class="p-4 rounded-xl border mt-2 ${appState.refuerzos.r2.correcto ? 'bg-emerald-50 border-emerald-300 text-emerald-900' : 'bg-amber-50 border-amber-300 text-amber-900'}">
+                                <span class="font-bold block">${appState.refuerzos.r2.correcto ? "🎉 Jerarquía Correctamente Estructurada" : "⚠️ Estructura no óptima"}</span>
+                                <p class="text-[11px] mt-1">
+                                    El control de ingeniería o sustitución ("Criterio de no desplazamiento o geocercas") es el más potente y debe estar arriba, superando las meras advertencias conductuales como el uso del impermeable o charlas.
+                                </p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else if (id === 3) {
+                const seleccionado = appState.refuerzos.r3.casoSeleccionado;
+                wrapper.innerHTML = `
+                    <div class="space-y-3 text-xs">
+                        <div class="bg-colmena-teal/10 p-4 rounded-2xl border border-colmena-teal/20">
+                            <span class="font-extrabold text-colmena-teal uppercase text-[10px] tracking-wider block mb-1">📟 Alerta de Fatiga Vial Crítica</span>
+                            <p class="text-slate-700 font-semibold leading-relaxed">
+                                Un conductor de transporte con carga pesada ha excedido las 11 horas continuas de conducción activa y se encuentra a 3 horas de la base principal. Se aproxima un tramo de montaña nocturno y complejo.
+                            </p>
+                        </div>
+                        <p class="font-bold text-slate-800">Defina la acción del prevencionista ante la degradación evidente de este control crítico:</p>
+                        <div class="space-y-2 max-w-2xl">
+                            ${[
+                                { key: 'alerta', label: "Enviar una alerta sms automatizada recordando las directivas de fatiga de la empresa y pedir que conduzca con precaución." },
+                                { key: 'bloqueo', label: "Bloquear remotamente la orden de despacho, ordenar pernocta inmediata autorizada en hotel de carretera del convenio y suspender el viaje." },
+                                { key: 'registro', label: "Dejar registrar la anomalía en el informe mensual consolidado para discutirlo en el comité de seguridad vial del próximo mes." }
+                            ].map(opc => `
+                                <button onclick="evaluarR3('${opc.key}')" class="w-full text-left p-3 rounded-xl border text-xs transition-all flex items-start space-x-2 ${seleccionado === opc.key ? 'bg-colmena-teal/10 border-colmena-teal text-colmena-teal font-semibold' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}">
+                                    <span class="mt-0.5">⬢</span>
+                                    <span>${opc.label}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+                        ${appState.refuerzos.r3.retroalimentado ? `
+                            <div class="p-3.5 bg-slate-100 rounded-xl border border-slate-300 text-slate-700 text-[11px] mt-2">
+                                <p>${appState.refuerzos.r3.explicacion}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else if (id === 4) {
+                wrapper.innerHTML = `
+                    <div class="space-y-3 text-xs">
+                        <p class="text-slate-600">Identifique y seleccione cuáles cláusulas documentales poseen ambigüedades blandas ("vagas") para conocer la propuesta del estándar Colmena:</p>
+                        <div class="space-y-2">
+                            ${[
+                                { id: 1, original: "Se procurará en la medida de lo posible que los operarios no conduzcan fatigados.", corregida: "Se prohíbe el inicio de la ruta si el conductor registra más de 10 horas de jornada laboral activa." },
+                                { id: 2, original: "Se recomienda que no contesten llamadas en la vía.", corregida: "Se restringe operativamente todo contacto celular. El sistema bloqueará terminales durante la marcha." }
+                            ].map(item => `
+                                <div onclick="toggleClausulaR4(${item.id})" class="p-3 rounded-xl border cursor-pointer transition-all ${appState.refuerzos.r4.seleccionadas[item.id] ? 'bg-amber-50 border-amber-400 text-amber-950 shadow-inner' : 'bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-700'}">
+                                    <div class="flex items-center space-x-2 font-semibold">
+                                        <span class="text-base">${appState.refuerzos.r4.seleccionadas[item.id] ? "⚠️" : "📄"}</span>
+                                        <span>Cláusula Actual: "${item.original}"</span>
+                                    </div>
+                                    ${appState.refuerzos.r4.seleccionadas[item.id] ? `
+                                        <div class="mt-2 bg-white p-2.5 rounded-lg border border-amber-300 text-[11px] text-slate-700">
+                                            <span class="font-bold text-colmena-teal block">Propuesta Cláusula de Control Crítico Dureza Operativa:</span>
+                                            "${item.corregida}"
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="pt-2">
+                            <button onclick="evaluarR4()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 px-4 rounded-xl transition-all">Validar Selección</button>
+                        </div>
+                        ${appState.refuerzos.r4.retroalimentado ? `
+                            <div class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-900 leading-relaxed text-[11px]">
+                                <strong>Análisis Preventivo:</strong> Para evitar vacíos operacionales, elimine de los procedimientos palabras como "se sugiere", "intentar", "procurar". Utilice verbos directos de control de ingeniería ("bloquear", "parar", "cancelar").
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else if (id === 5) {
+                const elems = appState.refuerzos.r5.elementos;
+                wrapper.innerHTML = `
+                    <div class="space-y-3 text-xs">
+                        <p class="text-slate-600 font-medium">Asigne cada uno de los conceptos de la operación vial a su respectiva categoría del Bow Tie:</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            ${Object.keys(elems).map(elem => `
+                                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-between">
+                                    <span class="font-bold text-slate-800 mb-2">${elem}</span>
+                                    <select onchange="updateBowTieMatch('${elem}', this.value)" class="w-full text-xs p-1.5 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-colmena-teal">
+                                        <option value="">Seleccione Categoría Bow Tie...</option>
+                                        <option value="preventiva" ${elems[elem] === 'preventiva' ? 'selected' : ''}>Barrera Preventiva (Antes del Accidente)</option>
+                                        <option value="mitigadora" ${elems[elem] === 'mitigadora' ? 'selected' : ''}>Barrera Mitigadora (Después del Accidente)</option>
+                                        <option value="consecuencia" ${elems[elem] === 'consecuencia' ? 'selected' : ''}>Consecuencia Final</option>
+                                        <option value="amenaza" ${elems[elem] === 'amenaza' ? 'selected' : ''}>Amenaza Directa</option>
+                                    </select>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="pt-2">
+                            <button onclick="evaluarR5()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 px-4 rounded-xl transition-all">Verificar Conceptos</button>
+                        </div>
+                        ${appState.refuerzos.r5.retroalimentado ? `
+                            <div class="p-3.5 bg-slate-100 border border-slate-300 rounded-xl space-y-1.5 text-[11px] text-slate-700">
+                                <span class="font-bold text-colmena-teal block">Estructura Bow Tie Colmena Validada:</span>
+                                <ul class="list-disc pl-4 space-y-1">
+                                    <li><strong>Geocerca de velocidad:</strong> Barrera Preventiva</li>
+                                    <li><strong>Lesión severa del ocupante:</strong> Consecuencia</li>
+                                    <li><strong>Agotamiento extremo del chofer:</strong> Amenaza</li>
+                                    <li><strong>Uso reglamentario del Airbag:</strong> Barrera Mitigadora</li>
+                                </ul>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else if (id === 6) {
+                const rest = appState.refuerzos.r6.restricciones;
+                wrapper.innerHTML = `
+                    <div class="space-y-3 text-xs">
+                        <p class="text-slate-600">Simulador de Despacho de Viaje: Un operario motorizado solicita autorizar salida nocturna bajo una fuerte lluvia persistente. Marque las condiciones reales:</p>
+                        <div class="bg-slate-100 p-3 rounded-xl border border-slate-200 space-y-2">
+                            <label class="flex items-center space-x-2 cursor-pointer font-semibold">
+                                <input type="checkbox" onchange="toggleRestriccionR6('tormentaCelular')" ${rest.tormentaCelular ? 'checked' : ''} />
+                                <span>El conductor porta traje impermeable reflectivo y casco certificado (EPP de conducta).</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer font-semibold">
+                                <input type="checkbox" onchange="toggleRestriccionR6('gpsDesconectado')" ${rest.gpsDesconectado ? 'checked' : ''} />
+                                <span>Existe directiva interna firmada de "No desplazamiento / Suspensión de ruta activa en tormentas".</span>
+                            </label>
+                        </div>
+                        <div class="flex space-x-2 pt-1">
+                            <button onclick="evaluarR6('aprobado')" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-3 rounded-xl text-xs">Autorizar Viaje (Despacho)</button>
+                            <button onclick="evaluarR6('denegado')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-3 rounded-xl text-xs">Denegar Despacho (Suspender Ruta)</button>
+                        </div>
+                        ${appState.refuerzos.r6.retroalimentado ? `
+                            <div class="p-3.5 bg-slate-100 rounded-xl border border-slate-300 text-[11px]">
+                                ${appState.refuerzos.r6.decision === 'denegado' ? `
+                                    <span class="text-emerald-700 font-extrabold block">✓ Excelente Criterio de Prevención</span>
+                                ` : `
+                                    <span class="text-rose-700 font-extrabold block">⚠ Riesgo Operacional Elevado</span>
+                                `}
+                                <p class="mt-1 text-slate-600">
+                                    En motocicletas, la vulnerabilidad en lluvia nocturna es extrema. Los trajes e impermeables solo reducen la incomodidad, no mejoran la adherencia ni frenan las colisiones. La única barrera real de control crítico es el No desplazamiento.
+                                </p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else if (id === 7) {
+                const sel = appState.refuerzos.r7.opcionCritica;
+                wrapper.innerHTML = `
+                    <div class="space-y-3 text-xs">
+                        <p class="text-slate-600">Durante una auditoría, se detecta que las alarmas de velocidad reportadas por el GPS no son consolidadas ni analizadas debido a que el supervisor está sobrecargado en su puesto. Defina la acción:</p>
+                        <div class="space-y-2 max-w-2xl">
+                            ${[
+                                { key: 'capacitar', label: "Agendar una capacitación urgente al supervisor sobre el uso del software GPS." },
+                                { key: 'bloquear', label: "Rediseñar el canal de control: Reconfigurar la plataforma GPS para que envíe un bloqueo automático del acelerador al vehículo en el siguiente puesto seguro cuando se detecten reincidencias, evitando la dependencia del supervisor." },
+                                { key: 'advertencia', label: "Pedirle que redacte un correo electrónico formal de advertencia de velocidad a los conductores." }
+                            ].map(opc => `
+                                <button onclick="evaluarR7('${opc.key}')" class="w-full text-left p-3 rounded-xl border transition-all ${sel === opc.key ? 'bg-colmena-teal/10 border-colmena-teal text-colmena-teal font-bold' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}">
+                                    <span>${opc.label}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+                        ${appState.refuerzos.r7.retroalimentado ? `
+                            <div class="p-3 bg-slate-100 border border-slate-300 rounded-xl text-[11px] text-slate-600">
+                                ${sel === 'bloquear' ? `
+                                    <span class="text-emerald-700 font-extrabold block">✓ Correcto</span>
+                                    La automatización y bloqueo técnico es la única forma de blindar el control crítico cuando falla el factor de control administrativo.
+                                ` : `
+                                    <span class="text-amber-700 font-extrabold block">⚠ Requiere fortalecimiento</span>
+                                    Las amonestaciones y capacitaciones sobrecargan de gestión al personal, manteniendo el control expuesto a fallos humanos.
+                                `}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+        }
+
+        // FUNCIONES DE CONTROL DE RESPUESTAS DE JUEGOS DE REFUERZO
+
+        function responderR1(index, tipo) {
+            appState.refuerzos.r1.respuestas[index] = tipo;
+            renderRefuerzoInteractive(1);
+        }
+
+        function evaluarR1() {
+            const resp = appState.refuerzos.r1.respuestas;
+            let count = 0;
+            if (resp[0] === 'declarativo') count++;
+            if (resp[1] === 'critico') count++;
+            if (resp[2] === 'declarativo') count++;
+            if (resp[3] === 'declarativo') count++;
+
+            appState.refuerzos.r1.calificacion = count;
+            appState.refuerzos.r1.retroalimentado = true;
+            renderRefuerzoInteractive(1);
+            showNotification("Semáforo evaluado.");
+        }
+
+        function moverFilaR2(index, dir) {
+            const arr = appState.refuerzos.r2.orden;
+            const target = index + dir;
+            if (target < 0 || target >= arr.length) return;
+            const temp = arr[index];
+            arr[index] = arr[target];
+            arr[target] = temp;
+            renderRefuerzoInteractive(2);
+        }
+
+        function evaluarR2() {
+            // El elemento tecnológico/ingeniería "Criterio de no desplazamiento o geocercas" debe quedar en top 1 o 2.
+            const esOk = appState.refuerzos.r2.orden[0].includes('no desplazamiento') || appState.refuerzos.r2.orden[1].includes('no desplazamiento');
+            appState.refuerzos.r2.correcto = esOk;
+            appState.refuerzos.r2.retroalimentado = true;
+            renderRefuerzoInteractive(2);
+            showNotification("Jerarquía evaluada.");
+        }
+
+        function evaluarR3(opc) {
+            appState.refuerzos.r3.casoSeleccionado = opc;
+            appState.refuerzos.r3.retroalimentado = true;
+            appState.refuerzos.r3.explicacion = opc === 'bloqueo' 
+                ? '¡Excelente respuesta técnica! Detener remotamente el viaje o programar pernocta obligatoria del vehículo frena la energía del riesgo antes de cruzar la frontera de un posible siniestro vial.'
+                : 'Peligro: El uso de mensajes o registros mensuales dependen completamente de la voluntad del conductor o de reuniones tardías. Esto desvirtúa el estándar del control crítico.';
+            renderRefuerzoInteractive(3);
+            showNotification("Caso de fatiga resuelto.");
+        }
+
+        function toggleClausulaR4(id) {
+            appState.refuerzos.r4.seleccionadas[id] = !appState.refuerzos.r4.seleccionadas[id];
+            renderRefuerzoInteractive(4);
+        }
+
+        function evaluarR4() {
+            appState.refuerzos.r4.retroalimentado = true;
+            renderRefuerzoInteractive(4);
+            showNotification("Auditoría de redacción completada.");
+        }
+
+        function updateBowTieMatch(elem, val) {
+            appState.refuerzos.r5.elementos[elem] = val;
+        }
+
+        function evaluarR5() {
+            appState.refuerzos.r5.retroalimentado = true;
+            renderRefuerzoInteractive(5);
+            showNotification("Estructura de Bow Tie chequeada.");
+        }
+
+        function toggleRestriccionR6(campo) {
+            appState.refuerzos.r6.restricciones[campo] = !appState.refuerzos.r6.restricciones[campo];
+            renderRefuerzoInteractive(6);
+        }
+
+        function evaluarR6(decision) {
+            appState.refuerzos.r6.decision = decision;
+            appState.refuerzos.r6.retroalimentado = true;
+            renderRefuerzoInteractive(6);
+            showNotification("Despacho evaluado.");
+        }
+
+        function evaluarR7(opc) {
+            appState.refuerzos.r7.opcionCritica = opc;
+            appState.refuerzos.r7.retroalimentado = true;
+            renderRefuerzoInteractive(7);
+            showNotification("Canal de control evaluado.");
+        }
+
+        // SINCRONIZADOR DEL BOW TIE VISUAL EN TIEMPO REAL (Taller 5)
+        function renderBowTieVisualizer() {
+            const container = document.getElementById('bowtie-visual-container');
+            if (!container) return;
+
+            const taller = appState.talleres.taller5;
+
+            container.innerHTML = `
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-center">
+                        
+                        <!-- Amenazas -->
+                        <div class="space-y-2 col-span-1 text-center">
+                            <span class="text-[9px] font-extrabold text-rose-700 uppercase tracking-widest block">Amenazas</span>
+                            ${taller.filas.map(row => `
+                                <div class="bg-rose-50 border border-rose-200 text-rose-950 p-2.5 rounded-xl font-medium text-[10px] min-h-[48px] flex items-center justify-center">
+                                    ${row.c1 || 'Vacio'}
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <!-- Barreras Preventivas -->
+                        <div class="space-y-2 col-span-1 text-center">
+                            <span class="text-[9px] font-extrabold text-colmena-tealdark uppercase tracking-widest block">Barreras Preventivas</span>
+                            ${taller.filas.map(row => `
+                                <div class="bg-colmena-tealsoft border border-colmena-teal/20 text-teal-950 p-2.5 rounded-xl text-[10px] min-h-[48px] flex items-center justify-center">
+                                    ${row.c2 || 'Vacio'}
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <!-- Evento Crítico -->
+                        <div class="bg-amber-100 border-2 border-colmena-gold p-4 rounded-2xl text-center shadow col-span-1">
+                            <span class="text-[8px] font-extrabold text-amber-800 uppercase tracking-widest block mb-1">Evento Superior</span>
+                            <textarea oninput="appState.talleres.taller5.eventoSuperior = this.value; renderBowTieVisualizer()" rows="2" class="w-full text-[10px] font-bold text-slate-800 bg-white border border-amber-300 rounded-lg p-1 text-center focus:outline-none focus:ring-1 focus:ring-colmena-teal resize-none">${taller.eventoSuperior}</textarea>
+                        </div>
+
+                        <!-- Barreras Mitigadoras -->
+                        <div class="space-y-2 col-span-1 text-center">
+                            <span class="text-[9px] font-extrabold text-blue-700 uppercase tracking-widest block">Barreras Mitigadoras</span>
+                            ${taller.filas.map(row => `
+                                <div class="bg-blue-50 border border-blue-200 text-blue-950 p-2.5 rounded-xl text-[10px] min-h-[48px] flex items-center justify-center">
+                                    ${row.c3 || 'Vacio'}
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <!-- Consecuencias -->
+                        <div class="space-y-2 col-span-1 text-center">
+                            <span class="text-[9px] font-extrabold text-purple-700 uppercase tracking-widest block">Consecuencias</span>
+                            ${taller.filas.map(row => `
+                                <div class="bg-purple-50 border border-purple-200 text-purple-950 p-2.5 rounded-xl font-medium text-[10px] min-h-[48px] flex items-center justify-center">
+                                    ${row.c4 || 'Vacio'}
+                                </div>
+                            `).join('')}
+                        </div>
+
+                    </div>
+                </div>
+            `;
+        }
+
+        // ALGORITMO EVALUADOR (HEURÍSTICO LOCAL / GEMINI API CON BACKOFF EXPO)
+        async function auditarTaller(id) {
+            const btn = document.getElementById(`btn-evaluar-${id}`);
+            btn.disabled = true;
+            btn.innerHTML = `<span class="animate-pulse">Auditando taller...</span>`;
+
+            const key = document.getElementById('gemini-key').value || "";
+            const tallerKey = `taller${id}`;
+            const tallerObj = appState.talleres[tallerKey];
+            const refuerzoKey = `r${id}`;
+            const refuerzoObj = appState.refuerzos[refuerzoKey];
+
+            // 1. EVALUACIÓN LOCAL (FALLBACK Y COMPROBACIÓN RÁPIDA)
+            let localScore = 0;
+            let localFortalezas = [];
+            let localMejoras = [];
+
+            // Validar respuesta de transferencia
+            if (tallerObj.respTransferencia && tallerObj.respTransferencia.trim().length > 15) {
+                localScore += 40;
+                localFortalezas.push("Diligenció la pregunta de transferencia asociándolo al contexto organizacional.");
+            } else {
+                localMejoras.push("La pregunta de transferencia contiene un análisis ausente o muy escueto.");
+            }
+
+            // Validar celdas llenas
+            const llenas = tallerObj.filas.filter(f => Object.values(f).every(v => v && v.trim() !== ''));
+            const pct = (llenas.length / tallerObj.filas.length) * 100;
+            localScore += Math.round(pct * 0.4);
+
+            if (pct === 100) {
+                localFortalezas.push("La matriz técnica tiene el total de sus campos cubiertos.");
+            } else {
+                localMejoras.push("Tiene filas o celdas incompletas en la planilla de trabajo.");
+            }
+
+            // Validar si hizo el refuerzo interactivo
+            if (refuerzoObj && (refuerzoObj.retroalimentado || refuerzoObj.correcto)) {
+                localScore += 20;
+                localFortalezas.push("El estudiante completó la simulación evaluativa interactiva de refuerzo.");
+            } else {
+                localMejoras.push("Se recomienda realizar la simulación interactiva antes de presentar la auditoría.");
+            }
+
+            // Análisis metodológico puntual
+            if (id === 1) {
+                const tieneGps = tallerObj.filas.some(f => f.c1.toLowerCase().includes('gps') || f.c1.toLowerCase().includes('telemetría'));
+                if (tieneGps) localFortalezas.push("Reconoce la telemetría como una herramienta tecnológica útil para alertar en tiempo real.");
+            } else if (id === 4) {
+                const restrictivo = tallerObj.filas.some(f => f.c5.toLowerCase().includes('bloquear') || f.c5.toLowerCase().includes('cancelar') || f.c5.toLowerCase().includes('parar'));
+                if (restrictivo) {
+                    localFortalezas.push("Plantea decisiones restrictivas y duras ante la falla evidente del control vial.");
+                } else {
+                    localMejoras.push("Ante fallas de controles, proponga decisiones duras de detención, no solo advertencias.");
+                }
+            }
+
+            const mockResult = {
+                score: Math.min(localScore, 100),
+                nivel: localScore >= 85 ? 'Nivel de Control Avanzado' : localScore >= 60 ? 'Nivel Operativo Medio' : 'Nivel Básico de Control',
+                color: localScore >= 85 ? 'colmena-teal' : localScore >= 60 ? 'amber-600' : 'rose-600',
+                fortalezas: localFortalezas,
+                observaciones: localMejoras,
+                consejoIa: "El estándar de ARL Colmena promueve el diseño de barreras duras (controles automáticos) para salvaguardar vidas frente a errores del factor humano en las rutas.",
+                diagnosticoIa: "Auditoría local finalizada con éxito. Se detectaron prácticas adecuadas en el diligenciamiento técnico de matrices."
+            };
+
+            // 2. LLAMADA API CON GEMINI SI HAY CLAVE DE USUARIO
+            if (key.trim()) {
+                const systemPrompt = `Eres un auditor experto de seguridad vial de ARL Colmena y especialista en la norma ISO 39001. Tu objetivo es evaluar el taller de seguridad vial del estudiante, usando un tono constructivo y profesional, emitiendo la respuesta en formato JSON estructurado.`;
+                const userPrompt = `
+                    Taller: ${tallerObj.titulo}
+                    Propósito: ${tallerObj.proposito}
+                    Empresa del Estudiante: ${appState.student.org || "No especificada"}
+                    Cargo del Estudiante: ${appState.student.role || "No especificado"}
+                    Planilla de Trabajo del Estudiante: ${JSON.stringify(tallerObj.filas)}
+                    Pregunta de Transferencia: ${tallerObj.pregTransferencia}
+                    Respuesta del Estudiante: ${tallerObj.respTransferencia}
+                    Actividad de Evaluación Interactiva de Refuerzo: ${JSON.stringify(refuerzoObj)}
+
+                    Genera un análisis JSON con estos campos exactamente:
+                    {
+                        "score": (número 1 a 100),
+                        "diagnostico": "análisis ejecutivo de sus respuestas",
+                        "puntos_fuertes": ["punto 1", "punto 2"],
+                        "oportunidades_mejora": ["oportunidad 1", "oportunidad 2"],
+                        "consejo_colmena": "consejo metodológico de seguridad vial con el tono institucional de Colmena Seguros"
+                    }
+                `;
+
+                // Reintentos con Backoff Exponencial
+                const callGemini = async (retries = 5, delay = 1000) => {
+                    try {
+                        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${key}`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: userPrompt }] }],
+                                systemInstruction: { parts: [{ text: systemPrompt }] },
+                                generationConfig: {
+                                    responseMimeType: "application/json",
+                                    responseSchema: {
+                                        type: "OBJECT",
+                                        properties: {
+                                            score: { type: "INTEGER" },
+                                            diagnostico: { type: "STRING" },
+                                            puntos_fuertes: { type: "ARRAY", items: { type: "STRING" } },
+                                            oportunidades_mejora: { type: "ARRAY", items: { type: "STRING" } },
+                                            consejo_colmena: { type: "STRING" }
+                                        },
+                                        required: ["score", "diagnostico", "puntos_fuertes", "oportunidades_mejora", "consejo_colmena"]
+                                    }
+                                }
+                            })
+                        });
+
+                        if (!response.ok) throw new Error("Status " + response.status);
+                        const resData = await response.json();
+                        return JSON.parse(resData.candidates[0].content.parts[0].text);
+                    } catch (err) {
+                        if (retries > 0) {
+                            await new Promise(r => setTimeout(r, delay));
+                            return callGemini(retries - 1, delay * 2);
+                        } else {
+                            throw err;
+                        }
+                    }
+                };
+
+                try {
+                    const iaRes = await callGemini();
+                    appState.feedbacks[tallerKey] = {
+                        score: iaRes.score,
+                        nivel: iaRes.score >= 85 ? 'Nivel Avanzado' : iaRes.score >= 60 ? 'Nivel Intermedio' : 'Nivel Básico',
+                        color: iaRes.score >= 85 ? 'colmena-teal' : iaRes.score >= 60 ? 'amber-600' : 'rose-600',
+                        fortalezas: iaRes.puntos_fuertes,
+                        observaciones: iaRes.oportunidades_mejora,
+                        consejoIa: iaRes.consejo_colmena,
+                        diagnosticoIa: iaRes.diagnostico
+                    };
+                    tallerObj.score = iaRes.score;
+                } catch (e) {
+                    // Fallback local ante fallo de conexión
+                    appState.feedbacks[tallerKey] = mockResult;
+                    tallerObj.score = mockResult.score;
+                    showNotification("La IA no está disponible. Generando reporte local.");
+                }
+            } else {
+                // Heurística local de Colmena
+                appState.feedbacks[tallerKey] = mockResult;
+                tallerObj.score = mockResult.score;
+            }
+
+            tallerObj.completado = true;
+            btn.disabled = false;
+            btn.innerHTML = `<span>Calificar y Auditar Taller ➜</span>`;
+            
+            renderSidebar();
+            renderFeedbackPanel(tallerKey);
+            showNotification(`Taller ${id} evaluado exitosamente.`);
+        }
+
+        // MOSTRAR PANEL DE RETROALIMENTACIÓN DEBAJO DEL TALLER
+        function renderFeedbackPanel(tallerKey) {
+            const panel = document.getElementById(`feedback-panel-${tallerKey}`);
+            if (!panel) return;
+
+            const data = appState.feedbacks[tallerKey];
+            panel.classList.remove('hidden');
+
+            panel.innerHTML = `
+                <div class="bg-white rounded-3xl border-l-8 border-colmena-teal p-6 shadow-md space-y-4 mt-6">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <h3 class="text-sm font-extrabold text-slate-900 flex items-center">
+                            🛡️ Reporte de Auditoría de Control: ${appState.talleres[tallerKey].titulo}
+                        </h3>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-slate-500">Puntaje de Fuerza:</span>
+                            <span class="text-sm font-extrabold text-white bg-colmena-teal px-3 py-1 rounded-full">
+                                ${data.score} / 100
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                        <p class="text-xs text-slate-700 italic"><strong class="text-slate-900 not-italic block">Diagnóstico Técnico:</strong> ${data.diagnosticoIa}</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <h4 class="text-xs font-bold text-emerald-800 flex items-center">
+                                <span class="mr-1">✓</span> Puntos Fuertes Identificados
+                            </h4>
+                            <ul class="space-y-1.5">
+                                ${data.fortalezas.map(f => `<li class="text-xs text-slate-600 pl-4 relative before:content-['✓'] before:absolute before:left-0 before:text-emerald-600">${f}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="space-y-2">
+                            <h4 class="text-xs font-bold text-amber-800 flex items-center">
+                                <span class="mr-1">⚠</span> Oportunidades de Fortalecimiento
+                            </h4>
+                            <ul class="space-y-1.5">
+                                ${data.observaciones.map(o => `<li class="text-xs text-slate-600 pl-4 relative before:content-['•'] before:absolute before:left-0 before:text-amber-500">${o}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-colmena-tealsoft border border-colmena-teal/20 p-4 rounded-2xl mt-2">
+                        <h5 class="text-xs font-bold text-colmena-tealdark flex items-center">
+                            🐝 El Consejo de la Colmena:
+                        </h5>
+                        <p class="text-[11px] text-slate-700 mt-1 leading-relaxed">${data.consejoIa}</p>
+                    </div>
+                </div>
+            `;
+            panel.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // RENDER DE PANTALLA REPORTE Y CERTIFICADO FINAL
+        function renderReportScreen(container) {
+            container.innerHTML = `
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 space-y-6" id="printable-report-card">
+                    
+                    <!-- ENCABEZADO CERTIFICADO -->
+                    <div class="text-center border-b border-slate-100 pb-5">
+                        <div class="w-16 h-16 bg-colmena-teal/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <span class="text-colmena-teal text-3xl">🏅</span>
+                        </div>
+                        <h2 class="text-2xl font-extrabold text-colmena-navy">Informe Técnico de Prevención Vial</h2>
+                        <p class="text-slate-500 text-xs mt-1">Consolidado Metodológico de Talleres de Control Crítico - ARL Colmena</p>
+                    </div>
+
+                    <!-- DATOS ESTUDIANTE -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200/60">
+                        <div>
+                            <span class="text-[9px] text-slate-400 font-bold uppercase block">Nombre Completo</span>
+                            <span class="text-xs font-bold text-slate-800" id="rep-name">Cargando...</span>
+                        </div>
+                        <div>
+                            <span class="text-[9px] text-slate-400 font-bold uppercase block">Documento de Identidad</span>
+                            <span class="text-xs font-bold text-slate-800" id="rep-id">Cargando...</span>
+                        </div>
+                        <div>
+                            <span class="text-[9px] text-slate-400 font-bold uppercase block">Empresa / Organización</span>
+                            <span class="text-xs font-bold text-slate-800" id="rep-org">Cargando...</span>
+                        </div>
+                        <div>
+                            <span class="text-[9px] text-slate-400 font-bold uppercase block">Cargo Analista</span>
+                            <span class="text-xs font-bold text-slate-800" id="rep-role">Cargando...</span>
+                        </div>
+                    </div>
+
+                    <!-- LISTADO DE PROGRESO DE TALLERES -->
+                    <div class="space-y-4">
+                        <h3 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Talleres Realizados y Evaluaciones</h3>
+                        <div class="space-y-3" id="rep-workshops-list">
+                            <!-- Inyectado por JS -->
+                        </div>
+                    </div>
+
+                    <!-- FIRMAS / VERIFICACIÓN (PRINT ONLY) -->
+                    <div class="pt-8 mt-8 border-t border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-6 text-center text-xs">
+                        <div class="space-y-1">
+                            <div class="border-b border-slate-300 w-48 mx-auto pb-4">
+                                <span class="font-bold text-colmena-teal">EVALUACIÓN AUTOMÁTICA</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400">Verificado por Motor IA Colmena</span>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="border-b border-slate-300 w-48 mx-auto pb-4">
+                                <span class="font-bold text-slate-800" id="firm-student-name">...</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400">Firma del Analista Técnico</span>
+                        </div>
+                    </div>
+
+                    <!-- CONTROLES EXPORTACIÓN -->
+                    <div class="pt-5 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4 no-print">
+                        <p class="text-[10px] text-slate-500 max-w-md text-center sm:text-left">
+                            Este reporte representa un insumo técnico de auditoría. Use el botón de abajo para imprimir o exportar a formato PDF para su archivo de Plan de Seguridad Vial (PESV).
+                        </p>
+                        <div class="flex space-x-2 w-full sm:w-auto">
+                            <button onclick="copyDataToClipboard()" class="flex-1 sm:flex-none bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs px-4 py-3 rounded-xl transition-all">
+                                Copiar al Portapapeles
+                            </button>
+                            <button onclick="window.print()" class="flex-1 sm:flex-none bg-colmena-teal hover:bg-colmena-tealdark text-white font-bold text-xs px-5 py-3 rounded-xl transition-all shadow-md">
+                                Imprimir / Guardar PDF
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            `;
+            renderReport();
+        }
+
+        function renderReport() {
+            const repName = document.getElementById('rep-name');
+            const repId = document.getElementById('rep-id');
+            const repOrg = document.getElementById('rep-org');
+            const repRole = document.getElementById('rep-role');
+            const firmStudentName = document.getElementById('firm-student-name');
+
+            if (repName) repName.textContent = appState.student.name || "(No Configurado)";
+            if (repId) repId.textContent = appState.student.id || "(No Configurado)";
+            if (repOrg) repOrg.textContent = appState.student.org || "(No Configurado)";
+            if (repRole) repRole.textContent = appState.student.role || "(No Configurado)";
+            if (firmStudentName) firmStudentName.textContent = appState.student.name || "Firma del Estudiante";
+
+            const listContainer = document.getElementById('rep-workshops-list');
+            if (!listContainer) return;
+
+            let html = '';
+            Object.keys(appState.talleres).forEach(key => {
+                const t = appState.talleres[key];
+                const feedback = appState.feedbacks[key];
+
+                html += `
+                    <div class="border border-slate-200 rounded-2xl overflow-hidden text-xs bg-white">
+                        <div class="bg-slate-50 px-4 py-2.5 flex items-center justify-between font-bold text-slate-800 border-b border-slate-100 flex-wrap gap-2">
+                            <span>Taller ${t.id}: ${t.titulo}</span>
+                            <div>
+                                ${t.completado ? `
+                                    <span class="bg-colmena-teal/10 text-colmena-teal px-2.5 py-0.5 rounded-full text-[10px] border border-colmena-teal/20">
+                                        Calificado: ${feedback?.score || 0} / 100
+                                    </span>
+                                ` : `
+                                    <span class="bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full text-[10px]">Sin Auditar</span>
+                                `}
+                            </div>
+                        </div>
+                        <div class="p-4 space-y-3">
+                            <div>
+                                <span class="font-bold text-colmena-teal block mb-1">Criterio de Transferencia Declarado:</span>
+                                <p class="text-slate-600 italic">"${t.respTransferencia || "Falta completar la respuesta a la pregunta de transferencia de este módulo."}"</p>
+                            </div>
+                            <div>
+                                <span class="font-bold text-slate-800 block mb-1">Estructura de Controles Registrada:</span>
+                                <div class="flex flex-wrap gap-1.5">
+                                    ${t.filas.map(row => `
+                                        <span class="bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg text-[9px] text-slate-700 font-medium">
+                                            🔹 ${row.c1 || 'Registro Personalizado'}
+                                        </span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            listContainer.innerHTML = html;
+        }
+
+        // COPIAR AL PORTAPAPELES (Usando compatibilidad para iframe)
+        function copyDataToClipboard() {
+            const tempTextarea = document.createElement("textarea");
+            document.body.appendChild(tempTextarea);
+
+            let content = `INFORME INTEGRAL DE SEGURIDAD VIAL - ARL COLMENA\n\n`;
+            content += `ESTUDIANTE: ${appState.student.name || "No especificado"}\n`;
+            content += `IDENTIFICACIÓN: ${appState.student.id || "No especificado"}\n`;
+            content += `EMPRESA: ${appState.student.org || "No especificada"}\n`;
+            content += `CARGO: ${appState.student.role || "No especificado"}\n\n`;
+
+            Object.keys(appState.talleres).forEach(key => {
+                const t = appState.talleres[key];
+                content += `--- TALLER ${t.id}: ${t.titulo} ---\n`;
+                content += `Pregunta de Transferencia: ${t.respTransferencia || "Sin responder"}\n\n`;
+            });
+
+            tempTextarea.value = content;
+            tempTextarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextarea);
+
+            showNotification("¡Informe copiado al portapapeles con éxito!");
+        }
+    </script>
+</body>
+</html>
