@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Riesgo de Flota Vehicular Laboral</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --accent-color: #f59e0b;
+            --danger-color: #dc2626;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --light-bg: #f3f4f6;
+            --dark-text: #1f2937;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-text);
+            background-color: #ffffff;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        nav {
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 1rem 0;
+        }
+
+        nav li {
+            margin: 0 1rem;
+        }
+
+        nav a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        nav a:hover {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+            background: var(--light-bg);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #6b7280;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        section {
+            padding: 3rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        section h2 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--secondary-color);
+        }
+
+        section h3 {
+            color: var(--secondary-color);
+            font-size: 1.5rem;
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .card.warning {
+            border-left-color: var(--warning-color);
+            background: #fef3c7;
+        }
+
+        .card.danger {
+            border-left-color: var(--danger-color);
+            background: #fee2e2;
+        }
+
+        .card.success {
+            border-left-color: var(--success-color);
+            background: #d1fae5;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background: var(--light-bg);
+        }
+
+        .simulator {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 2px solid var(--secondary-color);
+        }
+
+        .simulator h3 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-text);
+        }
+
+        select, input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        .btn {
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 0.5rem;
+        }
+
+        .btn:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+        }
+
+        .result {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-left: 4px solid var(--success-color);
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+
+        .badge-low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-high {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+
+        .badge-critical {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .checklist-item {
+            background: white;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 5px;
+            border-left: 3px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .checklist-item:hover {
+            border-left-color: var(--secondary-color);
+            background: var(--light-bg);
+        }
+
+        .checklist-item.checked {
+            border-left-color: var(--success-color);
+            background: #d1fae5;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            margin-right: 0.5rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .stat-label {
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+
+        footer {
+            background: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .tab-container {
+            margin: 2rem 0;
+        }
+
+        .tab-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tab-btn {
+            background: var(--light-bg);
+            border: 2px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+            }
+
+            nav li {
+                margin: 0.5rem 0;
+            }
+
+            table {
+                font-size: 0.875rem;
+            }
+
+            th, td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🚗 Análisis de Riesgo de Flota Vehicular Laboral</h1>
+            <p>Modelo Técnico Avanzado para la Gestión de Seguridad Vial</p>
+        </div>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#inicio">Inicio</a></li>
+            <li><a href="#modelo">Modelo 8 Capas</a></li>
+            <li><a href="#simulador">Simulador</a></li>
+            <li><a href="#criticidad">Criticidad</a></li>
+            <li><a href="#checklist">Checklist</a></li>
+            <li><a href="#casos">Casos Prácticos</a></li>
+        </ul>
+    </nav>
+
+    <div class="hero" id="inicio">
+        <div class="container">
+            <h1>Gestión Avanzada de Flota Vehicular</h1>
+            <p>Una flota laboral segura no es la que tiene todos los papeles al día; es la que demuestra que sus vehículos funcionan como barreras móviles capaces de evitar, reducir o mitigar lesiones graves y fatalidades.</p>
+        </div>
+    </div>
+
+    <section id="modelo">
+        <div class="container">
+            <h2>📋 Modelo de Ocho Capas para Análisis Avanzado</h2>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>1. Alcance y Gobernanza</h3>
+                    <p>La flota laboral incluye todo vehículo que participa en una actividad por causa o con ocasión del trabajo: propio, alquilado, contratado, tercerizado, ocasional o de apoyo.</p>
+                    <span class="badge badge-medium">Control Directo</span>
+                    <span class="badge badge-low">Control por Influencia</span>
+                </div>
+
+                <div class="card">
+                    <h3>2. Compatibilidad Vehículo-Tarea-Ruta-Carga</h3>
+                    <p>Un vehículo puede estar en buen estado y aun así ser inadecuado para la operación. La disponibilidad no es criterio de seguridad.</p>
+                    <span class="badge badge-high">Criterio Crítico</span>
+                </div>
+
+                <div class="card">
+                    <h3>3. Seguridad Activa, Pasiva y Post-Evento</h3>
+                    <p>Seguridad activa evita el siniestro, seguridad pasiva reduce el daño, seguridad post-evento mejora la respuesta.</p>
+                    <span class="badge badge-low">Sistema Seguro</span>
+                </div>
+
+                <div class="card">
+                    <h3>4. Mantenimiento y Defectos Críticos</h3>
+                    <p>El mantenimiento es una barrera crítica. Todo sistema debe definir defectos que impiden iniciar o continuar la operación.</p>
+                    <span class="badge badge-critical">No Salida</span>
+                </div>
+
+                <div class="card">
+                    <h3>5. Inspección Preoperacional Avanzada</h3>
+                    <p>Debe ser breve, crítica, trazable y orientada a decisiones. No basta reportar falla; debe existir reparación y verificación.</p>
+                    <span class="badge badge-medium">Barrera Diaria</span>
+                </div>
+
+                <div class="card">
+                    <h3>6. Control de Velocidad y Telemetría</h3>
+                    <p>La velocidad es el principal regulador de energía. La telemetría debe leer patrones y generar decisiones operativas.</p>
+                    <span class="badge badge-high">Control Crítico</span>
+                </div>
+
+                <div class="card">
+                    <h3>7. Fatiga y Diseño Operacional</h3>
+                    <p>La flota puede producir fatiga cuando la disponibilidad es insuficiente, los tiempos se comprimen o los retornos se extienden.</p>
+                    <span class="badge badge-medium">Factor Humano</span>
+                </div>
+
+                <div class="card">
+                    <h3>8. Distracción y Tecnología Embarcada</h3>
+                    <p>Una cabina laboral segura reduce demandas simultáneas. La decisión segura debe estar diseñada antes de que el conductor elija.</p>
+                    <span class="badge badge-low">Diseño Seguro</span>
+                </div>
+            </div>
+
+            <div class="card warning">
+                <h3>⚠️ Advertencia Técnica</h3>
+                <p>Un PESV puede estar documentalmente completo y aun así tener una flota insegura si no demuestra aptitud técnica, compatibilidad operacional, criterios de no salida, trazabilidad de defectos, verificación de controles y decisiones basadas en datos.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="simulador">
+        <div class="container">
+            <h2>🎯 Simulador de Identificación de Peligros</h2>
+            
+            <div class="simulator">
+                <h3>Caso Práctico: Evaluación de Vehículo en Operación</h3>
+                <p>Seleccione las características del vehículo y la operación para identificar peligros y valorar riesgos:</p>
+
+                <div class="form-group">
+                    <label>Tipo de Vehículo:</label>
+                    <select id="tipoVehiculo">
+                        <option value="propio">Vehículo Propio</option>
+                        <option value="alquilado">Vehículo Alquilado</option>
+                        <option value="contratista">Vehículo de Contratista</option>
+                        <option value="motocicleta">Motocicleta</option>
+                        <option value="ocasional">Vehículo Ocasional</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Ruta:</label>
+                    <select id="tipoRuta">
+                        <option value="urbana">Urbana (baja velocidad)</option>
+                        <option value="nacional">Vía Nacional (alta velocidad)</option>
+                        <option value="rural">Rural (condiciones variables)</option>
+                        <option value="patio">Patio Interno (peatones cercanos)</option>
+                        <option value="montana">Montaña (pendientes pronunciadas)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Carga:</label>
+                    <select id="tipoCarga">
+                        <option value="ninguna">Sin carga (solo conductor)</option>
+                        <option value="liviana">Carga liviana (documentos, equipos)</option>
+                        <option value="pesada">Carga pesada (herramientas, materiales)</option>
+                        <option value="peligrosa">Carga peligrosa</option>
+                        <option value="pasajeros">Transporte de pasajeros</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Condiciones Climáticas:</label>
+                    <select id="clima">
+                        <option value="normal">Normales (día, seco)</option>
+                        <option value="lluvia">Lluvia</option>
+                        <option value="niebla">Niebla / Baja visibilidad</option>
+                        <option value="noche">Operación nocturna</option>
+                        <option value="extremo">Condiciones extremas</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Estado del Mantenimiento:</label>
+                    <select id="mantenimiento">
+                        <option value="al-dia">Al día (último mantenimiento < 30 días)</option>
+                        <option value="proximo">Próximo a vencer (30-60 días)</option>
+                        <option value="vencido">Vencido (> 60 días)</option>
+                        <option value="defectos">Con defectos reportados</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Tecnología Disponible:</label>
+                    <select id="tecnologia">
+                        <option value="basica">Básica (sin ADAS, sin telemetría)</option>
+                        <option value="gps">Con GPS/Telemetría</option>
+                        <option value="adas">Con ADAS (asistencia avanzada)</option>
+                        <option value="completa">Completa (ADAS + Telemetría + Cámaras)</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="evaluarRiesgo()">Evaluar Riesgo</button>
+                <button class="btn btn-danger" onclick="limpiarSimulador()">Limpiar</button>
+
+                <div id="resultadoRiesgo" class="result">
+                    <h3>📊 Resultado del Análisis</h3>
+                    <div id="contenidoResultado"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="criticidad">
+        <div class="container">
+            <h2>📈 Calculadora de Matriz de Criticidad</h2>
+            
+            <div class="simulator">
+                <h3>Evaluación de Criticidad por Vehículo</h3>
+                <p>Puntúe cada factor del 1 al 3 para determinar el nivel de criticidad:</p>
+
+                <div class="grid">
+                    <div class="form-group">
+                        <label>Energía en movimiento (1-3):</label>
+                        <select id="energia">
+                            <option value="1">1 - Baja (urbano, baja velocidad)</option>
+                            <option value="2">2 - Media (nacional, velocidad moderada)</option>
+                            <option value="3">3 - Alta (carga pesada, alta velocidad, montaña)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Vulnerabilidad de usuarios (1-3):</label>
+                        <select id="vulnerabilidad">
+                            <option value="1">1 - Baja (solo ocupantes del vehículo)</option>
+                            <option value="2">2 - Media (interacción con otros vehículos)</option>
+                            <option value="3">3 - Alta (peatones, ciclistas, motociclistas)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Exposición (1-3):</label>
+                        <select id="exposicion">
+                            <option value="1">1 - Baja (uso ocasional, rutas cortas)</option>
+                            <option value="2">2 - Media (uso regular, rutas medias)</option>
+                            <option value="3">3 - Alta (uso intensivo, rutas largas, nocturno)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Falla técnica potencial (1-3):</label>
+                        <select id="falla">
+                            <option value="1">1 - Baja (mantenimiento al día, tecnología completa)</option>
+                            <option value="2">2 - Media (mantenimiento próximo, tecnología básica)</option>
+                            <option value="3">3 - Alta (mantenimiento vencido, sin tecnología)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Controles disponibles (1-3):</label>
+                        <select id="controles">
+                            <option value="1">1 - Débiles (sin verificación, sin respuesta)</option>
+                            <option value="2">2 - Moderados (verificación parcial, respuesta lenta)</option>
+                            <option value="3">3 - Fuertes (verificación completa, respuesta inmediata)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="calcularCriticidad()">Calcular Criticidad</button>
+
+                <div id="resultadoCriticidad" class="result">
+                    <h3>🎯 Nivel de Criticidad</h3>
+                    <div id="contenidoCriticidad"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Escala de Decisión</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Puntaje Total</th>
+                            <th>Nivel</th>
+                            <th>Decisión</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>5 - 8</td>
+                            <td><span class="badge badge-low">Bajo</span></td>
+                            <td>Mantener controles estándar y seguimiento periódico</td>
+                        </tr>
+                        <tr>
+                            <td>9 - 11</td>
+                            <td><span class="badge badge-medium">Medio</span></td>
+                            <td>Revisar compatibilidad, mantenimiento y controles específicos</td>
+                        </tr>
+                        <tr>
+                            <td>12 - 14</td>
+                            <td><span class="badge badge-high">Alto</span></td>
+                            <td>Definir controles críticos, verificación frecuente y autorización operacional</td>
+                        </tr>
+                        <tr>
+                            <td>15</td>
+                            <td><span class="badge badge-critical">Crítico</span></td>
+                            <td>Bloqueo, rediseño, sustitución o aprobación directiva con controles robustos</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section id="checklist">
+        <div class="container">
+            <h2>✅ Checklist de Auditoría Avanzada</h2>
+            
+            <div class="card">
+                <p>Haga clic en cada elemento para marcarlo como verificado. El progreso se guarda automáticamente.</p>
+            </div>
+
+            <div id="checklistContainer">
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox"> El inventario incluye flota propia, alquilada, tercerizada, motocicletas y vehículos ocasionales
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Cada vehículo tiene uso laboral, ruta y tarea caracterizados
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Existe matriz de criticidad por vehículo o clase de vehículo
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Los defectos críticos de no salida están definidos y aplicados
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox"> La inspección preoperacional genera decisiones y cierre trazable
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox"> El mantenimiento considera uso severo, ruta, carga y kilometraje real
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox"> La telemetría tiene umbrales, responsable y acciones cerradas
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Se controla compatibilidad vehículo-tarea-ruta-carga
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox"> La flota contratista tiene estándar verificable y derecho de bloqueo
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Existen indicadores adelantados de flota y controles críticos
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Se investigan incidentes, fallas y casi eventos de flota
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox"> Las decisiones de compra/renting incorporan seguridad activa y pasiva
+                </div>
+            </div>
+
+            <div class="stat-box">
+                <div class="stat-number" id="progresoChecklist">0%</div>
+                <div class="stat-label">Progreso de Auditoría</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="casos">
+        <div class="container">
+            <h2>📚 Casos Prácticos de Simulación</h2>
+
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="mostrarCaso(1)">Caso 1: Motocicleta Urbana</button>
+                    <button class="tab-btn" onclick="mostrarCaso(2)">Caso 2: Camión de Carga</button>
+                    <button class="tab-btn" onclick="mostrarCaso(3)">Caso 3: Vehículo de Supervisión</button>
+                    <button class="tab-btn" onclick="mostrarCaso(4)">Caso 4: Contratista Externo</button>
+                </div>
+
+                <div id="caso1" class="tab-content active">
+                    <div class="card">
+                        <h3>🏍️ Caso 1: Motocicleta de Mensajería Urbana</h3>
+                        <p><strong>Contexto:</strong> Motocicleta propia usada para mensajería en zona urbana, 8 horas diarias, 5 días a la semana.</p>
+                        
+                        <h4>Peligros Identificados:</h4>
+                        <ul>
+                            <li>Alta vulnerabilidad del conductor (sin protección estructural)</li>
+                            <li>Exposición prolongada a tráfico urbano</li>
+                            <li>Presión por tiempos de entrega</li>
+                            <li>Interacción con peatones y vehículos pesados</li>
+                            <li>Exposición a condiciones climáticas</li>
+                        </ul>
+
+                        <h4>Valoración del Riesgo:</h4>
+                        <table>
+                            <tr>
+                                <th>Factor</th>
+                                <th>Valoración</th>
+                                <th>Justificación</th>
+                            </tr>
+                            <tr>
+                                <td>Probabilidad</td>
+                                <td><span class="badge badge-high">Alta</span></td>
+                                <td>Exposición diaria, tráfico denso, presión de tiempos</td>
+                            </tr>
+                            <tr>
+                                <td>Severidad</td>
+                                <td><span class="badge badge-critical">Muy Alta</span></td>
+                                <td>Lesiones graves o fatales en caso de siniestro</td>
+                            </tr>
+                            <tr>
+                                <td>Nivel de Riesgo</td>
+                                <td><span class="badge badge-critical">Crítico</span></td>
+                                <td>Requiere controles especiales o eliminación</td>
+                            </tr>
+                        </table>
+
+                        <h4>Controles Críticos Requeridos:</h4>
+                        <ul>
+                            <li>Evaluación de eliminación o sustitución por modo más seguro</li>
+                            <li>Casco certificado y EPP completo obligatorio</li>
+                            <li>Límites de velocidad por ruta</li>
+                            <li>Restricción por condiciones climáticas</li>
+                            <li>Control de fatiga y tiempos de conducción</li>
+                            <li>Telemetría con alertas en tiempo real</li>
+                        </ul>
+
+                        <div class="card warning">
+                            <strong>⚠️ Criterio de Excelencia:</strong> Antes de fortalecer el casco, pregunte si la organización puede eliminar el desplazamiento en moto. La jerarquía de controles aplica también a la movilidad laboral.
+                        </div>
+                    </div>
+                </div>
+
+                <div id="caso2" class="tab-content">
+                    <div class="card">
+                        <h3>🚛 Caso 2: Camión de Carga en Ruta Nacional</h3>
+                        <p><strong>Contexto:</strong> Camión propio transportando materiales de construcción en ruta nacional, viajes de 6-8 horas, carga de 15 toneladas.</p>
+                        
+                        <h4>Peligros Identificados:</h4>
+                        <ul>
+                            <li>Alta energía en movimiento (masa × velocidad)</li>
+                            <li>Fatiga del conductor por jornadas extensas</li>
+                            <li>Posible sobrecarga o mala distribución</li>
+                            <li>Distancias de frenado aumentadas</li>
+                            <li>Puntos ciegos y maniobras complejas</li>
+                            <li>Interacción con usuarios vulnerables en paradas</li>
+                        </ul>
+
+                        <h4>Valoración del Riesgo:</h4>
+                        <table>
+                            <tr>
+                                <th>Factor</th>
+                                <th>Valoración</th>
+                                <th>Justificación</th>
+                            </tr>
+                            <tr>
+                                <td>Probabilidad</td>
+                                <td><span class="badge badge-medium">Media</span></td>
+                                <td>Conducción profesional, pero fatiga y presión</td>
+                            </tr>
+                            <tr>
+                                <td>Severidad</td>
+                                <td><span class="badge badge-critical">Muy Alta</span></td>
+                                <td>Múltiples víctimas potenciales, daños catastróficos</td>
+                            </tr>
+                            <tr>
+                                <td>Nivel de Riesgo</td>
+                                <td><span class="badge badge-high">Alto</span></td>
+                                <td>Requiere controles críticos rigurosos</td>
+                            </tr>
+                        </table>
+
+                        <h4>Controles Críticos Requeridos:</h4>
+                        <ul>
+                            <li>Verificación de carga (peso, distribución, sujeción)</li>
+                            <li>Inspección preoperacional exhaustiva (frenos, llantas, luces)</li>
+                            <li>Control de velocidad con telemetría y geocercas</li>
+                            <li>Programación de paradas y control de fatiga</li>
+                            <li>Mantenimiento preventivo riguroso</li>
+                            <li>Capacitación en conducción defensiva y carga</li>
+                        </ul>
+
+                        <div class="card danger">
+                            <strong>🚨 Defectos Críticos de No Salida:</strong> Frenos con pérdida de presión, llantas con banda insuficiente, luces defectuosas, carga mal asegurada, cinturón dañado.
+                        </div>
+                    </div>
+                </div>
+
+                <div id="caso3" class="tab-content">
+                    <div class="card">
+                        <h3>🚙 Caso 3: Camioneta de Supervisión en Zona Rural</h3>
+                        <p><strong>Contexto:</strong> Camioneta propia para supervisión de obras en zona rural, caminos destapados, viajes de 3-4 horas, a veces en solitario.</p>
+                        
+                        <h4>Peligros Identificados:</h4>
+                        <ul>
+                            <li>Superficie irregular y condiciones variables</li>
+                            <li>Aislamiento y dificultad de respuesta post-evento</li>
+                            <li>Presión por cumplir agenda de visitas</li>
+                            <li>Posible operación nocturna o con baja visibilidad</li>
+                            <li>Desgaste acelerado del vehículo</li>
+                        </ul>
+
+                        <h4>Valoración del Riesgo:</h4>
+                        <table>
+                            <tr>
+                                <th>Factor</th>
+                                <th>Valoración</th>
+                                <th>Justificación</th>
+                            </tr>
+                            <tr>
+                                <td>Probabilidad</td>
+                                <td><span class="badge badge-medium">Media</span></td>
+                                <td>Condiciones de vía, aislamiento, presión operativa</td>
+                            </tr>
+                            <tr>
+                                <td>Severidad</td>
+                                <td><span class="badge badge-high">Alta</span></td>
+                                <td>Volcamiento, salida de vía, dificultad de rescate</td>
+                            </tr>
+                            <tr>
+                                <td>Nivel de Riesgo</td>
+                                <td><span class="badge badge-high">Alto</span></td>
+                                <td>Requiere controles específicos por ruta</td>
+                            </tr>
+                        </table>
+
+                        <h4>Controles Críticos Requeridos:</h4>
+                        <ul>
+                            <li>Vehículo 4x4 con suspensión reforzada</li>
+                            <li>Kit de emergencia completo y comunicación satelital</li>
+                            <li>Protocolo de reporte de posición y horarios</li>
+                            <li>Restricción de operación nocturna en rutas críticas</li>
+                            <li>Mantenimiento preventivo intensivo por uso severo</li>
+                            <li>Capacitación en conducción off-road</li>
+                        </ul>
+
+                        <div class="card success">
+                            <strong>✅ Buena Práctica:</strong> Implementar sistema de "check-in" cada 2 horas y protocolo de "vehículo no reportado" con activación de búsqueda.
+                        </div>
+                    </div>
+                </div>
+
+                <div id="caso4" class="tab-content">
+                    <div class="card">
+                        <h3>🚐 Caso 4: Vehículo de Contratista en Instalaciones</h3>
+                        <p><strong>Contexto:</strong> Camioneta de contratista que ingresa a instalaciones de la empresa para mantenimiento, interactúa con peatones y otros vehículos.</p>
+                        
+                        <h4>Peligros Identificados:</h4>
+                        <ul>
+                            <li>Control limitado sobre mantenimiento y estado del vehículo</li>
+                            <li>Conductores no familiarizados con las instalaciones</li>
+                            <li>Interacción con peatones en patios y zonas de maniobra</li>
+                            <li>Posible documentación o mantenimiento vencido</li>
+                            <li>Falta de inducción específica en riesgos de la empresa</li>
+                        </ul>
+
+                        <h4>Valoración del Riesgo:</h4>
+                        <table>
+                            <tr>
+                                <th>Factor</th>
+                                <th>Valoración</th>
+                                <th>Justificación</th>
+                            </tr>
+                            <tr>
+                                <td>Probabilidad</td>
+                                <td><span class="badge badge-medium">Media</span></td>
+                                <td>Depende de controles de ingreso y verificación</td>
+                            </tr>
+                            <tr>
+                                <td>Severidad</td>
+                                <td><span class="badge badge-high">Alta</span></td>
+                                <td>Atropello de peatones, colisión en espacios confinados</td>
+                            </tr>
+                            <tr>
+                                <td>Nivel de Riesgo</td>
+                                <td><span class="badge badge-high">Alto</span></td>
+                                <td>Requiere control de ingreso y derecho de bloqueo</td>
+                            </tr>
+                        </table>
+
+                        <h4>Controles Críticos Requeridos:</h4>
+                        <ul>
+                            <li>Verificación documental antes del ingreso (SOAT, RTM, seguros)</li>
+                            <li>Inspección física del vehículo (llantas, luces, frenos)</li>
+                            <li>Inducción específica en riesgos de instalaciones</li>
+                            <li>Rutas autorizadas y límites de velocidad internos</li>
+                            <li>Acompañamiento o señalero en maniobras complejas</li>
+                            <li>Derecho de bloqueo si el vehículo no es apto</li>
+                        </ul>
+
+                        <div class="card warning">
+                            <strong>⚠️ Alerta Contractual:</strong> Pedir documentos al contratista no equivale a controlar su flota. Deben existir estándares de aptitud, verificación, indicadores y consecuencias operativas.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2>📊 Indicadores de Desempeño Recomendados</h2>
+            
+            <div class="grid">
+                <div class="stat-box">
+                    <div class="stat-number">📏</div>
+                    <div class="stat-label">Kilómetros u horas por clase de vehículo y actividad</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280;">Frecuencia: Mensual</p>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-number">🔧</div>
+                    <div class="stat-label">% vehículos con mantenimiento vencido o próximo</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280;">Frecuencia: Semanal</p>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-number">⚠️</div>
+                    <div class="stat-label">Número de no salidas por defecto crítico</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280;">Frecuencia: Semanal</p>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-number">🚀</div>
+                    <div class="stat-label">Eventos de velocidad por 1000 km</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280;">Frecuencia: Semanal</p>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-number">🏍️</div>
+                    <div class="stat-label">% desplazamientos en moto eliminados/sustituidos</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280;">Frecuencia: Mensual</p>
+                </div>
+
+                <div class="stat-box">
+                    <div class="stat-number">✅</div>
+                    <div class="stat-label">% vehículos contratistas verificados antes de operar</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280;">Frecuencia: Mensual</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p><strong>Modelo Técnico Avanzado de Análisis de Riesgo de Flota Vehicular Laboral</strong></p>
+            <p>Basado en Sistema Seguro, PESV, ISO 39001 y SG-SST</p>
+            <p style="margin-top: 1rem; font-size: 0.875rem;">La flota laboral debe poder responder: si mañana ocurre una variación normal de la operación, ¿nuestros vehículos seguirán protegiendo la vida o se convertirán en parte de la trayectoria hacia la fatalidad?</p>
+        </div>
+    </footer>
+
+    <script>
+        // Función para evaluar riesgo en el simulador
+        function evaluarRiesgo() {
+            const tipoVehiculo = document.getElementById('tipoVehiculo').value;
+            const tipoRuta = document.getElementById('tipoRuta').value;
+            const tipoCarga = document.getElementById('tipoCarga').value;
+            const clima = document.getElementById('clima').value;
+            const mantenimiento = document.getElementById('mantenimiento').value;
+            const tecnologia = document.getElementById('tecnologia').value;
+
+            let peligros = [];
+            let nivelRiesgo = 0;
+            let controles = [];
+
+            // Evaluar tipo de vehículo
+            if (tipoVehiculo === 'motocicleta') {
+                peligros.push('Alta vulnerabilidad del conductor');
+                nivelRiesgo += 3;
+                controles.push('Casco certificado y EPP completo');
+                controles.push('Evaluación de eliminación o sustitución');
+            } else if (tipoVehiculo === 'contratista') {
+                peligros.push('Control limitado sobre mantenimiento');
+                nivelRiesgo += 2;
+                controles.push('Verificación documental y física de ingreso');
+                controles.push('Derecho de bloqueo');
+            } else if (tipoVehiculo === 'ocasional') {
+                peligros.push('Baja trazabilidad y control técnico');
+                nivelRiesgo += 2;
+                controles.push('Política de autorización y requisitos mínimos');
+            }
+
+            // Evaluar tipo de ruta
+            if (tipoRuta === 'nacional' || tipoRuta === 'montana') {
+                peligros.push('Alta velocidad y condiciones variables');
+                nivelRiesgo += 2;
+                controles.push('Control de velocidad con telemetría');
+            } else if (tipoRuta === 'patio') {
+                peligros.push('Interacción con peatones');
+                nivelRiesgo += 2;
+                controles.push('Límite de velocidad interno');
+                controles.push('Señalero o apoyo de maniobra');
+            }
+
+            // Evaluar carga
+            if (tipoCarga === 'pesada' || tipoCarga === 'peligrosa') {
+                peligros.push('Mayor energía en movimiento');
+                nivelRiesgo += 2;
+                controles.push('Verificación de carga y sujeción');
+            } else if (tipoCarga === 'pasajeros') {
+                peligros.push('Múltiples ocupantes en riesgo');
+                nivelRiesgo += 1;
+                controles.push('Verificación de cinturones y capacidad');
+            }
+
+            // Evaluar clima
+            if (clima === 'lluvia' || clima === 'niebla' || clima === 'extremo') {
+                peligros.push('Baja visibilidad y adherencia');
+                nivelRiesgo += 2;
+                controles.push('Reducción de velocidad');
+                controles.push('Evaluación de suspensión de operación');
+            } else if (clima === 'noche') {
+                peligros.push('Operación con baja visibilidad');
+                nivelRiesgo += 1;
+                controles.push('Verificación de luces');
+                controles.push('Protocolo de operación nocturna');
+            }
+
+            // Evaluar mantenimiento
+            if (mantenimiento === 'vencido' || mantenimiento === 'defectos') {
+                peligros.push('Posibles fallas mecánicas');
+                nivelRiesgo += 3;
+                controles.push('BLOQUEO INMEDIATO - No salida');
+                controles.push('Reparación y verificación antes de operar');
+            } else if (mantenimiento === 'proximo') {
+                peligros.push('Mantenimiento próximo a vencer');
+                nivelRiesgo += 1;
+                controles.push('Programar mantenimiento urgente');
+            }
+
+            // Evaluar tecnología
+            if (tecnologia === 'basica') {
+                peligros.push('Sin sistemas de asistencia o monitoreo');
+                nivelRiesgo += 1;
+                controles.push('Implementar telemetría básica');
+            } else if (tecnologia === 'completa') {
+                controles.push('Verificar funcionamiento de ADAS y cámaras');
+            }
+
+            // Determinar nivel de riesgo
+            let nivelTexto = '';
+            let badgeClass = '';
+            if (nivelRiesgo <= 3) {
+                nivelTexto = 'BAJO';
+                badgeClass = 'badge-low';
+            } else if (nivelRiesgo <= 6) {
+                nivelTexto = 'MEDIO';
+                badgeClass = 'badge-medium';
+            } else if (nivelRiesgo <= 9) {
+                nivelTexto = 'ALTO';
+                badgeClass = 'badge-high';
+            } else {
+                nivelTexto = 'CRÍTICO';
+                badgeClass = 'badge-critical';
+            }
+
+            // Mostrar resultado
+            let html = `
+                <h4>Peligros Identificados (${peligros.length}):</h4>
+                <ul>
+                    ${peligros.map(p => `<li>${p}</li>`).join('')}
+                </ul>
+                
+                <h4>Nivel de Riesgo:</h4>
+                <p><span class="badge ${badgeClass}">${nivelTexto}</span> (Puntaje: ${nivelRiesgo})</p>
+                
+                <h4>Controles Recomendados:</h4>
+                <ul>
+                    ${controles.map(c => `<li>${c}</li>`).join('')}
+                </ul>
+            `;
+
+            if (nivelRiesgo > 9) {
+                html += `
+                    <div class="card danger" style="margin-top: 1rem;">
+                        <strong>🚨 ACCIÓN INMEDIATA REQUERIDA:</strong> Este vehículo/operación presenta riesgos críticos. 
+                        Se recomienda bloqueo hasta implementar controles efectivos o rediseño de la operación.
+                    </div>
+                `;
+            }
+
+            document.getElementById('contenidoResultado').innerHTML = html;
+            document.getElementById('resultadoRiesgo').classList.add('show');
+        }
+
+        function limpiarSimulador() {
+            document.getElementById('tipoVehiculo').selectedIndex = 0;
+            document.getElementById('tipoRuta').selectedIndex = 0;
+            document.getElementById('tipoCarga').selectedIndex = 0;
+            document.getElementById('clima').selectedIndex = 0;
+            document.getElementById('mantenimiento').selectedIndex = 0;
+            document.getElementById('tecnologia').selectedIndex = 0;
+            document.getElementById('resultadoRiesgo').classList.remove('show');
+        }
+
+        // Función para calcular criticidad
+        function calcularCriticidad() {
+            const energia = parseInt(document.getElementById('energia').value);
+            const vulnerabilidad = parseInt(document.getElementById('vulnerabilidad').value);
+            const exposicion = parseInt(document.getElementById('exposicion').value);
+            const falla = parseInt(document.getElementById('falla').value);
+            const controles = parseInt(document.getElementById('controles').value);
+
+            const puntaje = energia + vulnerabilidad + exposicion + falla + controles;
+
+            let nivel = '';
+            let decision = '';
+            let badgeClass = '';
+
+            if (puntaje <= 8) {
+                nivel = 'BAJO';
+                decision = 'Mantener controles estándar y seguimiento periódico.';
+                badgeClass = 'badge-low';
+            } else if (puntaje <= 11) {
+                nivel = 'MEDIO';
+                decision = 'Revisar compatibilidad, mantenimiento y controles específicos por ruta o tarea.';
+                badgeClass = 'badge-medium';
+            } else if (puntaje <= 14) {
+                nivel = 'ALTO';
+                decision = 'Definir controles críticos, verificación frecuente y autorización operacional.';
+                badgeClass = 'badge-high';
+            } else {
+                nivel = 'CRÍTICO';
+                decision = 'Bloqueo, rediseño, sustitución de vehículo o aprobación directiva con controles robustos.';
+                badgeClass = 'badge-critical';
+            }
+
+            const html = `
+                <p><strong>Puntaje Total:</strong> ${puntaje} / 15</p>
+                <p><strong>Nivel de Criticidad:</strong> <span class="badge ${badgeClass}">${nivel}</span></p>
+                <p><strong>Decisión Requerida:</strong> ${decision}</p>
+                
+                <h4 style="margin-top: 1.5rem;">Desglose:</h4>
+                <table>
+                    <tr>
+                        <td>Energía en movimiento</td>
+                        <td>${energia} / 3</td>
+                    </tr>
+                    <tr>
+                        <td>Vulnerabilidad de usuarios</td>
+                        <td>${vulnerabilidad} / 3</td>
+                    </tr>
+                    <tr>
+                        <td>Exposición</td>
+                        <td>${exposicion} / 3</td>
+                    </tr>
+                    <tr>
+                        <td>Falla técnica potencial</td>
+                        <td>${falla} / 3</td>
+                    </tr>
+                    <tr>
+                        <td>Controles disponibles</td>
+                        <td>${controles} / 3</td>
+                    </tr>
+                </table>
+            `;
+
+            document.getElementById('contenidoCriticidad').innerHTML = html;
+            document.getElementById('resultadoCriticidad').classList.add('show');
+        }
+
+        // Función para checklist
+        function toggleCheck(element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            element.classList.toggle('checked', checkbox.checked);
+            actualizarProgreso();
+        }
+
+        function actualizarProgreso() {
+            const checkboxes = document.querySelectorAll('#checklistContainer input[type="checkbox"]');
+            const checked = document.querySelectorAll('#checklistContainer input[type="checkbox"]:checked');
+            const porcentaje = Math.round((checked.length / checkboxes.length) * 100);
+            document.getElementById('progresoChecklist').textContent = porcentaje + '%';
+        }
+
+        // Función para tabs de casos
+        function mostrarCaso(numero) {
+            // Ocultar todos los contenidos
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Desactivar todos los botones
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Mostrar el caso seleccionado
+            document.getElementById('caso' + numero).classList.add('active');
+            
+            // Activar el botón correspondiente
+            event.target.classList.add('active');
+        }
+
+        // Smooth scroll para navegación
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
