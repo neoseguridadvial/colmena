@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Micrositio interactivo de refuerzo sobre antecedentes de la seguridad vial, paradigmas y enfoque de Sistema Seguro aplicado a la gestión vial empresarial.">
+<title>Colmena Vial | De la culpa al Sistema Seguro</title>
+<style>
+:root{
+  --amarillo:#FFC928;
+  --amarillo-2:#FFE77A;
+  --teal:#0097A7;
+  --teal-2:#087C8C;
+  --azul:#173A63;
+  --tinta:#18333A;
+  --gris:#5E7378;
+  --claro:#F5FAFA;
+  --blanco:#FFFFFF;
+  --verde:#1E8E67;
+  --rojo:#C94A4A;
+  --sombra:0 16px 40px rgba(16,67,75,.13);
+  --radio:22px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  color:var(--tinta);
+  background:
+    radial-gradient(circle at 10% 5%, rgba(255,201,40,.18), transparent 24rem),
+    radial-gradient(circle at 95% 20%, rgba(0,151,167,.12), transparent 27rem),
+    var(--claro);
+  line-height:1.5;
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+a{color:var(--teal-2)}
+.skip-link{position:absolute;left:-9999px;top:0;background:#000;color:#fff;padding:.8rem;z-index:1000}
+.skip-link:focus{left:1rem}
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(0,151,167,.12);
+}
+.nav{
+  max-width:1200px;margin:auto;padding:.8rem 1.2rem;
+  display:flex;align-items:center;gap:1rem;
+}
+.brand{display:flex;align-items:center;gap:.75rem;min-width:235px}
+.hive{
+  width:44px;height:44px;background:linear-gradient(145deg,var(--amarillo),#FFB000);
+  clip-path:polygon(25% 6.7%,75% 6.7%,100% 50%,75% 93.3%,25% 93.3%,0 50%);
+  display:grid;place-items:center;box-shadow:inset 0 0 0 7px rgba(255,255,255,.23);
+  color:var(--azul);font-weight:900;
+}
+.brand b{display:block;font-size:1rem}
+.brand small{display:block;color:var(--gris)}
+.progress-shell{flex:1;display:flex;align-items:center;gap:.7rem}
+.progress{height:12px;background:#E5F0F1;border-radius:999px;overflow:hidden;flex:1}
+.progress > div{height:100%;width:0;background:linear-gradient(90deg,var(--amarillo),var(--teal));transition:width .5s ease}
+.progress-label{font-size:.85rem;color:var(--gris);white-space:nowrap}
+.nav-actions{display:flex;gap:.4rem}
+.icon-btn{
+  border:1px solid #D6E7E9;background:#fff;border-radius:12px;padding:.55rem .7rem;color:var(--azul);
+}
+main{max-width:1200px;margin:auto;padding:1.4rem}
+.hero{
+  overflow:hidden;position:relative;
+  background:linear-gradient(125deg,var(--teal-2),var(--teal) 62%,#17AAB3);
+  border-radius:32px;color:#fff;padding:clamp(1.5rem,4vw,4rem);
+  box-shadow:var(--sombra);min-height:420px;
+  display:grid;grid-template-columns:1.25fr .75fr;gap:2rem;align-items:center;
+}
+.hero:before,.hero:after{
+  content:"";position:absolute;opacity:.13;background:var(--amarillo);
+  clip-path:polygon(25% 6.7%,75% 6.7%,100% 50%,75% 93.3%,25% 93.3%,0 50%);
+}
+.hero:before{width:260px;height:230px;right:-50px;top:-35px}
+.hero:after{width:180px;height:160px;right:190px;bottom:-70px}
+.eyebrow{
+  display:inline-flex;gap:.5rem;align-items:center;background:rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:.45rem .8rem;
+  font-size:.86rem;font-weight:700;
+}
+h1{font-size:clamp(2.2rem,5vw,4.7rem);line-height:1.02;margin:.9rem 0 1rem;letter-spacing:-.04em}
+.hero p{font-size:1.08rem;max-width:720px;color:#E7FBFC}
+.hero-actions{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.4rem}
+.btn{
+  border:none;border-radius:14px;padding:.85rem 1.05rem;font-weight:800;
+  display:inline-flex;align-items:center;justify-content:center;gap:.45rem;
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:var(--amarillo);color:var(--azul);box-shadow:0 9px 24px rgba(255,201,40,.28)}
+.btn-secondary{background:#fff;color:var(--teal-2)}
+.btn-outline{background:transparent;color:inherit;border:1px solid currentColor}
+.btn-dark{background:var(--azul);color:#fff}
+.btn-ghost{background:#EAF5F5;color:var(--teal-2)}
+.hero-visual{position:relative;z-index:1;display:grid;place-items:center}
+.system-wheel{width:min(340px,90vw);aspect-ratio:1;position:relative;display:grid;place-items:center}
+.wheel-center{
+  width:130px;aspect-ratio:1;border-radius:50%;background:var(--amarillo);color:var(--azul);
+  display:grid;place-items:center;text-align:center;font-weight:900;padding:1rem;
+  box-shadow:0 0 0 14px rgba(255,255,255,.14);
+}
+.petal{
+  position:absolute;width:100px;min-height:78px;border-radius:18px;background:#fff;color:var(--teal-2);
+  display:grid;place-items:center;text-align:center;padding:.7rem;font-weight:800;font-size:.84rem;
+  box-shadow:0 10px 25px rgba(0,0,0,.13)
+}
+.p1{top:0}.p2{right:0;top:28%}.p3{right:12%;bottom:0}.p4{left:12%;bottom:0}.p5{left:0;top:28%}
+.section-title{margin:2.4rem 0 1.1rem}
+.section-title h2{margin:0;font-size:clamp(1.7rem,3vw,2.5rem);letter-spacing:-.025em}
+.section-title p{margin:.4rem 0;color:var(--gris);max-width:850px}
+.journey{display:grid;grid-template-columns:repeat(5,1fr);gap:.85rem}
+.module-card{
+  background:#fff;border:1px solid #DCEBEC;border-radius:18px;padding:1rem;min-height:190px;
+  box-shadow:0 9px 24px rgba(28,89,96,.07);position:relative;overflow:hidden;
+}
+.module-card:before{content:"";position:absolute;left:0;top:0;width:100%;height:7px;background:var(--teal)}
+.module-card.completed:before{background:var(--verde)}
+.module-card.locked{filter:grayscale(.5);opacity:.64}
+.module-number{font-size:.8rem;font-weight:900;color:var(--teal-2);text-transform:uppercase;letter-spacing:.08em}
+.module-card h3{margin:.55rem 0;font-size:1.04rem}
+.module-card p{font-size:.89rem;color:var(--gris)}
+.module-status{position:absolute;bottom:1rem;left:1rem;font-size:.8rem;font-weight:800}
+.panel{
+  background:#fff;border:1px solid #D9EAEC;border-radius:var(--radio);
+  box-shadow:var(--sombra);padding:clamp(1.2rem,3vw,2.2rem);margin:1.2rem 0;
+}
+.module-view{display:none}
+.module-view.active{display:block;animation:rise .35s ease}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.module-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.2rem}
+.module-head h2{margin:0;font-size:clamp(1.7rem,3vw,2.5rem)}
+.badge{display:inline-block;border-radius:999px;padding:.35rem .65rem;font-weight:800;font-size:.78rem;background:var(--amarillo-2);color:var(--azul)}
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin:1rem 0}
+.kpi{background:#F3FAFA;border-radius:16px;padding:1rem;border:1px solid #DCEDEE}
+.kpi b{font-size:1.4rem;color:var(--teal-2);display:block}
+.kpi span{color:var(--tinta)}
+.callout{
+  border-left:7px solid var(--amarillo);background:#FFF9E8;border-radius:14px;padding:1rem;margin:1rem 0;
+}
+.callout.safe{border-left-color:var(--teal);background:#ECF9FA}
+.callout.danger{border-left-color:var(--rojo);background:#FFF1F1}
+.question{border:1px solid #D9E9EA;border-radius:16px;padding:1rem;margin:.8rem 0;background:#fff}
+.question legend,.question h4{font-weight:800;margin:0 0 .65rem}
+.option-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
+.option{
+  border:2px solid #D8E6E7;background:#fff;border-radius:14px;padding:.8rem;text-align:left;
+  color:var(--tinta);font-weight:700;
+}
+.option:hover,.option.selected{border-color:var(--teal);background:#EEF9FA}
+.option.correct{border-color:var(--verde);background:#ECF9F3}
+.option.wrong{border-color:var(--rojo);background:#FFF0F0}
+.feedback{display:none;margin-top:.65rem;padding:.7rem;border-radius:12px;font-size:.9rem;background:#EEF5F5}
+.feedback.show{display:block}
+.profile-card{
+  border-radius:22px;padding:1.2rem;background:linear-gradient(135deg,var(--azul),#245A88);color:#fff;
+  display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:center;margin:1rem 0;
+}
+.profile-gauge{
+  width:105px;height:105px;border-radius:50%;display:grid;place-items:center;
+  background:conic-gradient(var(--amarillo) var(--value),rgba(255,255,255,.16) 0);
+  position:relative;
+}
+.profile-gauge:after{content:"";position:absolute;width:75px;height:75px;border-radius:50%;background:var(--azul)}
+.profile-gauge span{position:relative;z-index:1;font-weight:900;font-size:1.25rem}
+.timeline{display:grid;grid-template-columns:repeat(5,1fr);gap:.7rem;margin:1rem 0}
+.time-card{background:#F7FBFB;border:1px solid #D8E9EA;border-radius:16px;padding:1rem}
+.time-card .year{color:var(--teal-2);font-weight:900;font-size:1.1rem}
+.time-card h4{margin:.4rem 0}
+.time-card p{font-size:.86rem;color:var(--gris)}
+.sort-list{display:grid;gap:.55rem;margin:1rem 0}
+.sort-item{display:flex;align-items:center;gap:.6rem;background:#F7FBFB;border:1px solid #D9E9EA;border-radius:14px;padding:.7rem}
+.sort-number{width:32px;height:32px;border-radius:50%;background:var(--amarillo);display:grid;place-items:center;font-weight:900}
+.sort-text{flex:1}
+.sort-controls button{border:none;background:#E2F2F3;color:var(--teal-2);border-radius:8px;padding:.35rem .5rem}
+.classifier{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}
+.class-card{border:1px solid #D7E8E9;border-radius:16px;padding:1rem;background:#fff}
+.class-card p{min-height:72px;font-weight:700}
+.class-actions{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
+.old-btn{background:#FFF0F0;color:#8C3030;border:1px solid #EABBBB}
+.safe-btn{background:#EAF8F5;color:#176B51;border:1px solid #B8DFD2}
+.class-actions button{border-radius:11px;padding:.65rem;font-weight:800}
+.class-card.answered{box-shadow:inset 0 0 0 3px #DDECEE}
+.score-pill{display:inline-flex;align-items:center;gap:.4rem;background:var(--azul);color:#fff;border-radius:999px;padding:.45rem .75rem;font-weight:800}
+.exposure-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}
+.exposure{
+  position:relative;border:2px solid #D6E7E8;background:#fff;border-radius:16px;padding:1rem;text-align:left;min-height:150px;
+}
+.exposure strong{display:block;margin:.45rem 0}
+.exposure small{color:var(--gris)}
+.exposure.selected{border-color:var(--teal);background:#EBF9FA}
+.exposure.selected:after{content:"✓";position:absolute;right:.7rem;top:.6rem;width:26px;height:26px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;font-weight:900}
+.scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
+.scenario{background:#F7FBFB;border:1px solid #D9EAEB;border-radius:17px;padding:1rem}
+.scenario h4{margin:.2rem 0 .5rem}
+.slider-row{display:grid;grid-template-columns:1.2fr 1fr 70px;align-items:center;gap:.7rem;margin:.8rem 0}
+input[type=range]{width:100%;accent-color:var(--teal)}
+.points{font-weight:900;text-align:right;color:var(--teal-2)}
+.budget-total{font-size:1.5rem;font-weight:900;color:var(--azul)}
+.budget-total.over{color:var(--rojo)}
+.bar-chart{height:16px;border-radius:999px;background:#E4EFF0;overflow:hidden;margin:.3rem 0}
+.bar-chart div{height:100%;background:linear-gradient(90deg,var(--amarillo),var(--teal));width:0;transition:width .3s}
+.quiz-grid{display:grid;gap:.75rem}
+.action-grid{display:grid;grid-template-columns:1.3fr .8fr .8fr;gap:.7rem}
+input[type=text],textarea,select{
+  width:100%;border:1px solid #CFE2E4;border-radius:12px;padding:.75rem;background:#fff;color:var(--tinta)
+}
+textarea{min-height:90px;resize:vertical}
+.result-board{
+  background:linear-gradient(135deg,var(--teal-2),var(--azul));color:#fff;border-radius:24px;padding:1.4rem;
+}
+.result-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem}
+.result-box{background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:1rem}
+.result-box b{display:block;font-size:1.6rem;color:var(--amarillo)}
+.certificate{
+  display:none;background:#fff;border:12px solid var(--teal);outline:5px solid var(--amarillo);
+  padding:3rem;text-align:center;min-height:650px;position:relative;
+}
+.certificate .seal{width:100px;height:100px;margin:1rem auto;background:var(--amarillo);clip-path:polygon(25% 6.7%,75% 6.7%,100% 50%,75% 93.3%,25% 93.3%,0 50%);display:grid;place-items:center;color:var(--azul);font-weight:900}
+.certificate h2{font-size:2.5rem;color:var(--teal-2);margin:.5rem}
+.certificate .cert-name{font-size:2rem;font-weight:900;color:var(--azul);border-bottom:2px solid #D7E5E6;display:inline-block;min-width:70%;padding:.5rem}
+.modal{
+  position:fixed;inset:0;background:rgba(10,40,48,.72);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem;
+}
+.modal.show{display:flex}
+.modal-card{background:#fff;border-radius:24px;max-width:780px;width:100%;max-height:92vh;overflow:auto;padding:1.4rem;box-shadow:0 25px 80px rgba(0,0,0,.3)}
+.modal-card h2{margin-top:0}
+.toast{
+  position:fixed;right:1rem;bottom:1rem;background:var(--azul);color:#fff;padding:.85rem 1rem;border-radius:14px;
+  box-shadow:var(--sombra);z-index:200;transform:translateY(140%);transition:transform .3s;
+}
+.toast.show{transform:none}
+footer{margin:2.5rem 0 1rem;padding:1.2rem;border-top:1px solid #D4E5E7;color:var(--gris);font-size:.85rem}
+.source-list{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem}
+.source-list a{display:block;background:#fff;border:1px solid #D7E7E8;border-radius:12px;padding:.7rem;text-decoration:none}
+.hidden{display:none!important}
+.center{text-align:center}
+.flex{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+.spread{display:flex;justify-content:space-between;gap:1rem;align-items:center;flex-wrap:wrap}
+.muted{color:var(--gris)}
+.small{font-size:.86rem}
+hr{border:none;border-top:1px solid #DCE9EA;margin:1.2rem 0}
+@media(max-width:980px){
+  .hero{grid-template-columns:1fr}.hero-visual{margin-top:1rem}
+  .journey,.timeline{grid-template-columns:repeat(2,1fr)}
+  .classifier,.exposure-grid,.scenario-grid{grid-template-columns:1fr 1fr}
+  .result-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:680px){
+  main{padding:.8rem}.nav{padding:.65rem}.brand small,.progress-label{display:none}.brand{min-width:auto}.nav-actions{display:none}
+  .hero{padding:1.35rem;border-radius:22px;min-height:auto}
+  .hero-visual{display:none}
+  .journey,.timeline,.classifier,.exposure-grid,.scenario-grid,.kpi-grid,.result-grid,.source-list{grid-template-columns:1fr}
+  .option-grid,.class-actions{grid-template-columns:1fr}
+  .action-grid{grid-template-columns:1fr}
+  .slider-row{grid-template-columns:1fr 70px}.slider-row label{grid-column:1/-1}
+  .module-head{display:block}.module-head .score-pill{margin-top:.6rem}
+}
+@media print{
+  body *{visibility:hidden}
+  #certificate,#certificate *{visibility:visible}
+  #certificate{display:block!important;position:absolute;left:0;top:0;width:100%;border:10px solid #008C99;outline:none}
+  @page{size:A4 landscape;margin:12mm}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+/* ===== REDISEÑO RESPONSIVE V2 ===== */
+:root{
+  --max:1280px;
+  --space:clamp(1rem,2vw,1.5rem);
+  --shadow-soft:0 10px 30px rgba(14,66,74,.09);
+  --shadow-lift:0 20px 55px rgba(14,66,74,.15);
+}
+html{font-size:16px;scroll-padding-top:132px}
+body{overflow-x:hidden;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+body.module-mode #home,body.module-mode #journeySection,body.module-mode #referenceSection,body.module-mode footer{display:none}
+body.module-mode main{padding-top:clamp(.7rem,1.5vw,1.1rem)}
+img,svg,video,canvas{max-width:100%;height:auto}
+button,a,input,textarea,select{max-width:100%}
+button,.btn,.option,.exposure{overflow-wrap:anywhere;word-break:normal}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{
+  outline:3px solid rgba(255,201,40,.8);outline-offset:3px
+}
+.topbar{box-shadow:0 8px 30px rgba(19,58,99,.06)}
+.nav{max-width:var(--max);width:100%;min-width:0;padding:.75rem clamp(.85rem,2vw,1.4rem)}
+.brand{min-width:0;flex:0 1 250px}
+.brand>div:last-child{min-width:0}
+.brand b,.brand small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.progress-shell{min-width:120px}
+.progress{min-width:60px}
+.module-switcher-wrap{border-top:1px solid rgba(0,151,167,.09);background:rgba(255,255,255,.96)}
+.module-switcher{
+  max-width:var(--max);margin:auto;padding:.55rem clamp(.85rem,2vw,1.4rem);
+  display:flex;gap:.5rem;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:thin
+}
+.module-switcher button{
+  flex:0 0 auto;min-height:40px;border:1px solid #D7E8EA;background:#fff;color:var(--azul);
+  border-radius:999px;padding:.55rem .82rem;font-weight:800;font-size:.84rem;white-space:nowrap
+}
+.module-switcher button:hover{border-color:var(--teal);background:#F0FAFA}
+.module-switcher button.active{background:var(--azul);border-color:var(--azul);color:#fff}
+.module-switcher button.done:not(.active){background:#EAF8F3;border-color:#BFE3D5;color:#176B51}
+.short-label{display:none}
+.toast{opacity:0;pointer-events:none}
+.toast.show{opacity:1;pointer-events:auto}
+main{max-width:var(--max);width:100%;padding:clamp(.9rem,2.4vw,1.8rem)}
+.hero{
+  min-height:unset;padding:clamp(1.45rem,4vw,3.8rem);
+  grid-template-columns:minmax(0,1.25fr) minmax(330px,.75fr);gap:clamp(1.5rem,4vw,3.5rem)
+}
+.hero>div{min-width:0}
+h1{font-size:clamp(2.15rem,4.6vw,4.4rem);max-width:840px;overflow-wrap:normal}
+.hero p{max-width:760px;line-height:1.65}
+.hero .kpi-grid{max-width:760px}
+.system-wheel{width:clamp(350px,31vw,420px)}
+.wheel-center{width:142px;font-size:.92rem;line-height:1.25}
+.petal{width:128px;min-height:74px;padding:.65rem .75rem;font-size:.79rem;line-height:1.25}
+.p1{top:2%}.p2{right:-2%;top:29%}.p3{right:10%;bottom:1%}.p4{left:10%;bottom:1%}.p5{left:-2%;top:29%}
+.section-title{margin:clamp(2rem,4vw,3.4rem) 0 1rem}
+.section-title h2{line-height:1.15}
+.journey{grid-template-columns:repeat(auto-fit,minmax(min(100%,215px),1fr));gap:1rem;align-items:stretch}
+.module-card{
+  min-height:0;padding:1.15rem;display:flex;flex-direction:column;gap:.55rem;overflow:visible;
+  transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease
+}
+.module-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lift);border-color:#B9DCDD}
+.module-card h3{margin:.15rem 0;font-size:1.08rem;line-height:1.25}
+.module-card p{margin:0;line-height:1.55;flex:1}
+.module-card-footer{display:flex;justify-content:space-between;align-items:center;gap:.65rem;margin-top:.6rem;flex-wrap:wrap}
+.module-card-footer .btn{min-height:40px;padding:.58rem .78rem}
+.module-status{position:static;display:inline-flex;align-items:center;min-height:28px;line-height:1.25}
+.module-card.locked{filter:none;opacity:1}
+.panel{overflow:clip;box-shadow:var(--shadow-soft);padding:clamp(1.05rem,3vw,2.2rem)}
+.module-head{align-items:flex-start}
+.module-head>div{min-width:0}
+.module-head h2{line-height:1.15;overflow-wrap:anywhere}
+.score-pill{flex:0 0 auto;white-space:nowrap}
+.kpi-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.kpi{min-width:0}
+.callout{line-height:1.65;overflow-wrap:anywhere}
+.timeline{grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:.85rem}
+.time-card{min-width:0;height:100%}
+.time-card p{line-height:1.55}
+.sort-item{min-width:0}
+.sort-text{min-width:0;overflow-wrap:anywhere}
+.sort-controls{display:flex;gap:.3rem;flex:0 0 auto}
+.sort-controls button{min-width:38px;min-height:38px}
+.classifier{grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));align-items:stretch}
+.class-card{display:flex;flex-direction:column;min-width:0;height:100%}
+.class-card p{min-height:0;flex:1;line-height:1.55;margin-top:0}
+.class-actions button{min-height:48px;line-height:1.25}
+.exposure-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,235px),1fr));align-items:stretch}
+.exposure{min-height:0;height:100%;line-height:1.45}
+.scenario-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));align-items:stretch}
+.scenario{display:flex;flex-direction:column;min-width:0}
+.scenario h4{line-height:1.4}
+.scenario .option{width:100%;margin:.28rem 0}
+.question{min-width:0}
+.question legend{max-width:100%;padding:0 .25rem;line-height:1.45}
+.option-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));align-items:stretch}
+.option{min-height:52px;line-height:1.35;display:flex;align-items:center;gap:.55rem;width:100%}
+label.option{cursor:pointer}
+label.option input{flex:0 0 auto;margin:0}
+.slider-row{grid-template-columns:minmax(210px,1.3fr) minmax(160px,1fr) 64px}
+.bar-chart{height:18px}
+.action-grid{grid-template-columns:minmax(0,1.4fr) minmax(170px,.75fr) minmax(170px,.75fr)}
+.action-grid>div{min-width:0}
+.result-grid{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.result-box{min-width:0;overflow-wrap:anywhere}
+.result-box b{line-height:1.15;margin:.25rem 0}
+.source-list{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+.source-list a{line-height:1.5;transition:transform .18s ease,border-color .18s ease}
+.source-list a:hover{transform:translateY(-2px);border-color:var(--teal)}
+.profile-card{grid-template-columns:auto minmax(0,1fr)}
+.profile-card>div{min-width:0}
+.modal{padding:clamp(.5rem,2vw,1rem)}
+.modal-card{width:min(920px,100%);padding:clamp(1rem,3vw,1.6rem);position:relative}
+.modal-card>.spread:first-child{display:block;padding-right:3.2rem}
+.modal-card>.spread:first-child>.icon-btn{position:absolute;right:1rem;top:1rem}
+.modal-card>.spread:first-child h2{padding-right:.25rem}
+.modal-card .action-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.certificate{max-width:1100px;margin:1.5rem auto;min-height:0;padding:clamp(1.5rem,5vw,3.5rem)}
+.cert-name{overflow-wrap:anywhere}
+.mobile-dock{display:none}
+.mobile-dock.dock-hidden{display:none!important}
+.flex>.btn,.spread>.btn{flex:0 0 auto}
+
+@media(max-width:1000px){
+  html{scroll-padding-top:138px}
+  .hero{grid-template-columns:1fr;gap:1rem}
+  .hero-visual{display:none}
+  .hero p{max-width:850px}
+  .hero .kpi-grid{max-width:none}
+  .module-head{flex-direction:column}
+  .score-pill{white-space:normal}
+  .action-grid{grid-template-columns:1fr 1fr}
+  .action-grid>div:first-child{grid-column:1/-1}
+}
+@media(max-width:760px){
+  html{scroll-padding-top:126px}
+  body{padding-bottom:78px}
+  .nav{gap:.65rem}
+  .brand{flex:0 1 auto}
+  .brand small{display:none}
+  .progress-shell{flex:1}
+  .progress-label{font-size:.76rem}
+  .nav-actions{display:flex}
+  .nav-actions .icon-btn{display:none}
+  .module-switcher{padding:.45rem .8rem;justify-content:space-between;gap:.35rem}
+  .module-switcher button{flex:1 1 0;min-width:43px;padding:.48rem .35rem}
+  .module-switcher .full-label{display:none}
+  .module-switcher .short-label{display:inline}
+  main{padding:.8rem}
+  .hero{border-radius:24px;padding:1.35rem}
+  .hero:before{width:180px;height:160px}
+  h1{font-size:clamp(2.05rem,11vw,3.2rem)}
+  .eyebrow{border-radius:16px;line-height:1.3}
+  .hero-actions{display:grid;grid-template-columns:1fr}
+  .hero-actions .btn{width:100%}
+  .hero .kpi-grid{grid-template-columns:1fr 1fr}
+  .hero .kpi-grid .kpi:last-child{grid-column:1/-1}
+  .panel{border-radius:18px;margin:.9rem 0}
+  .module-head{gap:.55rem}
+  .module-head h2{font-size:clamp(1.55rem,7vw,2.1rem)}
+  .timeline,.classifier,.exposure-grid,.scenario-grid,.kpi-grid,.result-grid,.source-list{grid-template-columns:1fr}
+  .class-actions,.option-grid{grid-template-columns:1fr}
+  .slider-row{grid-template-columns:minmax(0,1fr) 58px;gap:.5rem}
+  .slider-row label{grid-column:1/-1}
+  .action-grid,.modal-card .action-grid{grid-template-columns:1fr!important}
+  .action-grid>div:first-child{grid-column:auto}
+  .profile-card{grid-template-columns:1fr;text-align:center}
+  .profile-gauge{margin:auto}
+  .module-card-footer{align-items:stretch}
+  .module-card-footer .btn{width:100%;order:2}
+  .module-status{order:1}
+  .spread{align-items:stretch}
+  .spread>.btn{flex:1 1 180px}
+  .certificate{border-width:7px;outline-width:3px}
+  .certificate h2{font-size:clamp(1.7rem,8vw,2.4rem)}
+  .certificate .cert-name{font-size:clamp(1.35rem,7vw,2rem);min-width:0;width:100%}
+  .mobile-dock{
+    position:fixed;display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:.45rem;
+    left:.65rem;right:.65rem;bottom:.65rem;z-index:90;padding:.5rem;
+    background:rgba(255,255,255,.96);border:1px solid #D7E8EA;border-radius:18px;
+    box-shadow:0 16px 45px rgba(20,55,70,.22);backdrop-filter:blur(14px)
+  }
+  .mobile-dock button{border:none;border-radius:12px;min-height:48px;padding:.45rem;background:#EEF7F7;color:var(--azul);font-weight:900}
+  .mobile-dock button.primary{background:var(--amarillo)}
+  .mobile-dock button:disabled{opacity:.42;cursor:not-allowed}
+}
+@media(max-width:440px){
+  .hive{width:40px;height:40px}
+  .brand b{font-size:.92rem}
+  .progress-label{display:none}
+  .hero .kpi-grid{grid-template-columns:1fr}
+  .hero .kpi-grid .kpi:last-child{grid-column:auto}
+  .btn{width:100%;min-height:48px}
+  .icon-btn{width:auto;min-height:auto}
+  .flex{align-items:stretch}
+  .flex>.btn{flex:1 1 100%}
+  .sort-item{align-items:flex-start;flex-wrap:wrap}
+  .sort-text{flex:1 1 calc(100% - 48px)}
+  .sort-controls{margin-left:42px}
+  .module-switcher button{font-size:.78rem;padding:.5rem .65rem}
+}
+@media print{
+  body{padding-bottom:0}
+  .mobile-dock,.module-switcher-wrap{display:none!important}
+}
+
+</style>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<header class="topbar">
+  <nav class="nav" aria-label="Navegación principal">
+    <div class="brand">
+      <div class="hive" aria-hidden="true">SV</div>
+      <div><b>Colmena Vial</b><small>Refuerzo empresarial</small></div>
+    </div>
+    <div class="progress-shell" aria-label="Avance del recorrido">
+      <div class="progress"><div id="topProgress"></div></div>
+      <span class="progress-label" id="progressLabel">0% completado</span>
+    </div>
+    <div class="nav-actions">
+      <button class="icon-btn" onclick="toggleTextSize()" title="Cambiar tamaño de texto" aria-label="Cambiar tamaño de texto">Aa</button>
+      <button class="icon-btn" onclick="resetCourse()" title="Reiniciar recorrido" aria-label="Reiniciar recorrido">↻</button>
+    </div>
+  </nav>
+
+<div class="module-switcher-wrap">
+  <div class="module-switcher" aria-label="Acceso rápido a los módulos">
+    <button data-module-target="0" onclick="goHome()"><span class="full-label">⌂ Inicio</span><span class="short-label">⌂</span></button>
+    <button data-module-target="1" onclick="goModule(1)"><span class="full-label">1 · Historia</span><span class="short-label">M1</span></button>
+    <button data-module-target="2" onclick="goModule(2)"><span class="full-label">2 · Paradigmas</span><span class="short-label">M2</span></button>
+    <button data-module-target="3" onclick="goModule(3)"><span class="full-label">3 · Empresa 360°</span><span class="short-label">M3</span></button>
+    <button data-module-target="4" onclick="goModule(4)"><span class="full-label">4 · Barreras</span><span class="short-label">M4</span></button>
+    <button data-module-target="5" onclick="goModule(5)"><span class="full-label">5 · Cierre</span><span class="short-label">M5</span></button>
+  </div>
+</div>
+</header>
+
+<main id="contenido">
+<section class="hero" id="home">
+  <div style="position:relative;z-index:1">
+    <span class="eyebrow">🐝 Experiencia interactiva · Seguridad vial empresarial</span>
+    <h1>De la culpa al <span style="color:var(--amarillo)">Sistema Seguro</span></h1>
+    <p>Un recorrido para reconocer los paradigmas que todavía dirigen nuestras decisiones, comprender la evolución de la seguridad vial y convertir el PESV en gestión real del riesgo, no en una colección de formatos.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="openDiagnostic()">Iniciar diagnóstico →</button>
+      <button class="btn btn-secondary" onclick="goModule(1)">Explorar los módulos</button>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><b>5</b><span>Módulos aplicados</span></div>
+      <div class="kpi"><b>35–45 min</b><span>Duración estimada</span></div>
+      <div class="kpi"><b>100%</b><span>Funciona sin conexión</span></div>
+    </div>
+  </div>
+  <div class="hero-visual" aria-label="Componentes del Sistema Seguro">
+    <div class="system-wheel">
+      <div class="petal p1">Velocidades seguras</div>
+      <div class="petal p2">Vehículos seguros</div>
+      <div class="petal p3">Atención post-siniestro</div>
+      <div class="petal p4">Vías y entornos seguros</div>
+      <div class="petal p5">Personas seguras</div>
+      <div class="wheel-center">RESPONSABILIDAD<br>COMPARTIDA</div>
+    </div>
+  </div>
+</section>
+
+<section id="journeySection">
+  <div class="section-title">
+    <h2>Tu recorrido de aprendizaje</h2>
+    <p>Cada módulo combina una idea central, una actividad breve y una aplicación empresarial. El avance queda guardado automáticamente en este dispositivo.</p>
+  </div>
+  <div class="journey" id="journeyCards"></div>
+</section>
+
+<section id="modules">
+  <article class="module-view" id="module1">
+    <div class="panel">
+      <div class="module-head">
+        <div><span class="badge">Módulo 1</span><h2>La seguridad vial no siempre pensó igual</h2><p class="muted">De la fatalidad y la culpa individual a la gestión de un sistema sociotécnico.</p></div>
+        <span class="score-pill">⏱ 7 min · 100 pts</span>
+      </div>
+      <div class="callout safe"><b>Idea clave:</b> el enfoque moderno no niega la responsabilidad individual; evita convertirla en la única explicación. Pregunta qué condiciones del sistema permitieron que un error terminara en muerte o lesión grave.</div>
+      <div class="timeline">
+        <div class="time-card"><span class="year">Etapa 1</span><h4>Fatalidad</h4><p>El “accidente” se entendía como azar inevitable. La prevención era reactiva.</p></div>
+        <div class="time-card"><span class="year">Etapa 2</span><h4>Conductor culpable</h4><p>El foco se concentró en disciplina, habilidad y cumplimiento individual.</p></div>
+        <div class="time-card"><span class="year">Etapa 3</span><h4>Matriz de Haddon</h4><p>Se amplió el análisis a persona, vehículo y entorno antes, durante y después del evento.</p></div>
+        <div class="time-card"><span class="year">Etapa 4</span><h4>Visión Cero</h4><p>La vida y la integridad se convierten en límites éticos del diseño del sistema.</p></div>
+        <div class="time-card"><span class="year">Etapa 5</span><h4>Sistema Seguro</h4><p>Se aceptan el error humano y la vulnerabilidad; se diseñan capas de protección.</p></div>
+      </div>
+      <h3>Actividad: reconstruye la evolución</h3>
+      <p class="muted">Ordena las tarjetas desde el paradigma más antiguo hasta el enfoque actual.</p>
+      <div id="sortList" class="sort-list"></div>
+      <div class="flex">
+        <button class="btn btn-primary" onclick="checkTimeline()">Validar secuencia</button>
+        <span id="timelineFeedback" class="muted"></span>
+      </div>
+      <div class="callout" style="margin-top:1.3rem"><b>Aplicación empresarial:</b> cuando la investigación concluye únicamente “acto inseguro”, la organización deja intactos los objetivos de producción, la programación, el diseño de rutas, el mantenimiento, la contratación y la supervisión que pudieron aumentar la exposición.</div>
+      <div class="spread">
+        <button class="btn btn-ghost" onclick="goHome()">← Inicio</button>
+        <button class="btn btn-dark" onclick="completeModule(1,2)">Continuar al detector de paradigmas →</button>
+      </div>
+    </div>
+  </article>
+
+  <article class="module-view" id="module2">
+    <div class="panel">
+      <div class="module-head">
+        <div><span class="badge">Módulo 2</span><h2>Detector de paradigmas</h2><p class="muted">Clasifica decisiones reales: ¿viejo paradigma o Sistema Seguro?</p></div>
+        <span class="score-pill" id="classifierScore">0 / 8</span>
+      </div>
+      <div class="classifier" id="classifier"></div>
+      <div class="callout safe" id="classifierResult"><b>Lectura técnica:</b> completa las ocho decisiones para conocer qué lógica predomina.</div>
+      <div class="spread">
+        <button class="btn btn-ghost" onclick="goModule(1)">← Módulo anterior</button>
+        <button class="btn btn-dark" onclick="completeModule(2,3)">Aplicar en la empresa →</button>
+      </div>
+    </div>
+  </article>
+
+  <article class="module-view" id="module3">
+    <div class="panel">
+      <div class="module-head">
+        <div><span class="badge">Módulo 3</span><h2>Empresa 360°: ¿dónde vive el riesgo vial?</h2><p class="muted">Caso aplicado a desplazamientos misionales, laborales, internos y relacionados con terceros.</p></div>
+        <span class="score-pill">🧭 Caso MIEL S.A.S.</span>
+      </div>
+      <div class="callout"><b>Escenario:</b> MIEL S.A.S. tiene 380 personas, fuerza comercial, mensajería tercerizada, vehículos propios, proveedores que ingresan al patio y personal que se desplaza diariamente desde municipios cercanos. En el último trimestre registró dos choques leves, siete casi-siniestros y múltiples reportes de fatiga.</div>
+      <h3>Reto 1: selecciona los escenarios que deben entrar al análisis de riesgo vial</h3>
+      <p class="muted">Marca todos los que estén bajo control o influencia de la organización.</p>
+      <div class="exposure-grid" id="exposureGrid"></div>
+      <div class="flex" style="margin-top:.8rem">
+        <button class="btn btn-primary" onclick="checkExposure()">Validar alcance</button>
+        <span id="exposureFeedback" class="muted"></span>
+      </div>
+      <hr>
+      <h3>Reto 2: toma tres decisiones de gestión</h3>
+      <div class="scenario-grid" id="scenarioGrid"></div>
+      <div class="callout safe" id="scenarioResult"><b>Criterio:</b> la mejor intervención actúa sobre la fuente organizacional del riesgo y añade barreras independientes; no descarga todo sobre la atención del conductor.</div>
+      <div class="spread">
+        <button class="btn btn-ghost" onclick="goModule(2)">← Módulo anterior</button>
+        <button class="btn btn-dark" onclick="completeModule(3,4)">Construir barreras →</button>
+      </div>
+    </div>
+  </article>
+
+  <article class="module-view" id="module4">
+    <div class="panel">
+      <div class="module-head">
+        <div><span class="badge">Módulo 4</span><h2>Laboratorio de barreras</h2><p class="muted">Distribuye 100 puntos de inversión preventiva. El presupuesto revela tu paradigma.</p></div>
+        <span class="score-pill">🍯 Presupuesto: 100</span>
+      </div>
+      <div class="callout danger"><b>Condición:</b> la empresa presenta exceso de velocidad en motociclistas, jornadas extendidas, vehículos con mantenimientos atrasados y contratistas sin criterios viales en sus contratos. La gerencia exige una intervención de 90 días.</div>
+      <div id="budgetSliders"></div>
+      <div class="spread">
+        <div>Total asignado: <span class="budget-total" id="budgetTotal">0</span> / 100</div>
+        <button class="btn btn-primary" onclick="evaluateBudget()">Evaluar estrategia</button>
+      </div>
+      <div id="budgetFeedback" class="callout safe"><b>Pista:</b> una charla puede apoyar, pero no compensa rutas inviables, incentivos perversos, vehículos inseguros o fatiga programada.</div>
+      <h3>Tu mezcla de intervención</h3>
+      <div class="bar-chart"><div id="systemicBar"></div></div>
+      <p class="small muted">La barra muestra la proporción destinada a controles organizacionales, operacionales, tecnológicos y post-siniestro.</p>
+      <div class="spread">
+        <button class="btn btn-ghost" onclick="goModule(3)">← Módulo anterior</button>
+        <button class="btn btn-dark" onclick="completeModule(4,5)">Ir al reto final →</button>
+      </div>
+    </div>
+  </article>
+
+  <article class="module-view" id="module5">
+    <div class="panel">
+      <div class="module-head">
+        <div><span class="badge">Módulo 5</span><h2>Sala de decisiones y cierre</h2><p class="muted">Demuestra lo interiorizado y conviértelo en un compromiso verificable.</p></div>
+        <span class="score-pill" id="finalScorePill">0 / 6</span>
+      </div>
+      <div class="quiz-grid" id="finalQuiz"></div>
+      <hr>
+      <h3>Plan de transferencia a 30 días</h3>
+      <p class="muted">Escribe una acción concreta, una persona responsable y un indicador verificable.</p>
+      <div class="action-grid">
+        <div><label for="actionText"><b>Acción prioritaria</b></label><textarea id="actionText" placeholder="Ej.: ajustar metas y ventanas de entrega que inducen exceso de velocidad..."></textarea></div>
+        <div><label for="actionOwner"><b>Responsable</b></label><input id="actionOwner" type="text" placeholder="Cargo o área"></div>
+        <div><label for="actionIndicator"><b>Indicador</b></label><input id="actionIndicator" type="text" placeholder="% rutas revisadas"></div>
+      </div>
+      <div class="flex" style="margin-top:.8rem">
+        <button class="btn btn-primary" onclick="finishCourse()">Cerrar recorrido y ver resultado</button>
+        <button class="btn btn-ghost" onclick="exportResults()">Exportar resultados CSV</button>
+      </div>
+      <div id="resultsArea" class="hidden" style="margin-top:1.2rem">
+        <div class="result-board">
+          <h3 style="margin-top:0">Resultado del recorrido</h3>
+          <div class="result-grid">
+            <div class="result-box"><span>Diagnóstico inicial</span><b id="rPre">—</b><small>Sistema Seguro</small></div>
+            <div class="result-box"><span>Resultado final</span><b id="rPost">—</b><small>Comprensión aplicada</small></div>
+            <div class="result-box"><span>Módulos</span><b id="rModules">—</b><small>Completados</small></div>
+            <div class="result-box"><span>Perfil</span><b id="rProfile" style="font-size:1rem">—</b><small>Paradigma predominante</small></div>
+          </div>
+          <p id="resultNarrative"></p>
+          <div class="flex">
+            <button class="btn btn-primary" onclick="showCertificate()">Ver constancia</button>
+            <button class="btn btn-secondary" onclick="window.print()">Imprimir / guardar PDF</button>
+          </div>
+        </div>
+      </div>
+      <div class="spread" style="margin-top:1rem">
+        <button class="btn btn-ghost" onclick="goModule(4)">← Módulo anterior</button>
+        <button class="btn btn-dark" onclick="goHome()">Volver al inicio</button>
+      </div>
+    </div>
+  </article>
+</section>
+
+<section class="panel" id="referenceSection">
+  <div class="section-title" style="margin-top:0">
+    <h2>Marco técnico de referencia</h2>
+    <p>El micrositio integra el enfoque de Sistema Seguro, la gestión organizacional del riesgo vial y la metodología del PESV. Debe contextualizarse con el diagnóstico, nivel y actividad económica de cada organización.</p>
+  </div>
+  <div class="source-list">
+    <a href="https://www.who.int/teams/social-determinants-of-health/safety-and-mobility/decade-of-action-for-road-safety-2021-2030" target="_blank" rel="noopener"><b>OMS / ONU</b><br><span class="small">Plan Mundial para el Decenio de Acción 2021–2030</span></a>
+    <a href="https://ansv.gov.co/es/escuela/9387" target="_blank" rel="noopener"><b>ANSV</b><br><span class="small">Fundamentos del enfoque de Sistema Seguro</span></a>
+    <a href="https://mintransporte.gov.co/" target="_blank" rel="noopener"><b>Ministerio de Transporte</b><br><span class="small">Resolución 40595 de 2022 y metodología PESV</span></a>
+    <a href="https://www.iso.org/standard/44958.html" target="_blank" rel="noopener"><b>ISO 39001:2012 + Amd 1:2024</b><br><span class="small">Sistema de gestión de la seguridad vial</span></a>
+  </div>
+</section>
+
+<section id="certificate" class="certificate">
+  <div class="seal">SV</div>
+  <p>CONSTANCIA DE PARTICIPACIÓN</p>
+  <h2>De la culpa al Sistema Seguro</h2>
+  <p>Se reconoce a</p>
+  <div class="cert-name" id="certName">Participante</div>
+  <p>por completar el micrositio de refuerzo en seguridad vial empresarial y formular una acción de transferencia orientada a la prevención de muertes y lesiones graves.</p>
+  <p><b>Organización:</b> <span id="certCompany">—</span></p>
+  <p><b>Resultado:</b> <span id="certScore">—</span> · <b>Perfil:</b> <span id="certProfile">—</span></p>
+  <p><b>Fecha:</b> <span id="certDate">—</span></p>
+  <p class="small muted">Constancia pedagógica de participación. No corresponde a una certificación de competencia laboral ni de auditoría.</p>
+</section>
+
+<footer>
+  <b>Nota de uso:</b> paleta visual inspirada en la identidad pública de Colmena Seguros; no incorpora logotipos ni sustituye el manual de marca institucional. Contenido pedagógico orientado al refuerzo y la conversación técnica. Para despliegue corporativo se recomienda validar identidad, tratamiento de datos, accesibilidad y trazabilidad con las áreas responsables.
+</footer>
+</main>
+
+<div class="modal" id="diagnosticModal" role="dialog" aria-modal="true" aria-labelledby="diagnosticTitle">
+  <div class="modal-card">
+    <div class="spread">
+      <div><span class="badge">Punto de partida</span><h2 id="diagnosticTitle">¿Qué concepto de seguridad vial tienes interiorizado?</h2></div>
+      <button class="icon-btn" onclick="closeDiagnostic()" aria-label="Cerrar">✕</button>
+    </div>
+    <p class="muted">No hay respuestas para “quedar bien”. El objetivo es identificar la lógica que usarías bajo presión.</p>
+    <div class="action-grid" style="grid-template-columns:1fr 1fr 1fr">
+      <input id="userName" type="text" placeholder="Nombre">
+      <input id="userCompany" type="text" placeholder="Empresa">
+      <input id="userRole" type="text" placeholder="Cargo / rol">
+    </div>
+    <div id="diagnosticQuestions"></div>
+    <button class="btn btn-primary" onclick="submitDiagnostic()">Ver mi perfil inicial</button>
+    <div id="diagnosticResult"></div>
+  </div>
+</div>
+
+
+<div class="mobile-dock" aria-label="Navegación móvil">
+  <button id="dockPrev" onclick="navRelative(-1)">← Anterior</button>
+  <button class="primary" id="dockHome" onclick="goHome()">☰ Menú</button>
+  <button id="dockNext" onclick="navRelative(1)">Siguiente →</button>
+</div>
+
+<div class="toast" id="toast">Avance guardado</div>
+
+<script>
+const modules = [
+ {id:1,title:"Evolución histórica",desc:"Reconoce cómo cambió la explicación de los siniestros viales.",icon:"🕰️"},
+ {id:2,title:"Detector de paradigmas",desc:"Diferencia la culpa individual de la gestión sistémica.",icon:"🧠"},
+ {id:3,title:"Empresa 360°",desc:"Amplía el alcance del riesgo vial bajo control e influencia.",icon:"🏢"},
+ {id:4,title:"Laboratorio de barreras",desc:"Diseña una intervención en capas con recursos limitados.",icon:"🛡️"},
+ {id:5,title:"Decisiones y cierre",desc:"Evalúa, transfiere y genera una constancia de participación.",icon:"🎯"}
+];
+
+const diagnostic = [
+ {q:"Después de un siniestro, la primera pregunta debería ser…",a:"¿Quién incumplió?",b:"¿Qué combinación de condiciones permitió el daño?",safe:"b"},
+ {q:"La meta superior de la seguridad vial es…",a:"Reducir el número total de choques.",b:"Eliminar muertes y lesiones graves, incluso cuando ocurran errores.",safe:"b"},
+ {q:"Una persona conductora con experiencia…",a:"No debería cometer errores básicos.",b:"Puede equivocarse; el sistema debe evitar que el error sea fatal.",safe:"b"},
+ {q:"Si aumenta la siniestralidad, la medida más rápida es…",a:"Hacer una capacitación obligatoria.",b:"Analizar exposición, velocidad, fatiga, vehículos, rutas e incentivos.",safe:"b"},
+ {q:"La responsabilidad de la seguridad vial es…",a:"Principalmente de quien conduce.",b:"Compartida entre usuarios, organización, diseñadores y autoridades.",safe:"b"},
+ {q:"Cumplir el límite de velocidad significa que…",a:"La velocidad es automáticamente segura.",b:"Todavía debe evaluarse frente al entorno, la vulnerabilidad y la tarea.",safe:"b"},
+ {q:"Un casi-siniestro sin lesión…",a:"No requiere análisis formal.",b:"Es una señal anticipada que permite intervenir antes del daño.",safe:"b"},
+ {q:"En el PESV, el éxito se demuestra sobre todo con…",a:"Documentos, campañas y listas de asistencia.",b:"Controles implementados y mejora verificable del desempeño.",safe:"b"}
+];
+
+const classifierItems = [
+ {t:"“El conductor se confió. Programemos una charla de dos horas y que firme compromiso”.",type:"old",why:"Se limita a la persona y no interviene condiciones que producen o toleran el riesgo."},
+ {t:"“La meta de entregas exige velocidades incompatibles con la ruta; debemos rediseñar programación e incentivos”.",type:"safe",why:"Actúa sobre una fuente organizacional del riesgo."},
+ {t:"“Si el vehículo pasó la revisión técnico-mecánica, ya es suficientemente seguro”.",type:"old",why:"El cumplimiento mínimo no reemplaza criterios de selección, mantenimiento y tecnologías de seguridad."},
+ {t:"“Los errores humanos son previsibles; por eso necesitamos barreras que no dependan todas de una conducta perfecta”.",type:"safe",why:"Reconoce falibilidad y defensa en profundidad."},
+ {t:"“Los contratistas responden por sus conductores; no deben incluirse en nuestro análisis”.",type:"old",why:"La organización conserva capacidad de influencia mediante selección, contrato, seguimiento y coordinación."},
+ {t:"“La velocidad se gestiona según energía, entorno y presencia de usuarios vulnerables, no solo por la señal”.",type:"safe",why:"Vincula la velocidad con tolerancia biomecánica y contexto."},
+ {t:"“Sin lesionados no hubo problema; archivemos el caso”.",type:"old",why:"Pierde información predictiva de casi-siniestros y condiciones precursoras."},
+ {t:"“Una investigación útil pregunta por decisiones, recursos, presiones, diseño y controles, además de las acciones individuales”.",type:"safe",why:"Amplía el análisis causal al sistema de trabajo."}
+];
+
+const exposures = [
+ {id:"mission",icon:"🚚",title:"Desplazamientos misionales",desc:"Entregas, visitas, inspecciones y transporte de carga."},
+ {id:"commute",icon:"🚌",title:"Trayectos casa–trabajo",desc:"Exposición de las personas durante el acceso al trabajo."},
+ {id:"internal",icon:"🏭",title:"Patios y vías internas",desc:"Interacción entre peatones, montacargas, motos y vehículos."},
+ {id:"contract",icon:"🤝",title:"Contratistas y proveedores",desc:"Servicios tercerizados que la empresa selecciona y coordina."},
+ {id:"visitors",icon:"🚶",title:"Clientes y visitantes",desc:"Acceso, estacionamiento, circulación y cruces dentro de sedes."},
+ {id:"community",icon:"🏘️",title:"Entorno y comunidad",desc:"Impactos de la operación sobre peatones, ciclistas y vecindario."}
+];
+
+const scenarios = [
+ {q:"Las entregas tardías reducen el bono y los motociclistas aceleran para recuperar tiempo.",opts:["Repetir curso de conducción defensiva.","Revisar metas, ventanas, rutas e incentivos; añadir monitoreo y retroalimentación.","Sancionar a quien supere el límite."],correct:1},
+ {q:"Un proveedor ingresa diariamente con camiones, pero el contrato no contiene requisitos de seguridad vial.",opts:["La responsabilidad es exclusivamente del proveedor.","Incluir criterios de habilitación, vehículos, conductores, reporte y seguimiento contractual.","Solicitar una carta de compromiso general."],correct:1},
+ {q:"Se reportan microsueños al final de turnos extendidos.",opts:["Entregar café y una pieza comunicativa.","Ajustar jornada, pausas, programación, transporte y capacidad de reporte sin represalia.","Pedir más autocuidado."],correct:1}
+];
+
+const budgetItems = [
+ {id:"training",label:"Formación y comunicación",systemic:false},
+ {id:"routes",label:"Rutas, horarios e incentivos",systemic:true},
+ {id:"speed",label:"Velocidad, telemática y supervisión",systemic:true},
+ {id:"vehicles",label:"Vehículos, mantenimiento y tecnologías",systemic:true},
+ {id:"contracts",label:"Compras y contratistas seguros",systemic:true},
+ {id:"post",label:"Respuesta post-siniestro y aprendizaje",systemic:true}
+];
+
+const finalQuestions = [
+ {q:"¿Qué distingue al Sistema Seguro?",opts:["Busca que nadie se equivoque.","Diseña el sistema para que los errores no produzcan muerte o lesión grave.","Sustituye las normas de tránsito."],correct:1},
+ {q:"Ante una meta comercial que induce exceso de velocidad, ¿qué control es prioritario?",opts:["Cartelera de autocuidado.","Rediseñar la meta, la ruta y la ventana de entrega.","Firmar compromiso individual."],correct:1},
+ {q:"¿Quién comparte responsabilidad en la seguridad vial empresarial?",opts:["Solo conductores y motociclistas.","Toda persona expuesta, sin participación organizacional.","Usuarios, alta dirección, procesos, contratistas y actores con capacidad de control o influencia."],correct:2},
+ {q:"¿Qué función cumple un casi-siniestro?",opts:["Es un dato preventivo para identificar fallas antes del daño.","Solo se registra si hubo daño material.","Sirve para sancionar al reportante."],correct:0},
+ {q:"¿Qué expresa una intervención en capas?",opts:["Varias campañas sobre el mismo tema.","Controles independientes sobre organización, vehículo, velocidad, entorno, personas y respuesta.","Un curso seguido de una evaluación."],correct:1},
+ {q:"¿Cómo debe evaluarse el PESV?",opts:["Por cantidad de documentos producidos.","Por asistencia a capacitaciones.","Por implementación, desempeño, aprendizaje y mejora del riesgo vial."],correct:2}
+];
+
+let state = {
+ user:{name:"",company:"",role:""},
+ completed:[],
+ preScore:null,
+ current:0,
+ classifier:{},
+ exposure:[],
+ scenarios:{},
+ budget:{},
+ final:{},
+ action:{text:"",owner:"",indicator:""},
+ textLarge:false
+};
+let timelineOrder = ["zero","fatal","system","haddon","blame"];
+
+function storageGet(key){try{return window.localStorage.getItem(key)}catch(e){return null}}
+function storageSet(key,value){try{window.localStorage.setItem(key,value);return true}catch(e){return false}}
+function storageRemove(key){try{window.localStorage.removeItem(key);return true}catch(e){return false}}
+function loadState(){
+ const saved=storageGet("colmenaVialState");
+ if(saved){try{state={...state,...JSON.parse(saved)}}catch(e){}}
+}
+function saveState(silent=false){
+ storageSet("colmenaVialState",JSON.stringify(state));
+ updateProgress();
+ if(!silent) toast("Avance guardado");
+}
+function toast(msg){
+ const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
+ setTimeout(()=>t.classList.remove("show"),1800);
+}
+function renderJourney(){
+ const el=document.getElementById("journeyCards");
+ el.innerHTML=modules.map(m=>{
+   const done=state.completed.includes(m.id);
+   const locked=m.id>1 && !state.completed.includes(m.id-1);
+   return `<div class="module-card ${done?'completed':''}">
+     <div class="module-number">${m.icon} Módulo ${m.id}</div>
+     <h3>${m.title}</h3><p>${m.desc}</p>
+     <div class="module-card-footer">
+       <span class="module-status">${done?'✓ Completado':locked?'Secuencia sugerida':'Disponible'}</span>
+       <button class="btn ${done?'btn-ghost':'btn-primary'}" onclick="goModule(${m.id})">${done?'Repasar':'Abrir módulo'}</button>
+     </div>
+   </div>`;
+ }).join("");
+}
+function updateProgress(){
+ const pct=Math.round(state.completed.length/5*100);
+ document.getElementById("topProgress").style.width=pct+"%";
+ document.getElementById("progressLabel").textContent=pct+"% completado";
+ renderJourney();
+ updateNavigationUI();
+}
+function updateNavigationUI(){
+ const current=Number(state.current||0);
+ document.querySelectorAll("[data-module-target]").forEach(btn=>{
+   const target=Number(btn.dataset.moduleTarget);
+   btn.classList.toggle("active",target===current);
+   btn.classList.toggle("done",target>0 && state.completed.includes(target));
+ });
+ const dock=document.querySelector(".mobile-dock");
+ if(dock) dock.classList.toggle("dock-hidden",current===0);
+ const prev=document.getElementById("dockPrev"),next=document.getElementById("dockNext");
+ const compact=window.innerWidth<=440;
+ if(prev){prev.disabled=current<=1;prev.textContent=current>1?(compact?`← M${current-1}`:`← Módulo ${current-1}`):"Anterior";}
+ if(next){next.disabled=current===5;next.textContent=current===0?"Empezar →":current<5?(compact?`M${current+1} →`:`Módulo ${current+1} →`):"Finalizado";}
+}
+function navRelative(direction){
+ const current=Number(state.current||0);
+ if(direction<0){current<=1?goHome():goModule(current-1);}
+ else{current===0?goModule(1):current<5?goModule(current+1):null;}
+}
+function goHome(){
+ document.body.classList.remove("module-mode");
+ document.querySelectorAll(".module-view").forEach(x=>x.classList.remove("active"));
+ state.current=0;saveState(true);updateNavigationUI();
+ document.getElementById("home").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function goModule(n){
+ document.body.classList.add("module-mode");
+ document.querySelectorAll(".module-view").forEach(x=>x.classList.remove("active"));
+ const target=document.getElementById("module"+n);
+ if(!target)return;
+ target.classList.add("active");
+ state.current=n;saveState(true);updateNavigationUI();
+ target.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function completeModule(n,next){
+ if(!state.completed.includes(n))state.completed.push(n);
+ saveState();
+ if(next)goModule(next);
+}
+function openDiagnostic(){
+ document.getElementById("diagnosticModal").classList.add("show");
+ document.getElementById("userName").value=state.user.name||"";
+ document.getElementById("userCompany").value=state.user.company||"";
+ document.getElementById("userRole").value=state.user.role||"";
+}
+function closeDiagnostic(){document.getElementById("diagnosticModal").classList.remove("show")}
+function renderDiagnostic(){
+ document.getElementById("diagnosticQuestions").innerHTML=diagnostic.map((d,i)=>`
+ <fieldset class="question"><legend>${i+1}. ${d.q}</legend>
+  <label class="option"><input type="radio" name="d${i}" value="a"> ${d.a}</label>
+  <label class="option" style="margin-top:.45rem"><input type="radio" name="d${i}" value="b"> ${d.b}</label>
+ </fieldset>`).join("");
+}
+function profileFromScore(score,max=8){
+ const p=score/max;
+ if(p<.45)return {name:"Paradigma centrado en la culpa",text:"Predomina la explicación individual. El reto es ampliar el análisis hacia diseño, gestión, exposición y barreras.",color:"#C94A4A"};
+ if(p<.75)return {name:"Transición sistémica",text:"Ya aparecen principios de Sistema Seguro, pero bajo presión todavía se recurre a formación, sanción o cumplimiento como respuesta principal.",color:"#E09013"};
+ return {name:"Enfoque de Sistema Seguro",text:"Predomina una lectura sistémica: responsabilidad compartida, tolerancia al error, control de energía y prevención en capas.",color:"#1E8E67"};
+}
+function submitDiagnostic(){
+ let score=0,answered=0;
+ diagnostic.forEach((d,i)=>{const r=document.querySelector(`input[name=d${i}]:checked`);if(r){answered++;if(r.value===d.safe)score++;}});
+ if(answered<diagnostic.length){toast("Responde las 8 situaciones");return}
+ state.user={name:document.getElementById("userName").value.trim()||"Participante",company:document.getElementById("userCompany").value.trim()||"Organización",role:document.getElementById("userRole").value.trim()};
+ state.preScore=score;
+ const p=profileFromScore(score);
+ document.getElementById("diagnosticResult").innerHTML=`<div class="profile-card">
+   <div class="profile-gauge" style="--value:${score/8*100}%"><span>${score}/8</span></div>
+   <div><small>Perfil inicial</small><h3 style="margin:.2rem 0">${p.name}</h3><p style="margin:0">${p.text}</p>
+   <button class="btn btn-primary" style="margin-top:.7rem" onclick="closeDiagnostic();goModule(1)">Comenzar recorrido →</button></div></div>`;
+ saveState();
+}
+
+const timelineData={
+ fatal:{title:"El siniestro se asume como fatalidad inevitable"},
+ blame:{title:"La prevención se centra en corregir al conductor"},
+ haddon:{title:"Se analiza persona–vehículo–entorno y fases del evento"},
+ zero:{title:"La muerte deja de aceptarse como precio de la movilidad"},
+ system:{title:"El sistema se diseña para tolerar errores sin daño grave"}
+};
+function renderTimeline(){
+ const el=document.getElementById("sortList");
+ el.innerHTML=timelineOrder.map((id,i)=>`<div class="sort-item">
+  <span class="sort-number">${i+1}</span><span class="sort-text">${timelineData[id].title}</span>
+  <span class="sort-controls"><button onclick="moveTimeline(${i},-1)" aria-label="Subir">↑</button> <button onclick="moveTimeline(${i},1)" aria-label="Bajar">↓</button></span>
+ </div>`).join("");
+}
+function moveTimeline(i,dir){
+ const j=i+dir;if(j<0||j>=timelineOrder.length)return;
+ [timelineOrder[i],timelineOrder[j]]=[timelineOrder[j],timelineOrder[i]];renderTimeline();
+}
+function checkTimeline(){
+ const correct=["fatal","blame","haddon","zero","system"];
+ const ok=timelineOrder.every((x,i)=>x===correct[i]);
+ document.getElementById("timelineFeedback").textContent=ok?"✓ Secuencia correcta. La explicación se amplió progresivamente del individuo al sistema.":"Aún no. Piensa: fatalidad → culpa → análisis multivariable → límite ético → diseño sistémico.";
+ if(ok){if(!state.completed.includes(1))state.completed.push(1);saveState();}
+}
+
+function renderClassifier(){
+ const el=document.getElementById("classifier");
+ el.innerHTML=classifierItems.map((x,i)=>{
+  const ans=state.classifier[i];
+  return `<div class="class-card ${ans?'answered':''}" id="class${i}">
+   <p>${i+1}. ${x.t}</p>
+   <div class="class-actions">
+    <button class="old-btn" onclick="classify(${i},'old')">🧱 Viejo paradigma</button>
+    <button class="safe-btn" onclick="classify(${i},'safe')">🛡️ Sistema Seguro</button>
+   </div>
+   <div class="feedback ${ans?'show':''}" id="cf${i}">${ans?classifierFeedback(i,ans):''}</div>
+  </div>`;
+ }).join("");
+ updateClassifierScore();
+}
+function classifierFeedback(i,ans){
+ const x=classifierItems[i],ok=ans===x.type;
+ return `<b>${ok?'Correcto':'Revisa la lógica'}:</b> ${x.why}`;
+}
+function classify(i,ans){
+ state.classifier[i]=ans;
+ const card=document.getElementById("class"+i);card.classList.add("answered");
+ const fb=document.getElementById("cf"+i);fb.innerHTML=classifierFeedback(i,ans);fb.classList.add("show");
+ updateClassifierScore();saveState(true);
+}
+function updateClassifierScore(){
+ const answered=Object.keys(state.classifier).length;
+ const score=Object.entries(state.classifier).filter(([i,a])=>classifierItems[i].type===a).length;
+ document.getElementById("classifierScore").textContent=`${score} / 8`;
+ if(answered===8){
+   const p=profileFromScore(score);
+   document.getElementById("classifierResult").innerHTML=`<b>${p.name}:</b> ${p.text}`;
+   if(!state.completed.includes(2))state.completed.push(2);saveState(true);
+ }
+}
+
+function renderExposures(){
+ document.getElementById("exposureGrid").innerHTML=exposures.map(x=>`<button class="exposure ${state.exposure.includes(x.id)?'selected':''}" onclick="toggleExposure('${x.id}',this)">
+ <span style="font-size:1.8rem">${x.icon}</span><strong>${x.title}</strong><small>${x.desc}</small></button>`).join("");
+}
+function toggleExposure(id,el){
+ const idx=state.exposure.indexOf(id);if(idx>=0)state.exposure.splice(idx,1);else state.exposure.push(id);
+ el.classList.toggle("selected");saveState(true);
+}
+function checkExposure(){
+ const all=state.exposure.length===exposures.length;
+ document.getElementById("exposureFeedback").textContent=all?"✓ Alcance completo. Cambia el grado de control, pero todos requieren valoración de exposición e influencia.":`Has incluido ${state.exposure.length} de 6. El riesgo vial empresarial no termina en la flota propia ni en la puerta de la sede.`;
+}
+function renderScenarios(){
+ document.getElementById("scenarioGrid").innerHTML=scenarios.map((s,i)=>`<div class="scenario"><h4>${i+1}. ${s.q}</h4>
+ ${s.opts.map((o,j)=>`<button class="option ${state.scenarios[i]==j?(j===s.correct?'correct':'wrong'):''}" onclick="answerScenario(${i},${j},this)">${o}</button>`).join("")}
+ <div class="feedback ${state.scenarios[i]!==undefined?'show':''}" id="sf${i}">${state.scenarios[i]!==undefined?scenarioText(i,state.scenarios[i]):''}</div></div>`).join("");
+}
+function scenarioText(i,j){return j===scenarios[i].correct?"✓ Intervención sistémica: actúa sobre la fuente y agrega control.":"La respuesta se apoya demasiado en conducta o declaración. Busca una medida que modifique el sistema de trabajo."}
+function answerScenario(i,j){
+ state.scenarios[i]=j;renderScenarios();
+ const answered=Object.keys(state.scenarios).length;
+ if(answered===scenarios.length){if(!state.completed.includes(3))state.completed.push(3);saveState();}
+ else saveState(true);
+}
+
+function renderBudget(){
+ document.getElementById("budgetSliders").innerHTML=budgetItems.map(x=>`<div class="slider-row">
+  <label for="b_${x.id}"><b>${x.label}</b><br><span class="small muted">${x.systemic?'Control de sistema':'Apoyo conductual'}</span></label>
+  <input id="b_${x.id}" type="range" min="0" max="50" step="5" value="${state.budget[x.id]||0}" oninput="setBudget('${x.id}',this.value)">
+  <span class="points" id="bp_${x.id}">${state.budget[x.id]||0}</span>
+ </div>`).join("");
+ updateBudget();
+}
+function setBudget(id,val){state.budget[id]=Number(val);document.getElementById("bp_"+id).textContent=val;updateBudget();saveState(true)}
+function updateBudget(){
+ const total=budgetItems.reduce((s,x)=>s+(state.budget[x.id]||0),0);
+ const systemic=budgetItems.filter(x=>x.systemic).reduce((s,x)=>s+(state.budget[x.id]||0),0);
+ const totalEl=document.getElementById("budgetTotal");totalEl.textContent=total;totalEl.classList.toggle("over",total>100);
+ document.getElementById("systemicBar").style.width=Math.min(systemic,100)+"%";
+}
+function evaluateBudget(){
+ const total=budgetItems.reduce((s,x)=>s+(state.budget[x.id]||0),0);
+ const systemic=budgetItems.filter(x=>x.systemic).reduce((s,x)=>s+(state.budget[x.id]||0),0);
+ const training=state.budget.training||0;
+ const fb=document.getElementById("budgetFeedback");
+ if(total!==100){fb.className="callout danger";fb.innerHTML=`<b>Presupuesto inválido:</b> asignaste ${total}. Debes distribuir exactamente 100 puntos.`;return}
+ if(systemic>=75 && training<=25){
+   fb.className="callout safe";fb.innerHTML=`<b>Estrategia robusta:</b> ${systemic}% se concentra en barreras del sistema y ${training}% en formación. La mezcla reduce dependencia de la conducta perfecta.`;
+   if(!state.completed.includes(4))state.completed.push(4);saveState();
+ }else if(systemic>=60){
+   fb.className="callout";fb.innerHTML=`<b>Estrategia en transición:</b> hay controles sistémicos, pero la distribución todavía puede fortalecer rutas, velocidad, vehículos, contratación y respuesta post-siniestro.`;
+ }else{
+   fb.className="callout danger";fb.innerHTML=`<b>Viejo paradigma detectado:</b> la inversión depende demasiado de formación o de controles aislados. Rebalancea hacia fuentes organizacionales y barreras independientes.`;
+ }
+}
+
+function renderFinalQuiz(){
+ document.getElementById("finalQuiz").innerHTML=finalQuestions.map((q,i)=>`<div class="question"><h4>${i+1}. ${q.q}</h4>
+ <div class="option-grid">${q.opts.map((o,j)=>`<button class="option ${state.final[i]===j?(j===q.correct?'correct':'wrong'):''}" onclick="answerFinal(${i},${j})">${o}</button>`).join("")}</div>
+ <div class="feedback ${state.final[i]!==undefined?'show':''}">${state.final[i]===undefined?'':state.final[i]===q.correct?'✓ Decisión coherente con Sistema Seguro.':'Revisa: la respuesta correcta actúa sobre el sistema, la energía y el desempeño verificable.'}</div></div>`).join("");
+ updateFinalScore();
+}
+function answerFinal(i,j){state.final[i]=j;renderFinalQuiz();saveState(true)}
+function updateFinalScore(){
+ const score=Object.entries(state.final).filter(([i,a])=>finalQuestions[i].correct===a).length;
+ document.getElementById("finalScorePill").textContent=`${score} / 6`;
+}
+function finishCourse(){
+ const answered=Object.keys(state.final).length;
+ if(answered<finalQuestions.length){toast("Completa las 6 decisiones finales");return}
+ state.action={text:document.getElementById("actionText").value.trim(),owner:document.getElementById("actionOwner").value.trim(),indicator:document.getElementById("actionIndicator").value.trim()};
+ if(!state.action.text||!state.action.owner||!state.action.indicator){toast("Completa la acción, responsable e indicador");return}
+ if(!state.completed.includes(5))state.completed.push(5);
+ const score=Object.entries(state.final).filter(([i,a])=>finalQuestions[i].correct===a).length;
+ const post=Math.round(score/finalQuestions.length*100);
+ const pre=state.preScore===null?null:Math.round(state.preScore/8*100);
+ const p=profileFromScore(Math.round(score/finalQuestions.length*8));
+ document.getElementById("rPre").textContent=pre===null?"Sin dato":pre+"%";
+ document.getElementById("rPost").textContent=post+"%";
+ document.getElementById("rModules").textContent=state.completed.length+"/5";
+ document.getElementById("rProfile").textContent=p.name;
+ document.getElementById("resultNarrative").innerHTML=post>=84
+ ?`Tu desempeño evidencia comprensión aplicada del Sistema Seguro. El siguiente paso no es otra campaña: es ejecutar y verificar la acción de 30 días sobre una fuente real del riesgo.`
+ :post>=67
+ ?`Existe una transición sólida, pero conviene revisar las respuestas fallidas y asegurar que las medidas no dependan principalmente del comportamiento individual.`
+ :`El resultado todavía reproduce componentes del viejo paradigma. Repite los módulos 2 y 4 antes de aprobar una intervención empresarial.`;
+ document.getElementById("resultsArea").classList.remove("hidden");
+ saveState();
+}
+function showCertificate(){
+ const score=Object.entries(state.final).filter(([i,a])=>finalQuestions[i].correct===a).length;
+ const p=profileFromScore(Math.round(score/finalQuestions.length*8));
+ document.getElementById("certName").textContent=state.user.name||"Participante";
+ document.getElementById("certCompany").textContent=state.user.company||"Organización";
+ document.getElementById("certScore").textContent=Math.round(score/finalQuestions.length*100)+"%";
+ document.getElementById("certProfile").textContent=p.name;
+ document.getElementById("certDate").textContent=new Date().toLocaleDateString("es-CO",{year:"numeric",month:"long",day:"numeric"});
+ document.getElementById("certificate").style.display="block";
+ document.getElementById("certificate").scrollIntoView({behavior:"smooth"});
+}
+function exportResults(){
+ const finalScore=Object.entries(state.final).filter(([i,a])=>finalQuestions[i].correct===a).length;
+ const rows=[
+  ["Campo","Resultado"],
+  ["Nombre",state.user.name||""],["Empresa",state.user.company||""],["Cargo",state.user.role||""],
+  ["Diagnóstico inicial",state.preScore===null?"":state.preScore+"/8"],
+  ["Clasificador",Object.entries(state.classifier).filter(([i,a])=>classifierItems[i].type===a).length+"/8"],
+  ["Evaluación final",finalScore+"/6"],
+  ["Módulos completados",state.completed.join(" | ")],
+  ["Acción 30 días",state.action.text||document.getElementById("actionText").value],
+  ["Responsable",state.action.owner||document.getElementById("actionOwner").value],
+  ["Indicador",state.action.indicator||document.getElementById("actionIndicator").value],
+  ["Fecha",new Date().toISOString()]
+ ];
+ const csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");
+ const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="resultado_colmena_vial.csv";a.click();URL.revokeObjectURL(a.href);
+}
+function resetCourse(){
+ if(!confirm("¿Reiniciar todo el recorrido y borrar el avance guardado?"))return;
+ storageRemove("colmenaVialState");location.reload();
+}
+function toggleTextSize(){
+ state.textLarge=!state.textLarge;document.documentElement.style.fontSize=state.textLarge?"112.5%":"100%";saveState(true);
+}
+function hydrate(){
+ loadState();
+ if(state.textLarge)document.documentElement.style.fontSize="112.5%";
+ renderJourney();renderDiagnostic();renderTimeline();renderClassifier();renderExposures();renderScenarios();renderBudget();renderFinalQuiz();updateProgress();
+ document.getElementById("actionText").value=state.action.text||"";
+ document.getElementById("actionOwner").value=state.action.owner||"";
+ document.getElementById("actionIndicator").value=state.action.indicator||"";
+ if(state.current)goModule(state.current);
+}
+window.addEventListener("resize",updateNavigationUI);
+hydrate();
+</script>
+</body>
+</html>
