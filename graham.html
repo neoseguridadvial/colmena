@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graham & El Enfoque de Sistema Seguro</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        aguamarina: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#14b8a6', // Primary Teal/Aguamarina
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        },
+                        amarilloquemado: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706', // Primary Burned Yellow / Amber
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/fontawesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Pulse Animation for Photo Hotspots (Fixed position, pulsing stroke and opacity) */
+        @keyframes customPulse {
+            0% { opacity: 0.7; stroke-width: 2px; }
+            50% { opacity: 1; stroke-width: 6px; }
+            100% { opacity: 0.7; stroke-width: 2px; }
+        }
+        .hotspot-pulse {
+            animation: customPulse 1.8s infinite ease-in-out;
+        }
+
+        /* Glassmorphism modal backdrops */
+        .modal-backdrop {
+            background-color: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(6px);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #14b8a6;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0d9488;
+        }
+    </style>
+</head>
+<body class="h-full text-slate-800 bg-slate-50 font-sans flex flex-col min-h-screen">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-aguamarina-500 to-amarilloquemado-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                    <i class="fa-solid font-bold fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">Proyecto Graham & Sistema Seguro</h1>
+                    <p class="text-xs text-slate-500 font-medium">Anatomía para la supervivencia & Enfoque vial integral</p>
+                </div>
+            </div>
+
+            <!-- Tab Switcher Navigation Buttons -->
+            <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+                <button id="tab-btn-graham" onclick="switchTab('graham')" class="px-4 py-2 text-sm font-semibold rounded-lg transition-all shadow-sm bg-white text-aguamarina-700 flex items-center space-x-2">
+                    <i class="fa-solid fa-user-ninja text-amarilloquemado-600"></i>
+                    <span class="hidden md:inline">1. Infografía de Graham</span>
+                    <span class="md:hidden">Graham</span>
+                </button>
+                <button id="tab-btn-game" onclick="switchTab('game')" class="px-4 py-2 text-sm font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-900 flex items-center space-x-2">
+                    <i class="fa-solid fa-trophy text-amarilloquemado-600"></i>
+                    <span class="hidden md:inline">2. ¿Quién Quiere Ser Millonario?</span>
+                    <span class="md:hidden">Juego</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- TAB 1: GRAHAM INTERACTIVE INFOGRAPHIC -->
+        <section id="tab-graham" class="space-y-6">
+            
+            <!-- Banner introduction -->
+            <div class="bg-gradient-to-r from-aguamarina-600 to-aguamarina-800 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                <div class="relative z-10 max-w-3xl">
+                    <span class="inline-block px-3 py-1 bg-amarilloquemado-500 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-full mb-3">Biomecánica & Seguridad Vial</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold mb-2">¿Cómo debería evolucionar el cuerpo humano para sobrevivir a los choques?</h2>
+                    <p class="text-aguamarina-100 text-sm sm:text-base leading-relaxed">
+                        Graham fue diseñado por la TAC (Comisión de Accidentes de Transporte de Australia), un cirujano traumatólogo y una artista hiperrealista. Muestra nuestra extrema vulnerabilidad biológica ante los impactos de velocidad: para sobrevivir sin tecnología externa, este tendría que ser nuestro cuerpo.
+                    </p>
+                </div>
+                <div class="absolute -right-10 -bottom-10 opacity-15 text-white">
+                    <i class="fa-solid fa-bone text-9xl"></i>
+                </div>
+            </div>
+
+            <!-- Interactive Main Board -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-lg p-4 sm:p-6 relative">
+                <div class="text-center mb-4">
+                    <h3 class="text-lg font-bold text-slate-900">Haz clic en las partes del cuerpo o botones para desplegar detalles evolutivos</h3>
+                    <p class="text-xs text-slate-500">Cada punto analiza la fragilidad humana vs. la adaptación biológica de Graham</p>
+                </div>
+
+                <!-- Main Grid Layout: Callouts Left | Central Image Overlay | Callouts Right -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    
+                    <!-- Left Side Callout Cards (Desktop) -->
+                    <div class="lg:col-span-3 space-y-3">
+                        <div onclick="openGrahamModal('skull')" class="p-3 bg-slate-50 hover:bg-aguamarina-50 border border-slate-200 hover:border-aguamarina-400 rounded-xl cursor-pointer transition shadow-sm group">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-lg bg-amarilloquemado-500 text-white flex items-center justify-center font-bold">
+                                    <i class="fa-solid fa-skull"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-900 group-hover:text-aguamarina-700">1. Cráneo Casco</h4>
+                                    <p class="text-xs text-slate-500">Zonas de deformación biológica</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div onclick="openGrahamModal('neck')" class="p-3 bg-slate-50 hover:bg-aguamarina-50 border border-slate-200 hover:border-aguamarina-400 rounded-xl cursor-pointer transition shadow-sm group">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-lg bg-aguamarina-500 text-white flex items-center justify-center font-bold">
+                                    <i class="fa-solid fa-[#14b8a6] fa-shield-cat"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-900 group-hover:text-aguamarina-700">2. Cuello Fusionado</h4>
+                                    <p class="text-xs text-slate-500">Sin vértebras expuestas</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div onclick="openGrahamModal('ribs')" class="p-3 bg-slate-50 hover:bg-aguamarina-50 border border-slate-200 hover:border-aguamarina-400 rounded-xl cursor-pointer transition shadow-sm group">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-lg bg-amarilloquemado-600 text-white flex items-center justify-center font-bold">
+                                    <i class="fa-solid fa-vest"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-900 group-hover:text-aguamarina-700">3. Airbags Intercostales</h4>
+                                    <p class="text-xs text-slate-500">Sacos amortiguadores</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div onclick="openGrahamModal('feet')" class="p-3 bg-slate-50 hover:bg-aguamarina-50 border border-slate-200 hover:border-aguamarina-400 rounded-xl cursor-pointer transition shadow-sm group">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-lg bg-aguamarina-600 text-white flex items-center justify-center font-bold">
+                                    <i class="fa-solid fa-shoe-prints"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-900 group-hover:text-aguamarina-700">4. Pies Muelle</h4>
+                                    <p class="text-xs text-slate-500">Articulación extra propulsora</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Center Display: Photo + SVG Overlay -->
+                    <div class="lg:col-span-6 relative flex items-center justify-center min-h-[480px]">
+                        <div class="relative w-full max-w-md mx-auto aspect-[4/5] bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 shadow-md">
+                            
+                            <!-- Official Image of Graham -->
+                            <img src="https://i.imgur.com/AQfyxnu.png" 
+                                 alt="Escultura Graham Project TAC Australia" 
+                                 class="w-full h-full object-cover object-center"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/600x750/14b8a6/ffffff?text=Graham+Modelo+Biomecanico';">
+
+                            <!-- SVG Hotspot & Line Overlay Container -->
+                            <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet">
+                                <!-- Line connections from nodes to hotspots -->
+                                <!-- 1. SKULL -> Top skull center (480, 110) -->
+                                <path id="line-skull" d="M 170 110 L 320 110 L 480 110" fill="none" stroke="#d97706" stroke-width="2.5" stroke-dasharray="6 4"/>
+                                
+                                <!-- 2. BRAIN -> Upper forehead (520, 125) -->
+                                <path id="line-brain" d="M 830 125 L 680 125 L 520 125" fill="none" stroke="#14b8a6" stroke-width="2.5" stroke-dasharray="6 4"/>
+
+                                <!-- 3. NECK -> Chin/Neck Base (450, 230) -->
+                                <path id="line-neck" d="M 170 230 L 320 230 L 450 230" fill="none" stroke="#14b8a6" stroke-width="2.5" stroke-dasharray="6 4"/>
+
+                                <!-- 4. FACE -> Center Face (500, 180) -->
+                                <path id="line-face" d="M 830 230 L 680 230 L 500 180" fill="none" stroke="#d97706" stroke-width="2.5" stroke-dasharray="6 4"/>
+
+                                <!-- 5. RIBS -> Chest Ribs (440, 360) -->
+                                <path id="line-ribs" d="M 170 360 L 300 360 L 440 360" fill="none" stroke="#d97706" stroke-width="2.5" stroke-dasharray="6 4"/>
+
+                                <!-- 6. SKIN -> Shoulder/Epidermis (620, 320) -->
+                                <path id="line-skin" d="M 830 360 L 700 360 L 620 320" fill="none" stroke="#14b8a6" stroke-width="2.5" stroke-dasharray="6 4"/>
+
+                                <!-- 7. FEET -> Lower foot joint (370, 720) -->
+                                <path id="line-feet" d="M 170 680 L 280 680 L 370 720" fill="none" stroke="#d97706" stroke-width="2.5" stroke-dasharray="6 4"/>
+
+                                <!-- 8. KNEES -> Multidirectional Knee (510, 520) -->
+                                <path id="line-knees" d="M 830 610 L 670 610 L 510 520" fill="none" stroke="#14b8a6" stroke-width="2.5" stroke-dasharray="6 4"/>
+
+                                <!-- HOTSPOT PULSING TARGETS OVER PHOTO (STATIC POSITIONS WITH OPACITY/BORDER PULSE) -->
+                                <circle onclick="openGrahamModal('skull')" cx="480" cy="110" r="14" class="fill-amarilloquemado-600 stroke-white cursor-pointer hotspot-pulse pointer-events-auto"/>
+                                <circle onclick="openGrahamModal('brain')" cx="520" cy="125" r="14" class="fill-aguamarina-500 stroke-white cursor-pointer hotspot-pulse pointer-events-auto"/>
+                                
+                                <circle onclick="openGrahamModal('neck')" cx="450" cy="230" r="14" class="fill-amarilloquemado-600 stroke-white cursor-pointer hotspot-pulse pointer-events-auto"/>
+                                <circle onclick="openGrahamModal('face')" cx="500" cy="180" r="14" class="fill-aguamarina-500 stroke-white cursor-pointer hotspot-pulse pointer-events-auto"/>
+                                
+                                <circle onclick="openGrahamModal('ribs')" cx="440" cy="360" r="14" class="fill-aguamarina-500 stroke-white cursor-pointer hotspot-pulse pointer-events-auto"/>
+                                <circle onclick="openGrahamModal('skin')" cx="620" cy="320" r="14" class="fill-amarilloquemado-600 stroke-white cursor-pointer hotspot-pulse pointer-events-auto"/>
+                                
+                                <circle onclick="openGrahamModal('feet')" cx="370" cy="720" r="14" class="fill-amarilloquemado-600 stroke-white cursor-pointer hotspot-pulse pointer-events-auto"/>
+                                <circle onclick="openGrahamModal('knees')" cx="510" cy="520" r="14" class="fill-aguamarina-500 stroke-white cursor-pointer hotspot-pulse pointer-events-auto"/>
+
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Right Side Callout Cards (Desktop) -->
+                    <div class="lg:col-span-3 space-y-3">
+                        <div onclick="openGrahamModal('brain')" class="p-3 bg-slate-50 hover:bg-aguamarina-50 border border-slate-200 hover:border-aguamarina-400 rounded-xl cursor-pointer transition shadow-sm group">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-lg bg-aguamarina-500 text-white flex items-center justify-center font-bold">
+                                    <i class="fa-solid fa-brain"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-900 group-hover:text-aguamarina-700">5. Cerebro Protegido</h4>
+                                    <p class="text-xs text-slate-500">Líquido CEF + Amortiguadores</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div onclick="openGrahamModal('face')" class="p-3 bg-slate-50 hover:bg-aguamarina-50 border border-slate-200 hover:border-aguamarina-400 rounded-xl cursor-pointer transition shadow-sm group">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-lg bg-amarilloquemado-500 text-white flex items-center justify-center font-bold">
+                                    <i class="fa-solid fa-face-smile text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-900 group-hover:text-aguamarina-700">6. Rostro Plano</h4>
+                                    <p class="text-xs text-slate-500">Tejido adiposo plano</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div onclick="openGrahamModal('skin')" class="p-3 bg-slate-50 hover:bg-aguamarina-50 border border-slate-200 hover:border-aguamarina-400 rounded-xl cursor-pointer transition shadow-sm group">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-lg bg-aguamarina-600 text-white flex items-center justify-center font-bold">
+                                    <i class="fa-solid fa-hand-dots"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-900 group-hover:text-aguamarina-700">7. Piel Dermis Gruesa</h4>
+                                    <p class="text-xs text-slate-500">Escudo anti-abrasión</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div onclick="openGrahamModal('knees')" class="p-3 bg-slate-50 hover:bg-aguamarina-50 border border-slate-200 hover:border-aguamarina-400 rounded-xl cursor-pointer transition shadow-sm group">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-lg bg-amarilloquemado-600 text-white flex items-center justify-center font-bold">
+                                    <i class="fa-solid fa-person-walking"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-slate-900 group-hover:text-aguamarina-700">8. Rodillas Flexibles</h4>
+                                    <p class="text-xs text-slate-500">Movimiento multidireccional</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Context Banner: Human Vulnerability limits -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-start space-x-4">
+                    <div class="p-3 bg-red-100 text-red-600 rounded-lg font-bold text-xl">
+                        <i class="fa-solid fa-gauge-high"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-900 text-sm">Límite Biológico Humano</h4>
+                        <p class="text-xs text-slate-600 mt-1">El cuerpo no fue diseñado para soportar fuerzas mayores a choques a <strong class="text-slate-900">30 km/h</strong> sin sufrir lesiones severas o la muerte.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-start space-x-4">
+                    <div class="p-3 bg-amarilloquemado-100 text-amarilloquemado-700 rounded-lg font-bold text-xl">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-900 text-sm">Energía Cinética ($\frac{1}{2}mv^2$)</h4>
+                        <p class="text-xs text-slate-600 mt-1">Al duplicar la velocidad, la energía del impacto transferida al cuerpo se <strong class="text-slate-900">cuadruplica</strong> instantáneamente.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-start space-x-4">
+                    <div class="p-3 bg-aguamarina-100 text-aguamarina-700 rounded-lg font-bold text-xl">
+                        <i class="fa-solid fa-road-spikes"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-900 text-sm">Necesidad del Sistema Seguro</h4>
+                        <p class="text-xs text-slate-600 mt-1">Como no podemos cambiar nuestro cuerpo como Graham, debemos adaptar las vías, velocidades y vehículos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: WHO WANTS TO BE A MILLIONAIRE (SISTEMA SEGURO) -->
+        <section id="tab-game" class="hidden space-y-6">
+            
+            <!-- Game Header Status -->
+            <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-4 border-2 border-amarilloquemado-500">
+                <div class="flex items-center space-x-4">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-amarilloquemado-500 to-amarilloquemado-300 text-slate-950 flex items-center justify-center font-black text-2xl shadow-lg">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-black text-amber-400 tracking-wide">¿Quién Quiere Ser Millonario?</h2>
+                        <p class="text-xs text-slate-300">Especialista en el Enfoque de Sistema Seguro & Movilidad</p>
+                    </div>
+                </div>
+
+                <!-- Lifelines (Comodines) Buttons -->
+                <div class="flex items-center space-x-3 bg-slate-800 p-2 rounded-xl border border-slate-700">
+                    <button id="lifeline-5050" onclick="useLifeline5050()" class="px-3 py-2 bg-slate-700 hover:bg-amarilloquemado-600 text-white font-bold text-xs rounded-lg transition flex items-center space-x-1 border border-slate-600">
+                        <i class="fa-solid fa-scissors text-amber-400"></i>
+                        <span>50:50</span>
+                    </button>
+                    <button id="lifeline-phone" onclick="useLifelinePhone()" class="px-3 py-2 bg-slate-700 hover:bg-aguamarina-600 text-white font-bold text-xs rounded-lg transition flex items-center space-x-1 border border-slate-600">
+                        <i class="fa-solid fa-phone text-aguamarina-300"></i>
+                        <span>Llamada</span>
+                    </button>
+                    <button id="lifeline-audience" onclick="useLifelineAudience()" class="px-3 py-2 bg-slate-700 hover:bg-indigo-600 text-white font-bold text-xs rounded-lg transition flex items-center space-x-1 border border-slate-600">
+                        <i class="fa-solid fa-users text-indigo-300"></i>
+                        <span>Público</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Game Engine Grid: Main Question Card & Prize Scale Ladder -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Main Question Area -->
+                <div class="lg:col-span-8 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-lg flex flex-col justify-between space-y-6">
+                    
+                    <!-- Question Header & Difficulty -->
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span id="game-question-number" class="px-3 py-1 bg-aguamarina-100 text-aguamarina-800 font-bold text-xs rounded-full">Pregunta 1 de 15</span>
+                            <span id="game-question-val" class="text-lg font-black text-amarilloquemado-600">$100 USD</span>
+                        </div>
+                        
+                        <h3 id="game-question-text" class="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
+                            Cargando pregunta...
+                        </h3>
+                    </div>
+
+                    <!-- 4 Answer Options (A, B, C, D) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="game-options-container">
+                        <!-- Rendered by JS -->
+                    </div>
+
+                    <!-- Status Bar / Feedback -->
+                    <div id="game-feedback" class="p-4 rounded-xl hidden text-sm font-semibold flex items-center justify-between">
+                        <!-- JS Feedback -->
+                    </div>
+                </div>
+
+                <!-- Prize Scale Ladder -->
+                <div class="lg:col-span-4 bg-slate-900 text-white p-5 rounded-2xl shadow-lg border border-slate-800">
+                    <h4 class="font-extrabold text-sm text-slate-400 uppercase tracking-wider mb-4 text-center border-b border-slate-800 pb-2">Escala de Premios</h4>
+                    
+                    <div id="prize-ladder" class="space-y-1.5 flex flex-col-reverse text-xs font-bold font-mono">
+                        <!-- Rendered dynamically by JS -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- GRAHAM DETAIL MODAL (VENTANA EMERGENTE) -->
+    <div id="graham-modal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden transform transition-all my-8">
+            
+            <!-- Modal Header -->
+            <div id="modal-header-bg" class="bg-gradient-to-r from-aguamarina-600 to-aguamarina-800 p-6 text-white flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div id="modal-icon-container" class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-2xl text-white font-bold">
+                        <i class="fa-solid fa-skull"></i>
+                    </div>
+                    <div>
+                        <h3 id="modal-title" class="text-xl font-black">Título de la Anatomía</h3>
+                        <p id="modal-subtitle" class="text-xs text-aguamarina-100">Subtítulo explicativo</p>
+                    </div>
+                </div>
+                <button onclick="closeGrahamModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content Body -->
+            <div class="p-6 space-y-5 text-slate-700 text-sm">
+                
+                <!-- Vulnerability Box -->
+                <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl">
+                    <h4 class="font-bold text-red-900 text-xs uppercase tracking-wider mb-1 flex items-center space-x-2">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                        <span>Vulnerabilidad del Ser Humano Actual</span>
+                    </h4>
+                    <p id="modal-vulnerability" class="text-slate-700 leading-relaxed text-xs sm:text-sm">
+                        Detalle de las fracturas o traumatismos actuales.
+                    </p>
+                </div>
+
+                <!-- Adaptation Box -->
+                <div class="p-4 bg-aguamarina-50 border-l-4 border-aguamarina-500 rounded-r-xl">
+                    <h4 class="font-bold text-aguamarina-900 text-xs uppercase tracking-wider mb-1 flex items-center space-x-2">
+                        <i class="fa-solid fa-dna"></i>
+                        <span>Solución Evolutiva de Graham</span>
+                    </h4>
+                    <p id="modal-evolution" class="text-slate-700 leading-relaxed text-xs sm:text-sm">
+                        Descripción biomecánica modificada.
+                    </p>
+                </div>
+
+                <!-- Physics & Impact Box -->
+                <div class="p-4 bg-amarilloquemado-50 border-l-4 border-amarilloquemado-500 rounded-r-xl">
+                    <h4 class="font-bold text-amarilloquemado-900 text-xs uppercase tracking-wider mb-1 flex items-center space-x-2">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>Física de Absorsión de Energía</span>
+                    </h4>
+                    <p id="modal-physics" class="text-slate-700 leading-relaxed text-xs sm:text-sm">
+                        Explicación sobre desaceleración y Fuerzas G.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-slate-50 px-6 py-4 border-t border-slate-200 flex justify-end">
+                <button onclick="closeGrahamModal()" class="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow transition">
+                    Entendido / Cerrar Ventana
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIFELINE MODAL POPUP (LLAMADA O PÚBLICO) -->
+    <div id="lifeline-modal" class="fixed inset-0 z-50 hidden modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden p-6 text-center space-y-4">
+            <div id="lifeline-modal-icon" class="w-16 h-16 rounded-full bg-amarilloquemado-100 text-amarilloquemado-600 mx-auto flex items-center justify-center text-3xl font-bold">
+                <i class="fa-solid fa-phone"></i>
+            </div>
+            <h3 id="lifeline-modal-title" class="text-lg font-black text-slate-900">Ayuda del Comodín</h3>
+            <div id="lifeline-modal-content" class="text-sm text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <!-- Dynamic text or chart -->
+            </div>
+            <button onclick="closeLifelineModal()" class="w-full py-2.5 bg-aguamarina-600 hover:bg-aguamarina-700 text-white font-bold text-xs rounded-xl transition">
+                Continuar con el Juego
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+            <p>© 2026 Herramienta Educativa Interactivas sobre el Enfoque de Sistema Seguro y Biomecánica de Choques (Proyecto Graham - TAC Victoria).</p>
+        </div>
+    </footer>
+
+    <script>
+        const grahamData = {
+            skull: {
+                title: "1. Cráneo Estructurado como Casco",
+                subtitle: "Protección cefálica con zonas de deformación programada",
+                icon: "fa-skull",
+                vulnerability: "En un choque frontal, la cabeza humana golpea el parabrisas o volante con aceleraciones de hasta 80G. El delgado hueso craneal actual se fractura fácilmente causando hematomas epidurales mortales.",
+                evolution: "El cráneo de Graham es mucho más grande, grueso y rodeado de costillas óseas con cavidades amortiguadoras integradas, funcionando como un casco de motocicleta biológico.",
+                physics: "Aumenta la distancia de deformación estructural ($d$), reduciendo drásticamente la fuerza de pico ($F = \frac{\Delta p}{\Delta t}$) transferida a la caja craneana."
+            },
+            brain: {
+                title: "2. Cerebro Suspendido y Amortiguado",
+                subtitle: "Aislamiento contra concusiones y desaceleración inercial",
+                icon: "fa-brain",
+                vulnerability: "El cerebro humano flota en una cantidad muy reducida de líquido cefalorraquídeo. En un frenazo brusco, el cerebro choca violentamente contra las paredes internas del hueso (golpe y contragolpe), desgarrando axones y vasos sanguíneos.",
+                evolution: "El cerebro de Graham mantiene el mismo tamaño funcional pero se halla dentro de una cavidad reforzada con mayor volumen de líquido cefalorraquídeo y ligamentos elásticos de sujeción.",
+                physics: "Prolonga el tiempo de desaceleración interna ($\Delta t$), disminuyendo la aceleración angular y evitando el choque directo entre el tejido cerebral y el hueso."
+            },
+            neck: {
+                title: "3. Ausencia de Cuello (Fusionado)",
+                subtitle: "Eliminación del latigazo cervical y trauma medular",
+                icon: "fa-shield-cat",
+                vulnerability: "El cuello humano tiene 7 vértebras delgadas diseñadas para rotación, no para impacto. En una colisión, la cabeza oscila violentamente hacia adelante y atrás (Whiplash), fracturando C1-C7 y cortando la médula espinal.",
+                evolution: "Graham carece de cuello. Sus costillas se extienden directamente hacia arriba para envolver la base del cráneo, sacrificando la movilidad lateral pero creando un pilar inexpugnable.",
+                physics: "Elimina el brazo de palanca (torque $\tau = F \times r$) que ejerce la cabeza pesada sobre la frágil columna cervical durante el impacto."
+            },
+            face: {
+                title: "4. Rostro Plano con Acolchado Adiposo",
+                subtitle: "Reducción de fracturas faciales severas",
+                icon: "fa-face-smile",
+                vulnerability: "Nuestra nariz prominente, pómulos y cuencas oculares son frágiles. Al chocar contra tableros o manubrios, los huesos faciales se pulverizan, comprometiendo vías aéreas y vista.",
+                evolution: "La cara de Graham es completamente plana, sin partes óseas protuberantes, y cubierta por abundante tejido graso adiposo hiperdesarrollado que absorbe el golpe directo.",
+                physics: "Distribuye la presión cinemática ($P = \frac{F}{A}$) sobre una superficie mucho más amplia y acolchada."
+            },
+            ribs: {
+                title: "5. Tórax con Sacos Airbags Intercostales",
+                subtitle: "Escudo torácico amortiguador para órganos vitales",
+                icon: "fa-vest",
+                vulnerability: "Las costillas humanas se fracturan fácilmente bajo la presión del cinturón o volante, perforando pulmones (neumotórax) y lacerando el corazón o la aorta.",
+                evolution: "Entre cada costilla de Graham existen sacos de tejido cartilaginoso similares a 'airbags' naturales que expulsa gas/fluido para disipar la fuerza expansiva antes de tocar el corazón.",
+                physics: "Disipa la energía cinética ($E_c = \frac{1}{2}m v^2$) mediante deformación elástica de fluido intercostal."
+            },
+            skin: {
+                title: "6. Dermis Extremadamente Gruesa",
+                subtitle: "Protección cutánea contra quemaduras y abrasión vial",
+                icon: "fa-hand-dots",
+                vulnerability: "La piel humana se rasga con mínimos niveles de fricción contra el asfalto ('road rash'), provocando hemorragias masivas e infecciones graves.",
+                evolution: "La piel de Graham es ultra-densa, reforzada con queratina gruesa y tejido conectivo en el tórax y extremidades.",
+                physics: "Soporta altos esfuerzos cortantes de fricción ($\tau_{cortex}$) reduciendo el coeficiente de desgaste al raspar con materiales abrasivos."
+            },
+            knees: {
+                title: "7. Rodillas Multidireccionales",
+                subtitle: "Flexibilidad en 360 grados para impacto peatonal",
+                icon: "fa-person-walking",
+                vulnerability: "La articulación de la rodilla humana solo flexiona en una dirección. Si un auto embiste a un peatón de lado, los ligamentos cruzados e colaterales se rompen al instante.",
+                evolution: "Las rodillas de Graham poseen articulaciones esféricas reforzadas con tendones suplementarios capaces de doblarse suavemente en cualquier dirección sin romperse.",
+                physics: "Permite la articulación rotacional sin exceder el punto de ruptura por cizallamiento lateral."
+            },
+            feet: {
+                title: "8. Pies con Articulaciones Tipo Muelle",
+                subtitle: "Propulsión elástica para evasión rápida",
+                icon: "fa-shoe-prints",
+                vulnerability: "La parte inferior de la pierna y tobillo humano son frágiles ante el impacto de un parachoques o aplastamiento.",
+                evolution: "Graham posee una articulación adicional en la parte baja de la pierna que actúa como un resorte de propulsión rápida, permitiéndole saltar velozmente hacia arriba fuera de la trayectoria del auto.",
+                physics: "Transforma la energía elástica acumulada en aceleración vertical instantánea ($F = k \cdot x$)."
+            }
+        };
+
+        const millionaireQuestions = [
+            {
+                q: "¿Cuál es el principio biofísico fundamental que sustenta el Enfoque de Sistema Seguro?",
+                options: [
+                    "El cuerpo humano tiene una tolerancia limitada a las fuerzas de impacto biomecánico.",
+                    "Los seres humanos nunca cometen errores al conducir si están bien educados.",
+                    "La prioridad absoluta es maximizar la velocidad de los vehículos en autopistas.",
+                    "Los peatones siempre deben ceder el paso a los vehículos motorizados."
+                ],
+                correct: 0,
+                val: "$100"
+            },
+            {
+                q: "En caso de un impacto contra un peatón, ¿a partir de qué velocidad el riesgo de muerte para el peatón supera el 80%?",
+                options: [
+                    "20 km/h",
+                    "30 km/h",
+                    "50 km/h",
+                    "90 km/h"
+                ],
+                correct: 2,
+                val: "$200"
+            },
+            {
+                q: "¿En quiénes recae la responsabilidad de la seguridad vial en el Enfoque de Sistema Seguro?",
+                options: [
+                    "Exclusivamente en los conductores de vehículos.",
+                    "Únicamente en los ingenieros de tránsito.",
+                    "Compartida entre los diseñadores/administradores del sistema y los usuarios de la vía.",
+                    "Únicamente en la policía de carreteras."
+                ],
+                correct: 2,
+                val: "$300"
+            },
+            {
+                q: "¿Cuál de los siguientes NO es uno de los 5 pilares clave del Sistema Seguro?",
+                options: [
+                    "Velocidades Seguras",
+                    "Vehículos Seguros",
+                    "Aumento Indiscriminado de Multas Fiscales",
+                    "Atención Post-Colisión Efectiva"
+                ],
+                correct: 2,
+                val: "$500"
+            },
+            {
+                q: "El concepto de 'Vías e Infraestructura Indulgente' (Forgiving Roads) significa que la calle debe:",
+                options: [
+                    "Perdonar las multas automáticas a los conductores.",
+                    "Estar diseñada para evitar que un error humano previsible resulte en muerte o lesión grave.",
+                    "Eliminar todas las señales de tránsito para fomentar la autogestión.",
+                    "Tener pavimento blanco autorreflexivo."
+                ],
+                correct: 1,
+                val: "$1,000" // Milestone 1
+            },
+            {
+                q: "En la ecuación de Energía Cinética ($E_c = \\frac{1}{2}m v^2$), si duplicamos la velocidad ($v$) de un automóvil, ¿qué ocurre con la energía transmitida en un choque?",
+                options: [
+                    "Se mantiene exactamente igual.",
+                    "Se duplica.",
+                    "Se cuadruplica ($4\\times$).",
+                    "Aumenta ocho veces ($8\\times$)."
+                ],
+                correct: 2,
+                val: "$2,000"
+            },
+            {
+                q: "¿Cuál es la velocidad máxima de diseño recomendada en zonas urbanas densas con alto flujo de peatones sin separación física?",
+                options: [
+                    "30 km/h",
+                    "50 km/h",
+                    "70 km/h",
+                    "90 km/h"
+                ],
+                correct: 0,
+                val: "$4,000"
+            },
+            {
+                q: "¿Qué estrategia de infraestructura vial busca separar físicamente a los usuarios vulnerables (ciclistas y peatones) del tráfico motorizado pesado?",
+                options: [
+                    "Pacificación de tráfico y ciclorrutas segregadas.",
+                    "Eliminación de aceras para ampliar carriles.",
+                    "Instalación de resaltos de alta velocidad.",
+                    "Aumento de límites a 80 km/h."
+                ],
+                correct: 0,
+                val: "$8,000"
+            },
+            {
+                q: "¿Cuál es la filosofía ética internacional detrás de la iniciativa 'Visión Cero' (Vision Zero)?",
+                options: [
+                    "Ninguna muerte o lesión grave en el tránsito es aceptable.",
+                    "Llegar a cero tráfico en las horas pico.",
+                    "Reducir las multas de tránsito a cero.",
+                    "Cero emisiones de dióxido de carbono en 2030."
+                ],
+                correct: 0,
+                val: "$16,000"
+            },
+            {
+                q: "¿Qué función cumple la respuesta médica 'Atención Post-colisión' en el Sistema Seguro?",
+                options: [
+                    "Remolcar los vehículos dañados rápidamente.",
+                    "Llegar a tiempo ('La Hora Dorada') para estabilizar lesiones y reducir la probabilidad de muerte.",
+                    "Cobrar los seguros obligatorios.",
+                    "Asignar culpabilidad legal a los implicados."
+                ],
+                correct: 1,
+                val: "$32,000" // Milestone 2
+            },
+            {
+                q: "¿Por qué el modelo anatómico de Graham fue diseñado con sacos de tejido entre las costillas?",
+                options: [
+                    "Para almacenar oxígeno adicional al correr.",
+                    "Para actuar como bolsas de aire (airbags) biológicas que absorben la energía del impacto.",
+                    "Para mantener el calor corporal en climas fríos.",
+                    "Para flotar en el agua en caso de inmersión."
+                ],
+                correct: 1,
+                val: "$64,000"
+            },
+            {
+                q: "¿Qué elemento tecnológico en los vehículos modernos ayuda directamente a prevenir la colisión antes de que ocurra (Seguridad Activa)?",
+                options: [
+                    "Frenado Autónomo de Emergencia (AEB) y Asistente de Mantenimiento de Carril.",
+                    "Airbags laterales de cortina.",
+                    "Cinturón de seguridad con pretensor.",
+                    "Parachoques deformables."
+                ],
+                correct: 0,
+                val: "$125,000"
+            },
+            {
+                q: "En el Sistema Seguro, si un conductor comete una distracción menor, ¿quién falló prioritariamente si ocurre una muerte?",
+                options: [
+                    "Solo el conductor por ser distraído.",
+                    "El sistema vial completo, por no contemplar la falibilidad humana y carecer de barreras o velocidades seguras.",
+                    "El fabricante de teléfonos móviles.",
+                    "Nadie, fue un choque impredecible."
+                ],
+                correct: 1,
+                val: "$250,000"
+            },
+            {
+                q: "¿Cómo reducen las rotondas o glorietas la severidad de las colisiones en comparación con intersecciones con semáforo?",
+                options: [
+                    "Aumentan la velocidad de cruce.",
+                    "Eliminan los impactos en ángulo recto (T-bone) a alta velocidad y obligan a reducir la velocidad.",
+                    "Obligan a todos a detenerse 5 minutos.",
+                    "Eliminan la prioridad de los peatones."
+                ],
+                correct: 1,
+                val: "$500,000"
+            },
+            {
+                q: "¿Cuál es la lección definitiva que nos transmite la figura hiperrealista de Graham?",
+                options: [
+                    "Que debemos someternos a ingeniería genética para modificar nuestro cuerpo.",
+                    "Que la única forma de sobrevivir a choques de alta velocidad sin cambiar las vías requeriría una anatomía monstruosa e inviable; por ende, debemos cambiar el sistema vial.",
+                    "Que los automóviles son la máquina más segura del planeta.",
+                    "Que las leyes de la física no aplican si usamos casco."
+                ],
+                correct: 1,
+                val: "$1,000,000"
+            }
+        ];
+
+        let currentTab = 'graham';
+        let gameState = {
+            currentQIndex: 0,
+            scoreVal: "$0",
+            lifelinesUsed: {
+                fiftymoves: false,
+                phone: false,
+                audience: false
+            },
+            disabledOptions: [],
+            isGameOver: false
+        };
+
+        function switchTab(tab) {
+            currentTab = tab;
+            const tabGraham = document.getElementById('tab-graham');
+            const tabGame = document.getElementById('tab-game');
+            const btnGraham = document.getElementById('tab-btn-graham');
+            const btnGame = document.getElementById('tab-btn-game');
+
+            if (tab === 'graham') {
+                tabGraham.classList.remove('hidden');
+                tabGame.classList.add('hidden');
+                
+                btnGraham.className = "px-4 py-2 text-sm font-semibold rounded-lg transition-all shadow-sm bg-white text-aguamarina-700 flex items-center space-x-2";
+                btnGame.className = "px-4 py-2 text-sm font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-900 flex items-center space-x-2";
+            } else {
+                tabGraham.classList.add('hidden');
+                tabGame.classList.remove('hidden');
+
+                btnGame.className = "px-4 py-2 text-sm font-semibold rounded-lg transition-all shadow-sm bg-white text-aguamarina-700 flex items-center space-x-2";
+                btnGraham.className = "px-4 py-2 text-sm font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-900 flex items-center space-x-2";
+                
+                // Initialize game if not started
+                if (gameState.currentQIndex === 0 && !gameState.isGameOver) {
+                    initMillionaireGame();
+                }
+            }
+        }
+
+        function openGrahamModal(key) {
+            const item = grahamData[key];
+            if (!item) return;
+
+            document.getElementById('modal-title').innerText = item.title;
+            document.getElementById('modal-subtitle').innerText = item.subtitle;
+            document.getElementById('modal-vulnerability').innerText = item.vulnerability;
+            document.getElementById('modal-evolution').innerText = item.evolution;
+            document.getElementById('modal-physics').innerText = item.physics;
+
+            const iconContainer = document.getElementById('modal-icon-container');
+            iconContainer.innerHTML = `<i class="fa-solid ${item.icon}"></i>`;
+
+            const modal = document.getElementById('graham-modal');
+            modal.classList.remove('hidden');
+        }
+
+        function closeGrahamModal() {
+            document.getElementById('graham-modal').classList.add('hidden');
+        }
+
+        function initMillionaireGame() {
+            gameState.currentQIndex = 0;
+            gameState.scoreVal = "$0";
+            gameState.lifelinesUsed = { fiftymoves: false, phone: false, audience: false };
+            gameState.disabledOptions = [];
+            gameState.isGameOver = false;
+
+            // Reset Lifelines Buttons UI
+            document.getElementById('lifeline-5050').classList.remove('opacity-40', 'cursor-not-allowed', 'line-through');
+            document.getElementById('lifeline-phone').classList.remove('opacity-40', 'cursor-not-allowed', 'line-through');
+            document.getElementById('lifeline-audience').classList.remove('opacity-40', 'cursor-not-allowed', 'line-through');
+
+            renderPrizeLadder();
+            renderQuestion();
+        }
+
+        function renderPrizeLadder() {
+            const ladderContainer = document.getElementById('prize-ladder');
+            ladderContainer.innerHTML = '';
+
+            millionaireQuestions.forEach((item, idx) => {
+                const levelDiv = document.createElement('div');
+                const isCurrent = idx === gameState.currentQIndex;
+                const isMilestone = idx === 4 || idx === 9 || idx === 14;
+
+                let classes = "px-3 py-1 rounded flex justify-between items-center transition ";
+                if (isCurrent) {
+                    classes += "bg-amarilloquemado-500 text-slate-950 font-black shadow-md border-l-4 border-white ";
+                } else if (idx < gameState.currentQIndex) {
+                    classes += "bg-aguamarina-900 text-aguamarina-300 opacity-80 ";
+                } else if (isMilestone) {
+                    classes += "bg-slate-800 text-amber-300 font-extrabold ";
+                } else {
+                    classes += "bg-slate-800/60 text-slate-400 ";
+                }
+
+                levelDiv.className = classes;
+                levelDiv.innerHTML = `
+                    <span>Q${idx + 1}</span>
+                    <span>${item.val}</span>
+                `;
+                ladderContainer.appendChild(levelDiv);
+            });
+        }
+
+        function renderQuestion() {
+            const qData = millionaireQuestions[gameState.currentQIndex];
+            gameState.disabledOptions = [];
+
+            document.getElementById('game-question-number').innerText = `Pregunta ${gameState.currentQIndex + 1} de 15`;
+            document.getElementById('game-question-val').innerText = qData.val;
+            document.getElementById('game-question-text').innerText = qData.q;
+
+            const feedbackEl = document.getElementById('game-feedback');
+            feedbackEl.classList.add('hidden');
+
+            const optionsContainer = document.getElementById('game-options-container');
+            optionsContainer.innerHTML = '';
+
+            const letters = ['A', 'B', 'C', 'D'];
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.id = `opt-btn-${idx}`;
+                btn.onclick = () => selectOption(idx);
+                btn.className = "p-4 bg-slate-50 hover:bg-aguamarina-50 border-2 border-slate-200 hover:border-aguamarina-500 rounded-xl text-left font-semibold text-slate-800 transition flex items-start space-x-3 group";
+                
+                btn.innerHTML = `
+                    <span class="w-7 h-7 rounded-lg bg-slate-200 group-hover:bg-aguamarina-500 group-hover:text-white text-slate-700 font-bold text-xs flex items-center justify-center flex-shrink-0 transition">
+                        ${letters[idx]}
+                    </span>
+                    <span class="text-xs sm:text-sm leading-snug">${opt}</span>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+
+            renderPrizeLadder();
+        }
+
+        function selectOption(selectedIdx) {
+            if (gameState.isGameOver) return;
+
+            const qData = millionaireQuestions[gameState.currentQIndex];
+            const feedbackEl = document.getElementById('game-feedback');
+            const selectedBtn = document.getElementById(`opt-btn-${selectedIdx}`);
+
+            if (selectedIdx === qData.correct) {
+                // Correct Answer
+                selectedBtn.className = "p-4 bg-emerald-100 border-2 border-emerald-500 text-emerald-950 font-bold rounded-xl text-left flex items-start space-x-3";
+                feedbackEl.className = "p-4 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-between bg-emerald-50 text-emerald-800 border border-emerald-200 mt-4";
+                feedbackEl.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-lg"></i>
+                        <span>¡Respuesta Correcta! Has asegurado ${qData.val} USD.</span>
+                    </div>
+                `;
+                feedbackEl.classList.remove('hidden');
+
+                setTimeout(() => {
+                    if (gameState.currentQIndex < millionaireQuestions.length - 1) {
+                        gameState.currentQIndex++;
+                        renderQuestion();
+                    } else {
+                        // Millionaire Champion!
+                        showVictoryScreen();
+                    }
+                }, 1500);
+
+            } else {
+                // Incorrect Answer
+                selectedBtn.className = "p-4 bg-red-100 border-2 border-red-500 text-red-950 font-bold rounded-xl text-left flex items-start space-x-3";
+                
+                // Highlight correct
+                const correctBtn = document.getElementById(`opt-btn-${qData.correct}`);
+                if (correctBtn) {
+                    correctBtn.className = "p-4 bg-emerald-100 border-2 border-emerald-500 text-emerald-950 font-bold rounded-xl text-left flex items-start space-x-3";
+                }
+
+                gameState.isGameOver = true;
+                
+                // Calculate guaranteed prize
+                let prize = "$0 USD";
+                if (gameState.currentQIndex >= 9) prize = "$32,000 USD";
+                else if (gameState.currentQIndex >= 4) prize = "$1,000 USD";
+
+                feedbackEl.className = "p-4 rounded-xl text-xs sm:text-sm font-semibold flex flex-col sm:flex-row items-center justify-between bg-red-50 text-red-800 border border-red-200 mt-4 gap-3";
+                feedbackEl.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-triangle-exclamation text-red-600 text-lg"></i>
+                        <span>Respuesta incorrecta. Fin del juego. Premio garantizado: <strong>${prize}</strong></span>
+                    </div>
+                    <button onclick="initMillionaireGame()" class="px-4 py-2 bg-amarilloquemado-600 hover:bg-amarilloquemado-700 text-white font-bold text-xs rounded-lg transition shadow">
+                        Volver a Intentar
+                    </button>
+                `;
+                feedbackEl.classList.remove('hidden');
+            }
+        }
+
+        function useLifeline5050() {
+            if (gameState.lifelinesUsed.fiftymoves || gameState.isGameOver) return;
+            
+            const qData = millionaireQuestions[gameState.currentQIndex];
+            const incorrectIndices = [0, 1, 2, 3].filter(i => i !== qData.correct);
+            
+            // Randomly select 2 incorrect options to hide
+            incorrectIndices.sort(() => Math.random() - 0.5);
+            const toDisable = incorrectIndices.slice(0, 2);
+
+            toDisable.forEach(idx => {
+                const btn = document.getElementById(`opt-btn-${idx}`);
+                if (btn) {
+                    btn.classList.add('opacity-25', 'pointer-events-none');
+                    btn.innerHTML = `<span class="text-xs text-slate-400 font-mono italic">-- Alternativa Descartada --</span>`;
+                }
+            });
+
+            gameState.lifelinesUsed.fiftymoves = true;
+            const btn50 = document.getElementById('lifeline-5050');
+            btn50.classList.add('opacity-40', 'cursor-not-allowed', 'line-through');
+        }
+
+        function useLifelinePhone() {
+            if (gameState.lifelinesUsed.phone || gameState.isGameOver) return;
+
+            const qData = millionaireQuestions[gameState.currentQIndex];
+            const letters = ['A', 'B', 'C', 'D'];
+            const correctLetter = letters[qData.correct];
+
+            document.getElementById('lifeline-modal-icon').innerHTML = `<i class="fa-solid fa-user-doctor"></i>`;
+            document.getElementById('lifeline-modal-title').innerText = "Llamada al Dr. Christian Kenfield (Cirujano)";
+            document.getElementById('lifeline-modal-content').innerHTML = `
+                <p class="italic text-slate-700">"Hola. Analizando los límites biomecánicos del cuerpo y los principios del Sistema Seguro, te garantizo en un 90% que la respuesta correcta es la opción <strong>${correctLetter}</strong>."</p>
+            `;
+
+            document.getElementById('lifeline-modal').classList.remove('hidden');
+            gameState.lifelinesUsed.phone = true;
+            document.getElementById('lifeline-phone').classList.add('opacity-40', 'cursor-not-allowed', 'line-through');
+        }
+
+        function useLifelineAudience() {
+            if (gameState.lifelinesUsed.audience || gameState.isGameOver) return;
+
+            const qData = millionaireQuestions[gameState.currentQIndex];
+            let percentages = [15, 15, 15, 15];
+            percentages[qData.correct] = 55; // Correct gets highest percentage
+
+            document.getElementById('lifeline-modal-icon').innerHTML = `<i class="fa-solid fa-chart-simple"></i>`;
+            document.getElementById('lifeline-modal-title').innerText = "Votación del Público del Sistema Seguro";
+            
+            const letters = ['A', 'B', 'C', 'D'];
+            let chartHtml = `<div class="space-y-2 mt-2">`;
+            letters.forEach((l, idx) => {
+                const p = percentages[idx];
+                chartHtml += `
+                    <div class="flex items-center space-x-2 text-xs">
+                        <span class="font-bold w-4">${l}:</span>
+                        <div class="flex-grow bg-slate-200 h-4 rounded-full overflow-hidden">
+                            <div class="bg-aguamarina-500 h-full rounded-full" style="width: ${p}%"></div>
+                        </div>
+                        <span class="font-mono font-bold w-8 text-right">${p}%</span>
+                    </div>
+                `;
+            });
+            chartHtml += `</div>`;
+
+            document.getElementById('lifeline-modal-content').innerHTML = chartHtml;
+            document.getElementById('lifeline-modal').classList.remove('hidden');
+
+            gameState.lifelinesUsed.audience = true;
+            document.getElementById('lifeline-audience').classList.add('opacity-40', 'cursor-not-allowed', 'line-through');
+        }
+
+        function closeLifelineModal() {
+            document.getElementById('lifeline-modal').classList.add('hidden');
+        }
+
+        function showVictoryScreen() {
+            const feedbackEl = document.getElementById('game-feedback');
+            feedbackEl.className = "p-6 rounded-2xl bg-gradient-to-r from-amarilloquemado-500 to-amber-600 text-slate-950 font-black text-center mt-4 space-y-3 shadow-xl";
+            feedbackEl.innerHTML = `
+                <div class="text-3xl">🏆 ¡FELICITACIONES! 🏆</div>
+                <div class="text-lg">¡Has alcanzado el premio máximo de $1,000,000 USD!</div>
+                <p class="text-xs font-semibold text-slate-900 max-w-md mx-auto">
+                    Eres un experto absoluto en el Enfoque de Sistema Seguro y Biomecánica de Accidentes.
+                </p>
+                <button onclick="initMillionaireGame()" class="px-6 py-2.5 bg-slate-900 text-white font-bold text-xs rounded-xl hover:bg-slate-800 transition">
+                    Jugar de Nuevo
+                </button>
+            `;
+            feedbackEl.classList.remove('hidden');
+        }
+
+        window.onload = function() {
+            console.log("Aplicación Graham & Sistema Seguro cargada exitosamente.");
+        };
+    </script>
+</body>
+</html>
