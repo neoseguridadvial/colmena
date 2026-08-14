@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PESV en mi empresa — Definiciones y autodiagnóstico</title>
+<style>
+:root{
+  --ink:#263238; --muted:#64707a; --white:#fff; --bg:#f5f7f8;
+  --yellow:#f5b400; --yellow2:#fff3c4; --aqua:#29b9c4; --aqua2:#dff7f9;
+  --green:#6bcf55; --blue:#2d8fd5; --orange:#f39a35; --red:#d85b5b;
+  --line:#dde3e6; --shadow:0 12px 34px rgba(26,47,57,.11);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#fafafa,#f2f6f7);color:var(--ink)}
+button,input,select{font:inherit}
+.wrap{max-width:1240px;margin:auto;padding:18px}
+.hero{background:linear-gradient(135deg,#fff 0 63%,#f6fbfb 63%);border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow);padding:28px;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:260px;height:260px;border:34px solid rgba(41,185,196,.08);border-radius:40px;transform:rotate(25deg);right:-80px;top:-80px}
+.kicker{color:var(--aqua);font-weight:900;letter-spacing:.08em;font-size:13px}
+h1{font-size:clamp(30px,5vw,54px);line-height:1.02;margin:8px 0 12px}
+.hero p{max-width:820px;font-size:18px;line-height:1.55;color:var(--muted)}
+.hero-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.badge{padding:7px 10px;border-radius:999px;background:#eef7f8;font-weight:800;font-size:13px}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.nav a{padding:10px 13px;background:#fff;border:1px solid var(--line);border-radius:13px;text-decoration:none;color:var(--ink);font-weight:800}
+.section{margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:22px}
+.section h2{font-size:clamp(24px,3vw,34px);margin:0 0 8px}
+.lead{color:var(--muted);line-height:1.5;margin-top:0}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.defcard{border:1px solid var(--line);border-radius:18px;padding:16px;cursor:pointer;min-height:190px;position:relative;background:#fbfdfd;transition:.2s}
+.defcard:hover{transform:translateY(-2px);border-color:var(--aqua)}
+.defcard .icon{font-size:34px}.defcard h3{margin:8px 0}.defcard p{font-size:14px;line-height:1.45;color:var(--muted)}
+.defcard .more{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);color:var(--ink)}
+.defcard.open .more{display:block}
+.pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:900;background:var(--yellow2);color:#8b6500}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.exercise{border:1px solid var(--line);border-radius:20px;padding:16px}
+.scenario{padding:14px;border-radius:15px;background:#f8fbfb;margin:10px 0}
+.scenario b{display:block;margin-bottom:5px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{border:0;border-radius:13px;padding:10px 13px;font-weight:900;cursor:pointer;background:#edf3f4;color:var(--ink)}
+.btn.aqua{background:var(--aqua);color:white}.btn.yellow{background:var(--yellow);color:#3d3300}.btn.red{background:#fde7e7;color:#8d2929}
+.feedback{display:none;margin-top:10px;padding:11px;border-radius:12px;font-size:14px;line-height:1.45}
+.feedback.show{display:block}.feedback.good{background:#e7f7ef;border-left:5px solid #39a36c}.feedback.warn{background:#fff1dd;border-left:5px solid var(--orange)}
+.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:800;font-size:14px}.field input,.field select{padding:12px;border:1px solid var(--line);border-radius:12px;background:white}
+.result{margin-top:14px;padding:16px;border-radius:18px;background:linear-gradient(135deg,var(--yellow2),var(--aqua2));display:none}
+.result.show{display:block}
+.result h3{margin:0 0 8px;font-size:24px}
+.level-grid{display:grid;grid-template-columns:1.1fr repeat(3,1fr);gap:8px;margin-top:14px}
+.level-grid>div{padding:11px;border-radius:12px;text-align:center;font-size:13px;font-weight:800}
+.lh{background:#fce1cf}.m1{background:#16a6b5;color:#fff}.basic{background:#2d99db;color:#fff}.std{background:#63ce58;color:#173817}.adv{background:#0ea95e;color:white}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.check{border:1px solid var(--line);border-radius:13px;padding:11px;display:flex;gap:9px;align-items:flex-start;background:#fbfdfd}
+.check input{margin-top:4px;transform:scale(1.2)}
+.radar{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:14px}
+.radar .r{padding:12px;border-radius:15px;text-align:center;background:#edf3f4;font-size:12px;font-weight:900}
+.r.on{background:linear-gradient(135deg,var(--yellow2),var(--aqua2));outline:2px solid var(--aqua)}
+.summary{margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
+.priority{padding:10px 12px;border-radius:12px;background:#f7f9f9;margin:7px 0}
+.source{font-size:12px;color:var(--muted);line-height:1.5;background:#f8fafb;border-radius:14px;padding:12px}
+.callout{padding:16px;border-radius:17px;background:linear-gradient(135deg,#fff4c9,#e3f8f8);font-weight:800;line-height:1.5}
+.footer{text-align:center;color:var(--muted);font-size:12px;padding:24px 0}
+@media(max-width:900px){
+ .cards{grid-template-columns:1fr}.two,.formgrid{grid-template-columns:1fr}.checks{grid-template-columns:1fr}
+ .level-grid{grid-template-columns:1fr 1fr}.radar{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero">
+  <div class="kicker">REFUERZO PESV · APLICACIÓN EMPRESARIAL</div>
+  <h1>¿Qué cuenta realmente<br>para mi PESV?</h1>
+  <p>Explora las definiciones clave, contrástalas con situaciones reales de tu organización y termina con un autodiagnóstico. La meta no es memorizar términos: es <b>delimitar correctamente la exposición vial de la empresa</b>.</p>
+  <div class="hero-badges">
+    <span class="badge">Resolución 40595 de 2022</span>
+    <span class="badge">Ley 769 de 2002 · CNTT</span>
+    <span class="badge">Ley 1503 / Decreto 2106 de 2019</span>
+    <span class="badge">Aplicación a empresa</span>
+  </div>
+</section>
+
+<nav class="nav">
+ <a href="#def">1. Comprende</a><a href="#cuenta">2. ¿Esto cuenta?</a><a href="#nivel">3. Clasifica tu empresa</a><a href="#auto">4. Autodiagnóstico</a>
+</nav>
+
+<section class="section" id="def">
+ <h2>1. Definiciones que cambian el alcance del PESV</h2>
+ <p class="lead">Haz clic en cada tarjeta. Verás tres capas: qué significa, qué aporta el CNTT/PESV y cómo se traduce en la empresa.</p>
+ <div class="cards">
+  <div class="defcard" onclick="this.classList.toggle('open')">
+   <div class="icon">👥</div><span class="pill">PESV</span><h3>Colaborador</h3>
+   <p>No se limita a quienes tienen contrato laboral directo.</p>
+   <div class="more"><b>En PESV:</b> comprende trabajadores, contratistas y otras personas vinculadas que realizan funciones para procesos de la organización, incluso mediante tercerización o intermediación.<br><br><b>En la empresa:</b> si un contratista conduce una moto propia para ejecutar una función tuya, no desaparece de tu mapa de exposición solo porque “no esté en nómina”.</div>
+  </div>
+
+  <div class="defcard" onclick="this.classList.toggle('open')">
+   <div class="icon">🏘️</div><span class="pill">PESV</span><h3>Comunidad</h3>
+   <p>El riesgo vial empresarial puede afectar a personas externas a la organización.</p>
+   <div class="more"><b>En PESV:</b> incluye personas que se relacionan con la organización: clientes, estudiantes, proveedores, usuarios, vecinos u otros grupos vinculados al contexto operacional.<br><br><b>Aplicación:</b> un patio con ingreso de proveedores o una sede con circulación peatonal genera interfaces que deben reconocerse.</div>
+  </div>
+
+  <div class="defcard" onclick="this.classList.toggle('open')">
+   <div class="icon">🛣️</div><span class="pill">PESV</span><h3>Desplazamientos laborales</h3>
+   <p>No son únicamente los viajes en vehículos de la empresa.</p>
+   <div class="more"><b>En aplicación empresarial:</b> interesa identificar desplazamientos vinculados al trabajo y su exposición: en misión, ordinarios relacionados con la operación y, dentro del diagnóstico de movilidad, los desplazamientos in itinere cuando correspondan al análisis.<br><br><b>Clave:</b> clasificar el viaje ayuda a decidir qué puede controlar directamente la empresa y qué requiere medidas de influencia, formación o coordinación.</div>
+  </div>
+
+  <div class="defcard" onclick="this.classList.toggle('open')">
+   <div class="icon">🎯</div><span class="pill">PESV</span><h3>Misionalidad</h3>
+   <p>Determina cómo se clasifica la organización para el nivel de diseño e implementación.</p>
+   <div class="more"><b>Misionalidad 1:</b> organizaciones cuya actividad principal está dedicada a la prestación del servicio de transporte terrestre automotor.<br><br><b>Misionalidad 2:</b> organizaciones cuya actividad principal es diferente al transporte.<br><br><b>Pregunta útil:</b> “¿Transportar es nuestro negocio principal o solo una actividad necesaria para realizarlo?”</div>
+  </div>
+
+  <div class="defcard" onclick="this.classList.toggle('open')">
+   <div class="icon">🚚</div><span class="pill">PESV + CNTT</span><h3>Flota de vehículos</h3>
+   <p>No equivale únicamente a “vehículos que aparecen a nombre de la empresa”.</p>
+   <div class="more"><b>PESV:</b> considera automotores y no automotores puestos al servicio de la organización, incluidos propios, leasing, renting y otros modelos de vinculación; también pueden entrar vehículos de contratistas o trabajadores cuando son utilizados para cumplir funciones de la organización.<br><br><b>CNTT:</b> vehículo es el aparato montado sobre ruedas que permite transportar personas, animales o cosas por vía terrestre.</div>
+  </div>
+
+  <div class="defcard" onclick="this.classList.toggle('open')">
+   <div class="icon">🧑‍✈️</div><span class="pill">PESV + CNTT</span><h3>Conductores</h3>
+   <p>Importa quién opera vehículos puestos al servicio de la organización, no solo el cargo “conductor”.</p>
+   <div class="more"><b>CNTT:</b> conductor es la persona habilitada y capacitada técnica y teóricamente para operar un vehículo.<br><br><b>PESV:</b> para dimensionamiento importa el número de personas que utilizan vehículos automotores o no automotores puestos al servicio de la organización, independientemente del modelo de contratación o administración.<br><br><b>Aplicación:</b> vendedor, técnico, mensajero o gerente puede ser conductor en la exposición vial aunque su cargo no se llame así.</div>
+  </div>
+ </div>
+</section>
+
+<section class="section" id="cuenta">
+ <h2>2. Juego rápido: ¿esto cuenta en el mapa vial de la empresa?</h2>
+ <p class="lead">No respondas por intuición contractual. Piensa en <b>función, exposición y control organizacional</b>.</p>
+ <div class="two">
+  <div class="exercise">
+   <div class="scenario"><b>🏍️ Caso 1 · Comercial en moto propia</b>Visita clientes durante la jornada y la empresa le reconoce gastos de desplazamiento.
+    <div class="actions"><button class="btn aqua" onclick="answer('f1',true,true)">Sí cuenta</button><button class="btn" onclick="answer('f1',false,true)">No cuenta</button></div>
+    <div id="f1" class="feedback"></div>
+   </div>
+   <div class="scenario"><b>🚙 Caso 2 · Vehículo en renting</b>La camioneta está registrada a nombre del proveedor de renting y opera diariamente para la compañía.
+    <div class="actions"><button class="btn aqua" onclick="answer('f2',true,true)">Sí cuenta</button><button class="btn" onclick="answer('f2',false,true)">No cuenta</button></div>
+    <div id="f2" class="feedback"></div>
+   </div>
+   <div class="scenario"><b>🚶 Caso 3 · Visitantes y proveedores</b>Ingresan caminando a un patio donde circulan vehículos y montacargas.
+    <div class="actions"><button class="btn aqua" onclick="answer('f3',true,true)">Sí cuenta</button><button class="btn" onclick="answer('f3',false,true)">No cuenta</button></div>
+    <div id="f3" class="feedback"></div>
+   </div>
+  </div>
+
+  <div class="exercise">
+   <div class="scenario"><b>🧑‍💼 Caso 4 · Gerente que conduce</b>No tiene cargo de conductor, pero usa un vehículo de la empresa para visitar sedes.
+    <div class="actions"><button class="btn aqua" onclick="answer('f4',true,true)">Sí cuenta</button><button class="btn" onclick="answer('f4',false,true)">No cuenta</button></div>
+    <div id="f4" class="feedback"></div>
+   </div>
+   <div class="scenario"><b>🚌 Caso 5 · Transporte tercerizado</b>Una empresa externa transporta colaboradores siguiendo rutas y horarios contratados por la organización.
+    <div class="actions"><button class="btn aqua" onclick="answer('f5',true,true)">Sí debe analizarse</button><button class="btn" onclick="answer('f5',false,true)">Es solo problema del proveedor</button></div>
+    <div id="f5" class="feedback"></div>
+   </div>
+   <div class="scenario"><b>🏠 Caso 6 · Casa–trabajo</b>La empresa no suministra transporte, pero identifica alta siniestralidad en motociclistas que llegan a trabajar.
+    <div class="actions"><button class="btn aqua" onclick="answer('f6',true,true)">Debe entrar al diagnóstico</button><button class="btn" onclick="answer('f6',false,true)">No interesa al PESV</button></div>
+    <div id="f6" class="feedback"></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="section" id="nivel">
+ <h2>3. Clasifica tu organización</h2>
+ <p class="lead">Ingresa los datos. Esta herramienta usa la lógica de misionalidad y tamaño mostrada en la metodología PESV.</p>
+ <div class="formgrid">
+   <div class="field"><label>Actividad principal de la organización</label>
+    <select id="mission"><option value="2">Diferente a transporte terrestre automotor</option><option value="1">Prestación de servicio de transporte terrestre automotor</option></select>
+   </div>
+   <div class="field"><label>Número de vehículos automotores y no automotores puestos al servicio</label><input id="vehicles" type="number" min="0" value="0"></div>
+   <div class="field"><label>Número de conductores contratados o administrados</label><input id="drivers" type="number" min="0" value="0"></div>
+   <div class="field"><label>¿La organización contrata o administra personal de conductores?</label><select id="adminDrivers"><option value="no">No</option><option value="si">Sí</option></select></div>
+ </div>
+ <div class="actions"><button class="btn yellow" onclick="classify()">Calcular alcance y nivel</button></div>
+ <div id="classResult" class="result"></div>
+
+ <div class="level-grid">
+  <div class="lh">Misionalidad</div><div class="lh">Básico</div><div class="lh">Estándar</div><div class="lh">Avanzado</div>
+  <div class="m1">Transporte</div><div class="basic">11–19 vehículos<br>2–19 conductores</div><div class="std">20–50 vehículos<br>20–50 conductores</div><div class="adv">&gt;50 vehículos<br>&gt;50 conductores</div>
+  <div class="m1" style="background:#cbd32e;color:#344000">No transporte</div><div class="basic">11–49 vehículos<br>2–49 conductores</div><div class="std">50–100 vehículos<br>50–100 conductores</div><div class="adv">&gt;100 vehículos<br>&gt;100 conductores</div>
+ </div>
+ <div class="source">Nota pedagógica: la obligación general de diseñar e implementar PESV se activa para entidades, organizaciones o empresas públicas o privadas con flota superior a 10 unidades o que contraten o administren personal de conductores. La tabla permite dimensionar el nivel según misionalidad y tamaño. Para casos limítrofes o estructuras atípicas, valide siempre la versión normativa vigente y el criterio aplicable.</div>
+</section>
+
+<section class="section" id="auto">
+ <h2>4. Autodiagnóstico: ¿qué tan bien delimitada está tu exposición?</h2>
+ <p class="lead">Marca lo que ya hace tu organización. El resultado no es una auditoría de cumplimiento: es un radar de madurez para iniciar o depurar el diagnóstico PESV.</p>
+ <div class="checks">
+  <label class="check"><input type="checkbox" data-area="col" onchange="diagnose()"><span><b>Colaboradores</b><br>Tenemos identificadas personas expuestas a riesgo vial aunque no sean empleados directos.</span></label>
+  <label class="check"><input type="checkbox" data-area="col" onchange="diagnose()"><span><b>Roles reales</b><br>Identificamos quién conduce por función, aunque su cargo no diga “conductor”.</span></label>
+  <label class="check"><input type="checkbox" data-area="com" onchange="diagnose()"><span><b>Comunidad</b><br>Reconocemos peatones, usuarios, proveedores, clientes y terceros afectados por nuestra operación.</span></label>
+  <label class="check"><input type="checkbox" data-area="des" onchange="diagnose()"><span><b>Desplazamientos</b><br>Tenemos caracterizados viajes en misión, desplazamientos operacionales e in itinere relevantes para el diagnóstico.</span></label>
+  <label class="check"><input type="checkbox" data-area="flo" onchange="diagnose()"><span><b>Flota real</b><br>Incluimos propios, leasing, renting y vehículos puestos al servicio por otros modelos cuando corresponde.</span></label>
+  <label class="check"><input type="checkbox" data-area="flo" onchange="diagnose()"><span><b>No automotores</b><br>Revisamos bicicletas u otros vehículos no automotores usados para funciones de la organización.</span></label>
+  <label class="check"><input type="checkbox" data-area="con" onchange="diagnose()"><span><b>Conductores</b><br>Tenemos un censo actualizado de todas las personas que conducen vehículos puestos al servicio.</span></label>
+  <label class="check"><input type="checkbox" data-area="con" onchange="diagnose()"><span><b>Terceros</b><br>El diagnóstico contempla conducción tercerizada y criterios de control/influencia sobre contratistas.</span></label>
+  <label class="check"><input type="checkbox" data-area="mis" onchange="diagnose()"><span><b>Misionalidad</b><br>La clasificación se hizo por actividad principal y no simplemente porque “tenemos vehículos”.</span></label>
+  <label class="check"><input type="checkbox" data-area="mis" onchange="diagnose()"><span><b>Nivel PESV</b><br>Tenemos documentado por qué somos Básico, Estándar o Avanzado.</span></label>
+ </div>
+
+ <div class="radar">
+   <div class="r" id="rcol">👥 Colaboradores</div>
+   <div class="r" id="rcom">🏘️ Comunidad</div>
+   <div class="r" id="rdes">🛣️ Desplazamientos</div>
+   <div class="r" id="rflo">🚚 Flota</div>
+   <div class="r" id="rcon">🧑‍✈️ Conductores</div>
+ </div>
+ <div class="summary" id="diagSummary"><div class="callout">Marca las casillas para construir tu radar. La pregunta no es “¿tenemos vehículos?”, sino “¿cómo se mueve nuestra organización y a quién expone?”</div></div>
+</section>
+
+<section class="section">
+ <h2>5. Idea de cierre para discusión en clase</h2>
+ <div class="callout">
+  Si una empresa cuenta únicamente los vehículos que aparecen en su propiedad, únicamente las personas cuyo cargo dice “conductor” y únicamente los siniestros ocurridos en jornada, probablemente está viendo <b>solo una parte de su exposición vial real</b>. El PESV empieza por delimitar bien el sistema: personas, viajes, vehículos, terceros, operación y contexto.
+ </div>
+ <div class="source" style="margin-top:12px">
+  Referencias normativas de soporte: Resolución 20223040040595 de 2022 (Metodología PESV); artículo 12 de la Ley 1503 de 2011 modificado por el artículo 110 del Decreto 2106 de 2019; Ley 2050 de 2020; Ley 769 de 2002 — Código Nacional de Tránsito Terrestre, especialmente artículos 1 y 2.
+ </div>
+</section>
+<div class="footer">Herramienta educativa para refuerzo y autodiagnóstico · No sustituye una auditoría jurídica o de cumplimiento.</div>
+</div>
+
+<script>
+function answer(id,choice,correct){
+ const el=document.getElementById(id);
+ const ok=choice===correct;
+ el.className='feedback show '+(ok?'good':'warn');
+ el.innerHTML=ok
+ ? '✅ <b>Bien leído.</b> La relación con el riesgo vial se determina por la exposición y la función dentro del sistema empresarial, no solamente por propiedad, cargo o tipo de contrato.'
+ : '⚠️ <b>Revisa el criterio.</b> Estás usando una frontera demasiado estrecha. Pregunta: ¿esta persona, vehículo o desplazamiento está vinculado a la función de la organización o interactúa con su operación vial?';
+}
+
+function classify(){
+ const m=+document.getElementById('mission').value;
+ const v=Math.max(0,+document.getElementById('vehicles').value||0);
+ const d=Math.max(0,+document.getElementById('drivers').value||0);
+ const admin=document.getElementById('adminDrivers').value==='si';
+ const obligated=v>10 || admin || d>0;
+ let level='No determinado';
+ if(obligated){
+   if(m===1){
+     if(v>50||d>50) level='Avanzado';
+     else if(v>=20||d>=20) level='Estándar';
+     else level='Básico';
+   } else {
+     if(v>100||d>100) level='Avanzado';
+     else if(v>=50||d>=50) level='Estándar';
+     else level='Básico';
+   }
+ }
+ const r=document.getElementById('classResult'); r.classList.add('show');
+ if(obligated){
+   r.innerHTML=`<h3>🚦 Resultado: PESV aplicable · Nivel ${level}</h3>
+   <b>Misionalidad:</b> ${m===1?'1 — prestación de servicio de transporte terrestre automotor':'2 — actividad principal diferente al transporte'}<br>
+   <b>Flota reportada:</b> ${v} · <b>Conductores:</b> ${d}<br><br>
+   <b>Qué revisar ahora:</b> que la cifra de flota no esté limitada a propiedad jurídica y que el censo de conductores incluya a quienes realmente operan vehículos puestos al servicio de la organización.`;
+ }else{
+   r.innerHTML=`<h3>🔎 Con estos datos no se activa el supuesto general por tamaño/conductores</h3>
+   Reportaste ${v} vehículos y no administración de conductores. Esto no significa “sin riesgo vial”: la organización puede seguir teniendo exposición que conviene gestionar dentro del SG-SST y de sus controles operacionales.`;
+ }
+}
+
+function diagnose(){
+ const checks=[...document.querySelectorAll('#auto input[type=checkbox]')];
+ const areas={col:[0,0],com:[0,0],des:[0,0],flo:[0,0],con:[0,0],mis:[0,0]};
+ checks.forEach(c=>{areas[c.dataset.area][1]++; if(c.checked)areas[c.dataset.area][0]++});
+ ['col','com','des','flo','con'].forEach(a=>{
+   const el=document.getElementById('r'+a);
+   const x=areas[a]; el.classList.toggle('on',x[0]===x[1]&&x[1]>0);
+ });
+ const done=checks.filter(c=>c.checked).length, pct=Math.round(done/checks.length*100);
+ let level=pct>=80?'Base sólida':pct>=50?'En construcción':'Exposición parcialmente visible';
+ const gaps=[];
+ const labels={col:'colaboradores y roles de conducción',com:'comunidad e interfaces con terceros',des:'tipos de desplazamiento',flo:'flota realmente puesta al servicio',con:'censo de conductores',mis:'misionalidad y nivel PESV'};
+ Object.entries(areas).forEach(([k,v])=>{if(v[0]<v[1])gaps.push(labels[k])});
+ document.getElementById('diagSummary').innerHTML=`<div class="callout"><b>${level} · ${pct}%</b><br>
+ ${pct>=80?'La delimitación luce consistente para continuar con identificación y valoración del riesgo.':'Antes de profundizar en controles, conviene cerrar vacíos de alcance.'}</div>
+ <div class="priority"><b>Prioridades:</b> ${gaps.length?gaps.join(' · '):'No aparecen brechas en este radar básico.'}</div>`;
+}
+</script>
+</body>
+</html>
