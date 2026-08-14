@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RUTA MENTAL — Hábitos y comportamiento vial</title>
+<style>
+:root{
+ --white:#fff; --ink:#18302f; --muted:#60706f; --aqua:#35cfc2; --aqua2:#dff8f5;
+ --gold:#d99a00; --gold2:#fff0bf; --risk:#d65353; --safe:#2a9b73; --line:#dce9e7;
+ --bg:#f4fbfa; --shadow:0 14px 35px rgba(28,55,53,.12);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#f9fdfc,#eef8f6);color:var(--ink)}
+.app{max-width:1200px;margin:auto;padding:18px}
+header{background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px 18px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--gold),var(--aqua));display:grid;place-items:center;font-size:28px}
+h1{margin:0;font-size:clamp(24px,3vw,40px)}
+.subtitle{color:var(--muted);font-size:14px}
+button{font:inherit}
+.btn{border:0;border-radius:14px;padding:12px 16px;font-weight:800;cursor:pointer;background:#eef5f4;color:var(--ink)}
+.btn.primary{background:var(--gold);color:white}
+.btn.aqua{background:var(--aqua);color:#123a38}
+.main{display:grid;grid-template-columns:1.5fr .8fr;gap:18px;margin-top:18px}
+.card{background:white;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
+.scene-card{padding:16px}
+.scene{min-height:520px;border-radius:20px;overflow:hidden;position:relative;background:
+linear-gradient(#c8f4ef 0 40%,#b3d7a9 40% 48%,#6d7677 48% 80%,#d9ddd9 80% 100%)}
+.road-line{position:absolute;left:0;right:0;top:66%;height:6px;background:repeating-linear-gradient(90deg,#fff 0 48px,transparent 48px 82px)}
+.city{position:absolute;top:18%;left:0;right:0;display:flex;justify-content:space-around;opacity:.95}
+.building{width:90px;height:120px;background:#f8f1df;border-radius:8px 8px 0 0;border:3px solid #8ba09f}
+.building:nth-child(2){height:150px;background:#def5f1}.building:nth-child(3){height:105px;background:#fff1c5}
+.vehicle{position:absolute;bottom:90px;left:12%;font-size:78px;transition:.5s transform}
+.car-forward{display:inline-block;transform:scaleX(-1)}
+.event{position:absolute;right:6%;bottom:120px;max-width:310px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
+.event h2{margin:0 0 8px;font-size:22px}.event p{margin:0;color:var(--muted);line-height:1.4}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.choice{padding:13px;border:1px solid var(--line);border-radius:15px;background:#fff;text-align:left;cursor:pointer;font-weight:800}
+.choice:hover{border-color:var(--aqua);transform:translateY(-1px)}
+.feedback{margin-top:14px;padding:14px;border-radius:16px;display:none;line-height:1.45}
+.feedback.show{display:block}
+.feedback.safe{background:#e4f6ef;border-left:6px solid var(--safe)}
+.feedback.risk{background:#fdeaea;border-left:6px solid var(--risk)}
+.hud{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.metric{border:1px solid var(--line);background:#fbfefd;border-radius:15px;padding:10px}
+.metric b{display:block;font-size:20px}.metric span{font-size:12px;color:var(--muted)}
+.side{padding:16px;display:flex;flex-direction:column;gap:14px}
+.section{border:1px solid var(--line);border-radius:18px;padding:14px}
+.section h3{margin:0 0 10px}
+.habit{padding:10px;border-radius:14px;background:#f7fbfa;margin:8px 0}
+.bar{height:12px;background:#e8efee;border-radius:999px;overflow:hidden;margin-top:6px}
+.fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--aqua));transition:.4s}
+.tag{display:inline-block;padding:5px 8px;border-radius:999px;background:#edf6f4;font-size:12px;font-weight:800;margin:3px}
+.neurobox{background:linear-gradient(135deg,var(--gold2),var(--aqua2));padding:14px;border-radius:16px}
+.neurobox strong{font-size:18px}
+.timeline{display:flex;gap:8px;flex-wrap:wrap}
+.dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#eef4f3;font-weight:900}
+.dot.done{background:var(--aqua)}.dot.risk{background:#f6c7c7}
+.start{position:absolute;inset:0;background:rgba(15,38,37,.62);display:grid;place-items:center;padding:22px;z-index:5}
+.start.hidden{display:none}
+.modal{max-width:620px;background:white;border-radius:24px;padding:26px;text-align:center;box-shadow:var(--shadow)}
+.modal h2{font-size:34px;margin:.2em 0}.modal p{font-size:17px;line-height:1.5}
+.footer{margin-top:18px;padding:18px}
+.big-message{font-size:clamp(22px,3vw,34px);font-weight:900;text-align:center}
+.small{font-size:13px;color:var(--muted);line-height:1.5}
+@media(max-width:900px){
+ .main{grid-template-columns:1fr}
+ .choices{grid-template-columns:1fr}
+ .hud{grid-template-columns:1fr 1fr}
+ .event{left:5%;right:5%;bottom:105px;max-width:none}
+ .scene{min-height:620px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+ <div class="brand"><div class="logo">🧠</div><div><h1>RUTA MENTAL</h1><div class="subtitle">Cómo se construyen hábitos viales en una jornada real</div></div></div>
+ <div><button class="btn" id="restart">↻ Reiniciar</button></div>
+</header>
+
+<div class="main">
+ <section class="card scene-card">
+  <div class="hud">
+    <div class="metric"><b id="day">1/8</b><span>Momento de la jornada</span></div>
+    <div class="metric"><b id="safeScore">0</b><span>Conductas protectoras</span></div>
+    <div class="metric"><b id="riskScore">0</b><span>Conductas de riesgo</span></div>
+    <div class="metric"><b id="autoScore">0%</b><span>Automatización segura</span></div>
+  </div>
+
+  <div class="scene">
+   <div class="city"><div class="building"></div><div class="building"></div><div class="building"></div></div>
+   <div class="road-line"></div>
+   <div class="vehicle" id="vehicle"><span class="car-forward">🚗</span></div>
+   <div class="event" id="eventBox"></div>
+
+   <div class="start" id="start">
+    <div class="modal">
+      <div style="font-size:54px">🚗🧠</div>
+      <h2>Una jornada. Ocho momentos. Tus hábitos se van construyendo.</h2>
+      <p>No tienes que aprender reglas del juego. Solo decide qué harías en situaciones reales. El sistema observará qué repites y te mostrará cuándo una conducta empieza a convertirse en patrón y cuándo ese patrón comienza a automatizarse.</p>
+      <button class="btn aqua" id="startBtn">▶ Iniciar jornada</button>
+    </div>
+   </div>
+  </div>
+
+  <div id="feedback" class="feedback"></div>
+ </section>
+
+ <aside class="card side">
+   <div class="section">
+     <h3>🧩 Qué estás construyendo</h3>
+     <div class="habit">
+       <b>📵 Gestión del celular</b>
+       <div class="bar"><div class="fill" id="hPhone"></div></div>
+     </div>
+     <div class="habit">
+       <b>⏱️ Manejo del afán</b>
+       <div class="bar"><div class="fill" id="hTime"></div></div>
+     </div>
+     <div class="habit">
+       <b>😴 Gestión de fatiga</b>
+       <div class="bar"><div class="fill" id="hFatigue"></div></div>
+     </div>
+     <div class="habit">
+       <b>👁️ Observación preventiva</b>
+       <div class="bar"><div class="fill" id="hObserve"></div></div>
+     </div>
+   </div>
+
+   <div class="section">
+    <h3>🧠 Cerebro de ruta</h3>
+    <div class="neurobox" id="neuroBox">
+      <strong>Aún no hay patrón.</strong>
+      <div class="small">Una conducta aislada todavía no es un hábito.</div>
+    </div>
+   </div>
+
+   <div class="section">
+    <h3>📍 Tu recorrido</h3>
+    <div class="timeline" id="timeline"></div>
+   </div>
+
+   <div class="section">
+    <h3>🔎 Traducción simple</h3>
+    <div class="small" id="conceptText">
+      <b>Conducta:</b> una acción concreta. <br>
+      <b>Comportamiento:</b> patrón que aparece al observar varias conductas y condiciones. <br>
+      <b>Hábito:</b> una respuesta que se vuelve más disponible y automática cuando se repite en contextos similares.
+    </div>
+   </div>
+ </aside>
+</div>
+
+<section class="card footer">
+ <div class="big-message" id="footerMsg">No se trata de “ser perfecto”. Se trata de repetir lo que quieres que aparezca cuando estés cansado, apurado o distraído.</div>
+</section>
+</div>
+
+<script>
+const events=[
+ {title:"Sales tarde de casa",text:"Tienes una reunión a las 8:00 y vas 10 minutos tarde.",cat:"time",
+ choices:[
+  {t:"Acelero un poco; conozco la vía.",safe:false,why:"La presión de tiempo empieza a asociarse con aumentar la velocidad. Si se repite, puede convertirse en un patrón de respuesta al afán."},
+  {t:"Mantengo velocidad segura y aviso que llegaré tarde.",safe:true,why:"Separaste la urgencia organizacional de la conducción. Estás practicando una respuesta protectora ante el afán."}
+ ]},
+ {title:"Suena el celular",text:"Tu jefe escribe: “¿Dónde vas? Respóndeme ya.”",cat:"phone",
+ choices:[
+  {t:"Miro rápido; son solo dos segundos.",safe:false,why:"La señal 'notificación' se está asociando a 'mirar de inmediato'. Esa asociación puede automatizarse."},
+  {t:"No lo miro. Respondo cuando me detenga.",safe:true,why:"Estás creando una nueva asociación: notificación durante conducción → esperar → revisar en un lugar seguro."}
+ ]},
+ {title:"Llegas al vehículo",text:"Es un trayecto corto entre dos sedes.",cat:"observe",
+ choices:[
+  {t:"Arranco de una vez; son cinco minutos.",safe:false,why:"Omitir chequeos porque el trayecto es corto puede convertirse en una regla mental peligrosa."},
+  {t:"Cinturón, espejos, entorno y luego arranco.",safe:true,why:"La señal 'sentarme al volante' empieza a activar una secuencia estable de preparación."}
+ ]},
+ {title:"Después del almuerzo",text:"Tienes sueño, pero aún faltan varias visitas.",cat:"fatigue",
+ choices:[
+  {t:"Sigo; un café me ayuda.",safe:false,why:"La fatiga no desaparece por decisión. Repetir 'seguir pese al sueño' puede normalizar una respuesta insegura."},
+  {t:"Hago una pausa breve y reevalúo si estoy en condiciones.",safe:true,why:"Estás practicando una respuesta de autorregulación frente a señales tempranas de fatiga."}
+ ]},
+ {title:"Cliente impaciente",text:"Te dicen: “si no llegas en 15 minutos, perdemos el negocio”.",cat:"time",
+ choices:[
+  {t:"Voy más rápido. Es una excepción.",safe:false,why:"El cerebro aprende también de las excepciones repetidas. Si la presión siempre cambia tu conducción, ya no es excepción: es patrón."},
+  {t:"Mantengo conducción segura y escalo el tiempo irreal.",safe:true,why:"Proteges la conducción y haces visible un problema de diseño del trabajo."}
+ ]},
+ {title:"Otra notificación",text:"Ya ignoraste una antes. Ahora entra una llamada.",cat:"phone",
+ choices:[
+  {t:"Contesto con manos libres.",safe:false,why:"Aunque las manos estén libres, la conversación puede competir por recursos atencionales. Estás manteniendo la misma señal asociada a responder."},
+  {t:"Dejo que pase. Devuelvo la llamada al detenerme.",safe:true,why:"La repetición fortalece la nueva respuesta. El patrón empieza a consolidarse."}
+ ]},
+ {title:"Patio empresarial",text:"Un camión inicia reversa y un peatón cruza cerca.",cat:"observe",
+ choices:[
+  {t:"Paso rápido antes de que cierre el espacio.",safe:false,why:"Estás reforzando un patrón de oportunidad rápida frente a incertidumbre visual."},
+  {t:"Me detengo, observo y dejo que la maniobra termine.",safe:true,why:"Estás entrenando una respuesta de anticipación ante puntos ciegos y maniobras de alto riesgo."}
+ ]},
+ {title:"Último trayecto del día",text:"Estás cansado y quieres llegar pronto a casa.",cat:"fatigue",
+ choices:[
+  {t:"Aguanto; ya falta poco.",safe:false,why:"El contexto 'final del día' se está asociando con ignorar señales corporales. Eso también puede consolidarse."},
+  {t:"Reconozco el cansancio y ajusto mi conducción o hago una pausa.",safe:true,why:"Repetiste una respuesta protectora ante fatiga. Esa repetición hace que sea más disponible la próxima vez."}
+ ]}
+];
+
+let i=0, safe=0, risk=0;
+let habits={phone:0,time:0,fatigue:0,observe:0};
+let history=[];
+const start=document.getElementById('start'), eventBox=document.getElementById('eventBox'), feedback=document.getElementById('feedback');
+
+function renderTimeline(){
+ const t=document.getElementById('timeline'); t.innerHTML='';
+ for(let n=0;n<events.length;n++){
+   const d=document.createElement('div'); d.className='dot';
+   d.textContent=n+1;
+   if(n<history.length) d.classList.add(history[n]?'done':'risk');
+   t.appendChild(d);
+ }
+}
+function updateSide(cat,safeChoice){
+ const val=habits[cat];
+ document.getElementById('hPhone').style.width=habits.phone+'%';
+ document.getElementById('hTime').style.width=habits.time+'%';
+ document.getElementById('hFatigue').style.width=habits.fatigue+'%';
+ document.getElementById('hObserve').style.width=habits.observe+'%';
+ const total=Math.round((habits.phone+habits.time+habits.fatigue+habits.observe)/4);
+ document.getElementById('autoScore').textContent=total+'%';
+
+ const nb=document.getElementById('neuroBox');
+ if(val<25){
+   nb.innerHTML='<strong>Conducta aislada</strong><div class="small">Todavía no hay suficiente repetición para hablar de patrón.</div>';
+ }else if(val<55){
+   nb.innerHTML='<strong>Patrón emergente</strong><div class="small">La misma señal está empezando a producir una respuesta parecida.</div>';
+ }else if(val<80){
+   nb.innerHTML='<strong>Ruta aprendida</strong><div class="small">La respuesta ya es más disponible en ese contexto.</div>';
+ }else{
+   nb.innerHTML='<strong>Hábito protector en consolidación</strong><div class="small">La repetición está haciendo más fácil ejecutar esta respuesta sin depender tanto de deliberación extensa.</div>';
+ }
+}
+function renderEvent(){
+ document.getElementById('day').textContent=(i+1)+'/8';
+ if(i>=events.length){return finish();}
+ const e=events[i];
+ eventBox.innerHTML=`<h2>${e.title}</h2><p>${e.text}</p><div class="choices">
+ ${e.choices.map((c,idx)=>`<button class="choice" onclick="choose(${idx})">${c.t}</button>`).join('')}
+ </div>`;
+ feedback.className='feedback';
+ renderTimeline();
+}
+window.choose=function(idx){
+ const e=events[i], c=e.choices[idx];
+ history.push(c.safe);
+ if(c.safe){safe++; habits[e.cat]=Math.min(100,habits[e.cat]+35)}
+ else {risk++; habits[e.cat]=Math.max(0,habits[e.cat]-10)}
+ document.getElementById('safeScore').textContent=safe;
+ document.getElementById('riskScore').textContent=risk;
+ feedback.className='feedback show '+(c.safe?'safe':'risk');
+ feedback.innerHTML=`<b>${c.safe?'🛡️ Estás fortaleciendo una respuesta protectora':'⚠️ Aquí puede empezar un automatismo de riesgo'}</b><br>${c.why}
+ <div style="margin-top:10px"><button class="btn ${c.safe?'aqua':''}" onclick="next()">Continuar →</button></div>`;
+ document.querySelectorAll('.choice').forEach(b=>b.disabled=true);
+ updateSide(e.cat,c.safe);
+ document.getElementById('vehicle').style.transform=`translateX(${Math.min(420,i*42)}px)`;
+ renderTimeline();
+}
+window.next=function(){i++;feedback.className='feedback';renderEvent()}
+function finish(){
+ const avg=Math.round((habits.phone+habits.time+habits.fatigue+habits.observe)/4);
+ eventBox.innerHTML=`<h2>🏁 Jornada terminada</h2>
+ <p>Tu patrón general de automatización protectora quedó en <b>${avg}%</b>.</p>
+ <div style="margin-top:12px">
+   <span class="tag">📵 Celular ${habits.phone}%</span>
+   <span class="tag">⏱️ Afán ${habits.time}%</span>
+   <span class="tag">😴 Fatiga ${habits.fatigue}%</span>
+   <span class="tag">👁️ Observación ${habits.observe}%</span>
+ </div>
+ <p style="margin-top:14px"><b>La idea central:</b> una conducta es una acción puntual; un comportamiento aparece como patrón; un hábito es una respuesta que se vuelve más disponible con la repetición y el contexto.</p>
+ <p><b>Y la organización importa:</b> si el entorno facilita responder mensajes, correr por metas irreales o conducir fatigado, está alimentando el patrón.</p>
+ <button class="btn aqua" onclick="resetGame(true)">↻ Jugar otra jornada</button>`;
+ document.getElementById('footerMsg').textContent='Haz más fácil lo seguro. No dependas únicamente de la fuerza de voluntad.';
+}
+document.getElementById('startBtn').onclick=()=>{start.classList.add('hidden');renderEvent()}
+function resetGame(startImmediately=false){
+ i=0; safe=0; risk=0;
+ habits={phone:0,time:0,fatigue:0,observe:0};
+ history=[];
+ document.getElementById('safeScore').textContent='0';
+ document.getElementById('riskScore').textContent='0';
+ document.getElementById('autoScore').textContent='0%';
+ document.getElementById('day').textContent='1/8';
+ document.getElementById('hPhone').style.width='0%';
+ document.getElementById('hTime').style.width='0%';
+ document.getElementById('hFatigue').style.width='0%';
+ document.getElementById('hObserve').style.width='0%';
+ document.getElementById('neuroBox').innerHTML='<strong>Aún no hay patrón.</strong><div class="small">Una conducta aislada todavía no es un hábito.</div>';
+ document.getElementById('footerMsg').textContent='No se trata de “ser perfecto”. Se trata de repetir lo que quieres que aparezca cuando estés cansado, apurado o distraído.';
+ document.getElementById('vehicle').style.transform='translateX(0px)';
+ feedback.className='feedback';
+ feedback.innerHTML='';
+ renderTimeline();
+ if(startImmediately){
+   start.classList.add('hidden');
+   renderEvent();
+ }else{
+   start.classList.remove('hidden');
+   eventBox.innerHTML='';
+ }
+}
+document.getElementById('restart').onclick=()=>resetGame(false);
+renderTimeline();
+</script>
+</body>
+</html>
