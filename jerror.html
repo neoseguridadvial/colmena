@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Misión Sistema Seguro | Movilidad Empresarial</title>
+<style>
+:root{
+  --white:#fff;
+  --cream:#fffaf0;
+  --yellow:#d89b22;
+  --yellow2:#f5c34d;
+  --aqua:#65d9cf;
+  --aqua2:#1ba79e;
+  --ink:#173238;
+  --danger:#df584f;
+  --green:#2fa97d;
+  --soft:#eaf8f6;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(180deg,#eafcf9 0%,#fff9df 100%);color:var(--ink)}
+button{font:inherit}
+body{overflow-x:hidden}
+.wrap{width:min(1180px,calc(100% - 24px));margin:auto;padding:16px 0 44px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border:2px solid #d9efec;border-radius:22px;padding:12px 16px;position:sticky;top:8px;z-index:20;box-shadow:0 8px 30px rgba(23,50,56,.09)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:1000}.brandIcon{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--yellow2),var(--aqua));display:grid;place-items:center;font-size:25px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.08)}
+.hud{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end}.hudPill{background:#f7fbfb;border:1px solid #dcebea;border-radius:999px;padding:8px 11px;font-size:13px;font-weight:900}.hudPill b{color:var(--aqua2)}
+.screen{display:none}.screen.active{display:block;animation:pop .3s ease}@keyframes pop{from{opacity:0;transform:scale(.985) translateY(8px)}to{opacity:1;transform:none}}
+.hero{margin-top:18px;display:grid;grid-template-columns:1.05fr .95fr;gap:18px}.card{background:white;border-radius:28px;padding:30px;border:2px solid rgba(23,50,56,.06);box-shadow:0 18px 45px rgba(23,50,56,.11)}
+.kicker{display:inline-block;background:#fff0bf;border:2px solid #f0c953;border-radius:999px;padding:7px 11px;font-weight:1000;font-size:12px;text-transform:uppercase;letter-spacing:.6px}
+h1{font-size:clamp(42px,7vw,78px);line-height:.9;letter-spacing:-3px;margin:18px 0}.yellow{color:#ac7510}.aqua{color:#168f87}.lead{font-size:clamp(18px,2vw,23px);line-height:1.48;color:#486166}.btn{border:0;border-radius:16px;padding:15px 20px;font-weight:1000;cursor:pointer;box-shadow:inset 0 -4px 0 rgba(0,0,0,.13);transition:.15s}.btn:hover{transform:translateY(-2px)}.primary{background:var(--ink);color:#fff}.secondary{background:#e8faf7;color:#167c75}.yellowBtn{background:var(--yellow2);color:#5f4300}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.pixelScene{position:relative;min-height:470px;overflow:hidden;background:linear-gradient(#8fe7df 0 52%,#d7f8f1 52% 65%,#f4d477 65% 100%)}
+.cloud{position:absolute;background:white;border-radius:999px;width:120px;height:38px;opacity:.9}.cloud:before,.cloud:after{content:"";position:absolute;background:white;border-radius:50%}.cloud:before{width:55px;height:55px;left:18px;bottom:0}.cloud:after{width:44px;height:44px;right:17px;bottom:0}.c1{left:8%;top:14%}.c2{right:7%;top:25%;transform:scale(.8)}
+.road{position:absolute;left:0;right:0;bottom:55px;height:105px;background:#4c5e61;border-top:7px solid #fff;border-bottom:7px solid #fff}.road:after{content:"";position:absolute;left:0;right:0;top:44px;border-top:7px dashed #f3d957}.grass{position:absolute;left:0;right:0;bottom:0;height:60px;background:#5cc497;border-top:7px solid #369873}
+.avatarDemo{position:absolute;left:15%;bottom:92px;width:62px;height:82px}.head{width:44px;height:44px;border-radius:50%;background:#ffcf9d;border:5px solid var(--ink);position:absolute;left:9px;top:0}.helmet{position:absolute;width:51px;height:27px;background:var(--yellow2);border:5px solid var(--ink);border-radius:26px 26px 8px 8px;left:5px;top:-6px}.bodyA{position:absolute;left:12px;top:41px;width:38px;height:38px;background:var(--aqua);border:5px solid var(--ink);border-radius:10px}.legA,.legB{position:absolute;width:13px;height:25px;background:var(--ink);bottom:-13px}.legA{left:13px}.legB{right:13px}.shieldDemo{position:absolute;right:14%;bottom:140px;width:70px;height:80px;background:linear-gradient(135deg,#fff,var(--aqua));clip-path:polygon(50% 0,92% 16%,82% 72%,50% 100%,18% 72%,8% 16%);border:0;filter:drop-shadow(0 7px 0 rgba(23,50,56,.22));display:grid;place-items:center;font-size:28px;font-weight:1000;color:var(--ink)}
+.coinDemo{position:absolute;right:38%;top:30%;width:45px;height:45px;border-radius:50%;background:var(--yellow2);border:6px solid #aa7410;display:grid;place-items:center;font-size:20px;font-weight:1000;box-shadow:0 4px 0 #845a09}.sign{position:absolute;right:8%;bottom:84px;background:white;border:5px solid var(--ink);padding:10px 12px;border-radius:10px;font-weight:1000;transform:rotate(-3deg)}
+.rules{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}.rule{background:#f9fdfc;border:2px solid #e0efed;border-radius:18px;padding:15px;text-align:center}.rule .ico{font-size:28px}.rule strong{display:block;margin:5px 0}
+.gameCard{margin-top:18px;padding:0;overflow:hidden}.gameHeader{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:15px 18px;background:#fff}.levelTitle{font-weight:1000;font-size:20px}.mission{font-size:13px;color:#60777b}.gameWrap{position:relative;background:#c9f5ef;touch-action:none}.gameCanvas{display:block;width:100%;height:auto;max-height:65vh;background:#b9f3ec}.overlay{position:absolute;inset:0;background:rgba(13,39,44,.72);display:none;place-items:center;padding:20px;z-index:5}.overlay.show{display:grid}.modal{width:min(620px,100%);background:white;border-radius:24px;padding:26px;border:4px solid var(--yellow2);box-shadow:0 20px 60px rgba(0,0,0,.25);text-align:center}.modal .emoji{font-size:58px}.modal h2{font-size:32px;margin:6px 0 10px}.modal p{font-size:17px;line-height:1.48}.controls{display:flex;justify-content:center;gap:12px;padding:13px;background:#eefaf8;border-top:2px solid #d8efec}.ctrl{width:70px;height:58px;border:0;border-radius:16px;background:white;border:2px solid #cde7e3;font-size:25px;font-weight:1000;box-shadow:inset 0 -4px 0 #d3dfde;user-select:none}.ctrl:active{transform:translateY(2px);box-shadow:none}.tip{padding:12px 18px;background:#fff7d9;border-top:2px solid #f2d576;font-weight:800;font-size:14px}
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.levelCard{background:white;border-radius:22px;padding:20px;border:3px solid #e5efee}.levelCard.done{border-color:var(--aqua)}.levelNum{width:40px;height:40px;border-radius:12px;background:var(--yellow2);display:grid;place-items:center;font-weight:1000}
+.finalGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.metric{background:#f8fcfb;border:2px solid #dbecea;border-radius:18px;padding:18px;text-align:center}.metric strong{font-size:36px;display:block}.commit{background:linear-gradient(135deg,var(--ink),#295b62);color:white;border-radius:24px;padding:24px;margin-top:18px}.commit h2{margin-top:0}.habitRow{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px}.habitRow select{padding:12px;border-radius:12px;border:1px solid #cfe0de}.mini{font-size:13px;color:#668084}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.rules,.finalGrid{grid-template-columns:1fr 1fr}.levels{grid-template-columns:1fr}.pixelScene{min-height:360px}.habitRow{grid-template-columns:1fr}.topbar{position:static}}
+@media(max-width:600px){.wrap{width:min(100% - 12px,1180px)}.card{padding:20px;border-radius:22px}.topbar{align-items:flex-start;flex-direction:column}.hud{justify-content:flex-start}.rules,.finalGrid{grid-template-columns:1fr 1fr}.gameHeader{align-items:flex-start;flex-direction:column}.ctrl{width:64px}.lead{font-size:18px}h1{letter-spacing:-2px}.pixelScene{min-height:320px}}
+@media print{.topbar,.controls,.actions,.gameCard,.hero,.levels{display:none!important}.screen{display:none!important}#final{display:block!important}.card{box-shadow:none;border:1px solid #aaa}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><div class="brandIcon">⚡</div><div>MISIÓN SISTEMA SEGURO<div class="mini">Movilidad empresarial · aprender jugando</div></div></div>
+    <div class="hud"><div class="hudPill">🛡️ Barreras: <b id="hudShields">0</b></div><div class="hudPill">⭐ Hábitos: <b id="hudCoins">0</b></div><div class="hudPill">❤️ Energía: <b id="hudLives">3</b></div></div>
+  </div>
+
+  <section id="intro" class="screen active">
+    <div class="hero">
+      <div class="card">
+        <span class="kicker">🎮 Experiencia gamificada</span>
+        <h1>Las personas <span class="yellow">fallamos.</span><br>El sistema debe <span class="aqua">protegernos.</span></h1>
+        <p class="lead">Recorre tres mundos de movilidad empresarial. Salta riesgos, recoge hábitos seguros y activa barreras. Si cometes un error, no “pierdes”: el juego te muestra qué defensa faltó para impedir que el error se convierta en una lesión grave.</p>
+        <div class="actions"><button class="btn primary" onclick="startGame()">▶ Iniciar misión</button></div>
+        <div class="rules">
+          <div class="rule"><div class="ico">⬅️➡️</div><strong>Muévete</strong><span class="mini">Flechas o botones</span></div>
+          <div class="rule"><div class="ico">⬆️</div><strong>Salta</strong><span class="mini">Espacio o botón</span></div>
+          <div class="rule"><div class="ico">⭐</div><strong>Recoge</strong><span class="mini">Hábitos protectores</span></div>
+          <div class="rule"><div class="ico">🛡️</div><strong>Activa</strong><span class="mini">Barreras del sistema</span></div>
+        </div>
+      </div>
+      <div class="card pixelScene">
+        <div class="cloud c1"></div><div class="cloud c2"></div><div class="road"></div><div class="grass"></div>
+        <div class="avatarDemo"><div class="head"></div><div class="helmet"></div><div class="bodyA"></div><div class="legA"></div><div class="legB"></div></div>
+        <div class="coinDemo">★</div><div class="shieldDemo">S</div><div class="sign">ERROR ≠ MUERTE</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="game" class="screen">
+    <div class="card gameCard">
+      <div class="gameHeader"><div><div class="levelTitle" id="levelTitle">Nivel 1</div><div class="mission" id="missionText"></div></div><button class="btn secondary" onclick="showLevels()">Mapa de misión</button></div>
+      <div class="gameWrap">
+        <canvas id="gameCanvas" class="gameCanvas" width="1100" height="520" aria-label="Juego de plataformas de movilidad segura"></canvas>
+        <div id="overlay" class="overlay"><div class="modal"><div id="ovEmoji" class="emoji">💥</div><h2 id="ovTitle"></h2><p id="ovText"></p><div class="actions" style="justify-content:center"><button id="ovBtn" class="btn primary">Continuar</button></div></div></div>
+      </div>
+      <div class="controls">
+        <button class="ctrl" data-key="left" aria-label="Mover a la izquierda">◀</button>
+        <button class="ctrl" data-key="jump" aria-label="Saltar">▲</button>
+        <button class="ctrl" data-key="right" aria-label="Mover a la derecha">▶</button>
+      </div>
+      <div class="tip" id="tipText">💡 Recoge ⭐ hábitos seguros y 🛡️ barreras. Evita los riesgos rojos.</div>
+    </div>
+  </section>
+
+  <section id="map" class="screen">
+    <div class="card">
+      <span class="kicker">Mapa de la misión</span>
+      <h2 style="font-size:42px;margin:14px 0 8px">Tres mundos. Un mismo principio.</h2>
+      <p class="lead">Cada nivel representa un tipo de error cotidiano y las defensas que la organización puede construir.</p>
+      <div class="levels" id="levelCards"></div>
+      <div class="actions"><button class="btn primary" onclick="returnToGame()">Volver al juego</button></div>
+    </div>
+  </section>
+
+  <section id="final" class="screen">
+    <div class="card">
+      <span class="kicker">🏁 Misión cumplida</span>
+      <h2 style="font-size:clamp(38px,6vw,64px);line-height:1;margin:16px 0">No ganaste por ser perfecto.<br><span class="aqua">Ganaste por construir barreras.</span></h2>
+      <p class="lead">En Sistema Seguro, el error humano se anticipa. La meta es evitar que una equivocación normal termine en muerte o lesión grave.</p>
+      <div class="finalGrid">
+        <div class="metric"><span>⭐</span><strong id="finalCoins">0</strong><small>Hábitos recogidos</small></div>
+        <div class="metric"><span>🛡️</span><strong id="finalShields">0</strong><small>Barreras activadas</small></div>
+        <div class="metric"><span>🧠</span><strong id="finalErrors">0</strong><small>Errores convertidos en aprendizaje</small></div>
+        <div class="metric"><span>🏁</span><strong>3</strong><small>Mundos completados</small></div>
+      </div>
+      <div class="commit">
+        <h2>⚡ Automatiza un hábito seguro</h2>
+        <p>Elige una señal, una conducta y un refuerzo. Así pasamos de “sé que debería hacerlo” a una respuesta cada vez más automática.</p>
+        <div class="habitRow">
+          <select id="signal"><option>Al encender el vehículo</option><option>Cuando entra una llamada</option><option>Cuando siento sueño</option><option>Antes de reversar</option><option>Cuando voy tarde</option></select>
+          <select id="behavior"><option>Guardo el teléfono fuera de alcance</option><option>Me detengo en un lugar seguro</option><option>Hago una pausa y evalúo mi estado</option><option>Realizo verificación 360°</option><option>Informo el retraso y no aumento velocidad</option></select>
+          <select id="reward"><option>Registro el cumplimiento</option><option>Lo comparto con mi equipo</option><option>Activo un recordatorio visual</option><option>Reconozco una jornada sin distracciones</option></select>
+          <button class="btn yellowBtn" onclick="makeHabit()">Crear</button>
+        </div>
+        <div id="habitResult" style="margin-top:14px;font-weight:900"></div>
+      </div>
+      <div class="actions"><button class="btn primary" onclick="resetAll()">↻ Jugar otra vez</button><button class="btn secondary" onclick="window.print()">🖨️ Guardar resultado en PDF</button></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const canvas=document.getElementById('gameCanvas'),ctx=canvas.getContext('2d');
+const overlay=document.getElementById('overlay');
+let keys={left:false,right:false,jump:false};
+let levelIndex=0,coins=0,shields=0,lives=3,errors=0,completed=[false,false,false],running=false,last=0;
+let player,platforms,hazards,collectibles,goal,cameraX=0,worldWidth=2200,levelStartX=70;
+const levels=[
+ {title:'Nivel 1 · El mensaje urgente 📱',mission:'Vas a una visita empresarial. Evita la distracción, recoge hábitos y activa la política de no contacto durante la conducción.',sky:'#9be8df',ground:'#4b5e61',hazards:[
+   {x:470,w:100,label:'📱',name:'Distracción por celular',lesson:'El error es previsible. La barrera no puede ser solo “concéntrese”: una política de no contacto, tecnología configurada y tiempos de respuesta realistas reducen la exposición.'},
+   {x:1040,w:125,label:'⏱️',name:'Presión por llegar',lesson:'Cuando el tiempo operacional obliga a compensar con velocidad o multitarea, el riesgo ya no es únicamente individual: también es una decisión del sistema.'},
+   {x:1600,w:105,label:'💬',name:'Llamada de trabajo',lesson:'Manos libres no elimina toda la carga mental. Una conversación puede competir con la detección y procesamiento de información vial.'}
+ ],items:[{x:260,t:'coin',label:'📵'},{x:650,t:'shield',label:'🛡️'},{x:820,t:'coin',label:'🗓️'},{x:1270,t:'coin',label:'⏸️'},{x:1450,t:'shield',label:'🛡️'},{x:1850,t:'coin',label:'📍'}],tip:'📵 Regla del nivel: vehículo en movimiento = el mensaje puede esperar.'},
+ {title:'Nivel 2 · Afán y fatiga 😴',mission:'La jornada se extendió y aparece el afán. El reto no es “aguantar”: reconoce señales, usa pausas y evita compensar retrasos con velocidad.',sky:'#a6e8ff',ground:'#4d5b69',hazards:[
+   {x:420,w:110,label:'😴',name:'Fatiga',lesson:'La fatiga deteriora atención, tiempo de respuesta y toma de decisiones. La defensa es gestionar jornada, pausas, descanso y posibilidad real de detener la operación.'},
+   {x:970,w:120,label:'⚡',name:'Exceso de velocidad',lesson:'La velocidad aumenta la energía del impacto y reduce el margen para corregir errores. Sistema Seguro controla la energía, no confía en reflejos perfectos.'},
+   {x:1500,w:125,label:'📦',name:'Meta operativa',lesson:'Una meta que premia llegar “como sea” puede producir conductas de compensación. El diseño del trabajo también es una barrera de seguridad vial.'}
+ ],items:[{x:230,t:'coin',label:'☕'},{x:620,t:'shield',label:'🛡️'},{x:780,t:'coin',label:'🛌'},{x:1190,t:'coin',label:'30'},{x:1380,t:'shield',label:'🛡️'},{x:1840,t:'coin',label:'📣'}],tip:'😴 Si aparece sueño, el objetivo cambia: primero estar en condiciones de conducir.'},
+ {title:'Nivel 3 · Patio, reversa y puntos ciegos 🚚',mission:'Llegaste a la empresa. Conviven peatones, vehículos y maniobras. Recoge controles antes de cruzar la meta.',sky:'#bff0dc',ground:'#53615b',hazards:[
+   {x:430,w:115,label:'↩️',name:'Reversa sin verificación',lesson:'La reversa combina visibilidad limitada y convivencia con personas. Una verificación 360°, guía cuando aplique y diseño del patio reducen dependencia de la memoria.'},
+   {x:1000,w:130,label:'🚶',name:'Cruce no segregado',lesson:'Cuando peatones y vehículos comparten trayectoria sin segregación, el sistema deja poco margen al error de cualquiera de los dos.'},
+   {x:1570,w:130,label:'🚚',name:'Punto ciego',lesson:'Los puntos ciegos son una limitación conocida. Es mejor rediseñar flujos, velocidades, ayudas y zonas de exclusión que esperar percepción perfecta.'}
+ ],items:[{x:220,t:'coin',label:'360°'},{x:670,t:'shield',label:'🛡️'},{x:830,t:'coin',label:'🚶'},{x:1250,t:'coin',label:'5'},{x:1420,t:'shield',label:'🛡️'},{x:1880,t:'coin',label:'👁️'}],tip:'🚚 En patios, separar flujos y controlar velocidad protege incluso cuando alguien se equivoca.'}
+];
+function startGame(){levelIndex=0;coins=0;shields=0;lives=3;errors=0;completed=[false,false,false];updateHUD();show('game');loadLevel(0)}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
+function loadLevel(i){levelIndex=i;const L=levels[i];document.getElementById('levelTitle').textContent=L.title;document.getElementById('missionText').textContent=L.mission;document.getElementById('tipText').textContent='💡 '+L.tip;player={x:70,y:380,w:42,h:58,vx:0,vy:0,onGround:false,inv:0};platforms=[{x:0,y:455,w:worldWidth,h:65},{x:320,y:375,w:135,h:22},{x:720,y:330,w:150,h:22},{x:1240,y:365,w:150,h:22},{x:1760,y:325,w:150,h:22}];hazards=L.hazards.map(h=>({...h,y:420,h:35,hit:false}));collectibles=L.items.map((it,idx)=>({...it,y:idx%2?280:365,r:19,collected:false}));goal={x:2050,y:330,w:65,h:125};cameraX=0;running=true;last=performance.now();requestAnimationFrame(loop)}
+function rects(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
+function loop(t){if(!running)return;const dt=Math.min((t-last)/16.67,2);last=t;update(dt);draw();requestAnimationFrame(loop)}
+function update(dt){
+ const accel=.85,max=6.2,fr=.78; if(keys.left)player.vx-=accel*dt;if(keys.right)player.vx+=accel*dt;player.vx=Math.max(-max,Math.min(max,player.vx));if(!keys.left&&!keys.right)player.vx*=Math.pow(fr,dt);
+ if(keys.jump&&player.onGround){player.vy=-13.2;player.onGround=false;keys.jump=false}
+ player.vy+=.72*dt;player.x+=player.vx*dt;player.y+=player.vy*dt;player.x=Math.max(0,Math.min(worldWidth-player.w,player.x));player.onGround=false;
+ platforms.forEach(p=>{let prevY=player.y-player.vy*dt;if(player.x+player.w>p.x&&player.x<p.x+p.w&&player.y+player.h>=p.y&&prevY+player.h<=p.y+8&&player.vy>=0){player.y=p.y-player.h;player.vy=0;player.onGround=true}});
+ if(player.y>560){player.x=levelStartX;player.y=360;player.vy=0;hitHazard({name:'Salida de la zona segura',lesson:'Cuando el entorno permite una salida de vía o caída sin protección, también faltan barreras físicas y control de energía.'})}
+ if(player.inv>0)player.inv-=dt;
+ hazards.forEach(h=>{if(!h.hit&&player.inv<=0&&rects(player,h)){h.hit=true;hitHazard(h)}});
+ collectibles.forEach(c=>{if(!c.collected){let dx=(player.x+player.w/2)-c.x,dy=(player.y+player.h/2)-c.y;if(Math.hypot(dx,dy)<42){c.collected=true;if(c.t==='coin')coins++;else shields++;updateHUD()}}});
+ if(rects(player,goal)){running=false;completed[levelIndex]=true;showLevelComplete()}
+ cameraX=Math.max(0,Math.min(worldWidth-canvas.width,player.x-canvas.width*.33));
+}
+function hitHazard(h){errors++;lives=Math.max(0,lives-1);updateHUD();player.inv=80;player.vx=-3;player.vy=-7;showOverlay('💥','Cometiste un error','<strong>'+h.name+'.</strong><br><br>'+h.lesson+'<br><br><strong>Mensaje del Sistema Seguro:</strong> equivocarse es humano; la consecuencia grave no debe ser inevitable.','Volver a la misión',()=>{hideOverlay();if(lives===0){lives=3;updateHUD();player.x=70;player.y=360}})}
+function showLevelComplete(){const isLast=levelIndex===levels.length-1;showOverlay('🏁',isLast?'¡Completaste los tres mundos!':'¡Nivel superado!',isLast?'Recogiste hábitos y barreras mientras enfrentabas errores previsibles. Eso es exactamente lo que busca un Sistema Seguro: múltiples capas de protección.':'No pasaste por ser perfecto. Pasaste porque el sistema tenía más de una defensa disponible.',isLast?'Ver mi resultado':'Siguiente nivel',()=>{hideOverlay();if(isLast){finishGame()}else{loadLevel(levelIndex+1)}})}
+function showOverlay(em,t,tx,btn,fn){document.getElementById('ovEmoji').textContent=em;document.getElementById('ovTitle').textContent=t;document.getElementById('ovText').innerHTML=tx;document.getElementById('ovBtn').textContent=btn;document.getElementById('ovBtn').onclick=fn;overlay.classList.add('show')}
+function hideOverlay(){overlay.classList.remove('show')}
+function draw(){const L=levels[levelIndex];ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle=L.sky;ctx.fillRect(0,0,canvas.width,canvas.height);drawClouds();ctx.save();ctx.translate(-cameraX,0);drawWorld(L);ctx.restore()}
+function drawClouds(){ctx.fillStyle='rgba(255,255,255,.85)';for(let i=0;i<6;i++){let x=((i*230-cameraX*.18)%1400+1400)%1400-80,y=55+(i%3)*55;ctx.beginPath();ctx.arc(x,y,28,0,Math.PI*2);ctx.arc(x+30,y-8,35,0,Math.PI*2);ctx.arc(x+65,y,26,0,Math.PI*2);ctx.fill()}}
+function drawWorld(L){
+ ctx.fillStyle='#f3d77a';ctx.fillRect(0,455,worldWidth,65);ctx.fillStyle=L.ground;ctx.fillRect(0,420,worldWidth,35);ctx.strokeStyle='#fff';ctx.lineWidth=5;ctx.setLineDash([28,24]);ctx.beginPath();ctx.moveTo(0,438);ctx.lineTo(worldWidth,438);ctx.stroke();ctx.setLineDash([]);
+ platforms.slice(1).forEach(p=>{ctx.fillStyle='#fff2bd';ctx.fillRect(p.x,p.y,p.w,p.h);ctx.strokeStyle='#bd8e1b';ctx.lineWidth=4;ctx.strokeRect(p.x,p.y,p.w,p.h)});
+ hazards.forEach(h=>{ctx.fillStyle=h.hit?'#9daaaa':'#df584f';roundRect(h.x,h.y,h.w,h.h,10,true,false);ctx.font='26px Segoe UI Emoji';ctx.fillText(h.label,h.x+h.w/2-14,h.y-8);ctx.fillStyle='#fff';ctx.font='bold 12px Arial';ctx.textAlign='center';ctx.fillText('RIESGO',h.x+h.w/2,h.y+23);ctx.textAlign='start'});
+ collectibles.forEach(c=>{if(c.collected)return;ctx.beginPath();ctx.arc(c.x,c.y,c.r,0,Math.PI*2);ctx.fillStyle=c.t==='coin'?'#f5c34d':'#65d9cf';ctx.fill();ctx.lineWidth=5;ctx.strokeStyle=c.t==='coin'?'#9f6e0d':'#168f87';ctx.stroke();ctx.font='bold 16px Segoe UI Emoji';ctx.textAlign='center';ctx.fillStyle='#173238';ctx.fillText(c.label,c.x,c.y+6);ctx.textAlign='start'});
+ ctx.fillStyle='#fff';ctx.fillRect(goal.x,goal.y,12,goal.h);ctx.fillStyle='#65d9cf';ctx.beginPath();ctx.moveTo(goal.x+12,goal.y);ctx.lineTo(goal.x+70,goal.y+24);ctx.lineTo(goal.x+12,goal.y+48);ctx.closePath();ctx.fill();ctx.fillStyle='#173238';ctx.font='bold 14px Arial';ctx.fillText('META',goal.x-8,goal.y-10);
+ drawPlayer();
+}
+function drawPlayer(){ctx.save();ctx.translate(player.x,player.y);if(player.inv>0&&Math.floor(player.inv/5)%2===0)ctx.globalAlpha=.35;ctx.fillStyle='#173238';ctx.fillRect(8,37,12,21);ctx.fillRect(27,37,12,21);ctx.fillStyle='#65d9cf';roundRect(5,20,38,29,8,true,false);ctx.fillStyle='#ffce9c';ctx.beginPath();ctx.arc(24,15,16,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#173238';ctx.lineWidth=4;ctx.stroke();ctx.fillStyle='#f5c34d';ctx.beginPath();ctx.arc(24,10,18,Math.PI,0);ctx.lineTo(42,12);ctx.lineTo(6,12);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle='#173238';ctx.beginPath();ctx.arc(29,15,2.5,0,Math.PI*2);ctx.fill();ctx.restore()}
+function roundRect(x,y,w,h,r,fill,stroke){if(w<2*r)r=w/2;if(h<2*r)r=h/2;ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();if(fill)ctx.fill();if(stroke)ctx.stroke()}
+function updateHUD(){document.getElementById('hudShields').textContent=shields;document.getElementById('hudCoins').textContent=coins;document.getElementById('hudLives').textContent=lives}
+function showLevels(){running=false;const box=document.getElementById('levelCards');box.innerHTML=levels.map((l,i)=>'<div class="levelCard '+(completed[i]?'done':'')+'"><div class="levelNum">'+(i+1)+'</div><h3>'+l.title+'</h3><p>'+l.mission+'</p><strong>'+(completed[i]?'✅ Completado':i===levelIndex?'🎮 En curso':'🔒 Próximo reto')+'</strong></div>').join('');show('map')}
+function returnToGame(){show('game');running=true;last=performance.now();requestAnimationFrame(loop)}
+function finishGame(){document.getElementById('finalCoins').textContent=coins;document.getElementById('finalShields').textContent=shields;document.getElementById('finalErrors').textContent=errors;show('final')}
+function makeHabit(){let s=document.getElementById('signal').value,b=document.getElementById('behavior').value,r=document.getElementById('reward').value;document.getElementById('habitResult').textContent='Mi piloto automático: '+s+', '+b.toLowerCase()+'. Refuerzo: '+r.toLowerCase()+'.'}
+function resetAll(){show('intro');coins=0;shields=0;lives=3;errors=0;updateHUD()}
+window.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp',' '].includes(e.key))e.preventDefault();if(e.key==='ArrowLeft')keys.left=true;if(e.key==='ArrowRight')keys.right=true;if(e.key==='ArrowUp'||e.key===' ')keys.jump=true});
+window.addEventListener('keyup',e=>{if(e.key==='ArrowLeft')keys.left=false;if(e.key==='ArrowRight')keys.right=false;if(e.key==='ArrowUp'||e.key===' ')keys.jump=false});
+document.querySelectorAll('.ctrl').forEach(b=>{let k=b.dataset.key;const on=e=>{e.preventDefault();keys[k]=true};const off=e=>{e.preventDefault();keys[k]=false};b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointerleave',off);b.addEventListener('pointercancel',off)});
+</script>
+</body>
+</html>
