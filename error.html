@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Error Humano ≠ Sentencia | Sistema Seguro</title>
+<style>
+:root{
+  --white:#ffffff;
+  --cream:#fffaf0;
+  --burn:#d89b22;
+  --burn-dark:#aa7410;
+  --aqua:#64d8cf;
+  --aqua-dark:#198f88;
+  --ink:#173238;
+  --muted:#60767b;
+  --danger:#d85a52;
+  --success:#2f9f78;
+  --card:#ffffff;
+  --shadow:0 18px 50px rgba(23,50,56,.12);
+  --radius:24px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(145deg,var(--cream),#f3fffd);color:var(--ink)}
+button{font:inherit}
+.app{min-height:100vh;display:flex;flex-direction:column}
+header{padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;position:sticky;top:0;z-index:50;background:rgba(255,255,255,.86);backdrop-filter:blur(16px);border-bottom:1px solid rgba(23,50,56,.08)}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800}.logo{width:44px;height:44px;border-radius:14px;background:conic-gradient(from 20deg,var(--burn),var(--aqua),var(--burn));display:grid;place-items:center;box-shadow:0 8px 22px rgba(100,216,207,.28);font-size:22px}.tag{font-size:12px;color:var(--muted);font-weight:700}.progressWrap{display:flex;align-items:center;gap:10px;min-width:240px}.progress{flex:1;height:10px;background:#e8efef;border-radius:999px;overflow:hidden}.bar{height:100%;width:0%;background:linear-gradient(90deg,var(--burn),var(--aqua));transition:.4s}.pct{font-size:12px;font-weight:800;color:var(--muted)}
+main{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:34px 0 70px;flex:1}.screen{display:none;animation:fade .35s ease}.screen.active{display:block}@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:28px;align-items:stretch}.panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:34px;border:1px solid rgba(23,50,56,.06)}
+h1{font-size:clamp(42px,7vw,82px);line-height:.94;margin:0 0 20px;letter-spacing:-3px}.accent{color:var(--burn-dark)}.aqua{color:var(--aqua-dark)}.lead{font-size:clamp(18px,2vw,24px);line-height:1.5;color:#3d555a}.heroVisual{min-height:440px;position:relative;overflow:hidden;background:radial-gradient(circle at 30% 20%,#fff9d5,transparent 35%),linear-gradient(145deg,#eafffc,#fff)}.orb{position:absolute;border-radius:50%;filter:blur(1px);opacity:.9}.o1{width:220px;height:220px;background:var(--aqua);right:-50px;top:-40px}.o2{width:180px;height:180px;background:#ffd56f;left:-30px;bottom:30px}.statement{position:absolute;inset:60px 34px;display:flex;flex-direction:column;justify-content:center;z-index:2}.bigquote{font-weight:900;font-size:clamp(28px,4vw,48px);line-height:1.05}.small{color:var(--muted);line-height:1.55}.cta{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:16px;padding:16px 22px;font-weight:800;cursor:pointer;transition:.2s}.cta.primary{background:var(--ink);color:white}.cta.primary:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(23,50,56,.2)}.cta.secondary{background:#eff9f8;color:var(--aqua-dark);border:1px solid #c6f2ee}.cta.warn{background:#fff4d8;color:#7d5200;border:1px solid #f7d788}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}.pill{display:inline-flex;padding:8px 12px;border-radius:999px;background:#eef8f7;font-weight:800;font-size:12px;color:var(--aqua-dark)}
+.sectionTitle{font-size:clamp(30px,4vw,52px);margin:0 0 8px;letter-spacing:-1.5px}.sub{font-size:18px;color:var(--muted);margin:0 0 26px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:white;border-radius:20px;padding:22px;border:2px solid transparent;box-shadow:0 12px 30px rgba(23,50,56,.08);cursor:pointer;transition:.2s}.card:hover{transform:translateY(-4px);border-color:#bdeee9}.card.selected{border-color:var(--aqua-dark);background:#f2fffd}.card h3{margin:12px 0 8px}.icon{font-size:34px}.scenarioBox{display:grid;grid-template-columns:.9fr 1.1fr;gap:24px}.scene{background:linear-gradient(160deg,#173238,#275861);color:white;min-height:360px;border-radius:22px;padding:28px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden}.scene:after{content:"";position:absolute;width:240px;height:240px;background:rgba(100,216,207,.2);border-radius:50%;right:-80px;top:-60px}.scene .badge{position:absolute;top:22px;left:22px;background:#fff;color:var(--ink);padding:8px 11px;border-radius:999px;font-weight:900;font-size:12px}.choices{display:grid;gap:12px}.choice{border:1px solid #dbe7e7;background:white;border-radius:16px;padding:16px 18px;text-align:left;cursor:pointer;font-weight:700;transition:.15s}.choice:hover{border-color:var(--aqua-dark);transform:translateX(4px)}.feedback{margin-top:18px;padding:18px;border-radius:16px;display:none}.feedback.show{display:block}.feedback.good{background:#e9fff6;border:1px solid #bdebd6}.feedback.bad{background:#fff0ee;border:1px solid #f0c3bf}.feedback.neutral{background:#fff8e7;border:1px solid #f2db9e}.barrierGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.barrier{padding:18px;border-radius:16px;background:#f7fbfb;border:2px dashed #cfe4e3;cursor:pointer}.barrier.active{border-style:solid;border-color:var(--burn);background:#fff8e7}.habitBuilder{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.habitCol{background:white;border-radius:18px;padding:18px;border:1px solid #dfe9e8}.habitCol h3{margin-top:0}.selectBox, input{width:100%;padding:14px 15px;border-radius:12px;border:1px solid #cfdcdb;background:#fff;font:inherit}.habitCard{margin-top:22px;background:linear-gradient(135deg,#173238,#24474c);color:white;border-radius:22px;padding:26px}.metricGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.metric{background:white;border-radius:18px;padding:20px;text-align:center;box-shadow:0 8px 24px rgba(23,50,56,.07)}.metric strong{font-size:34px;display:block}.footerNote{margin-top:28px;padding:18px 20px;border-left:5px solid var(--burn);background:#fff9e8;border-radius:12px}.hidden{display:none!important}.navRow{display:flex;justify-content:space-between;gap:12px;margin-top:26px}.mini{font-size:13px;color:var(--muted)}
+@media(max-width:900px){header{align-items:flex-start;flex-direction:column}.progressWrap{width:100%;min-width:0}.hero,.scenarioBox{grid-template-columns:1fr}.grid,.metricGrid{grid-template-columns:1fr 1fr}.habitBuilder{grid-template-columns:1fr}.heroVisual{min-height:320px}}
+@media(max-width:600px){main{width:min(100% - 20px,1180px);padding-top:18px}.panel{padding:22px}.grid,.metricGrid,.barrierGrid{grid-template-columns:1fr}h1{letter-spacing:-2px}.cta{width:100%}.actions{flex-direction:column}.scene{min-height:300px}.statement{inset:40px 22px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand"><div class="logo">⚡</div><div><div>ERROR HUMANO ≠ SENTENCIA</div><div class="tag">Movilidad empresarial · Sistema Seguro</div></div></div>
+  <div class="progressWrap"><div class="progress"><div id="bar" class="bar"></div></div><span id="pct" class="pct">0%</span></div>
+</header>
+<main>
+<section id="s0" class="screen active">
+  <div class="hero">
+    <div class="panel">
+      <span class="pill">Experiencia interactiva</span>
+      <h1>Las personas <span class="accent">cometemos errores.</span><br><span class="aqua">No deberían costarnos la vida.</span></h1>
+      <p class="lead">En movilidad empresarial, un error cotidiano puede combinarse con velocidad, fatiga, presión operativa, infraestructura o decisiones organizacionales. Tu reto es descubrir dónde construir barreras.</p>
+      <div class="actions"><button class="cta primary" onclick="go(1)">Comenzar experiencia →</button></div>
+      <p class="mini">No buscamos personas perfectas. Buscamos sistemas capaces de proteger personas reales.</p>
+    </div>
+    <div class="panel heroVisual"><div class="orb o1"></div><div class="orb o2"></div><div class="statement"><div class="bigquote">“Errar es humano.<br>Diseñar para que el error no mate es gestión.”</div><p class="small">Piensa como conductor, peatón, motociclista, líder y organización.</p></div></div>
+  </div>
+</section>
+
+<section id="s1" class="screen">
+  <div class="panel">
+    <h2 class="sectionTitle">1. ¿Dónde aparece el error?</h2>
+    <p class="sub">Selecciona los escenarios que más reconoces en tu movilidad laboral.</p>
+    <div class="grid" id="errorCards">
+      <div class="card" onclick="toggleCard(this)"><div class="icon">📱</div><h3>Distracción</h3><p>Mensajes, llamadas, navegación, reuniones o multitarea.</p></div>
+      <div class="card" onclick="toggleCard(this)"><div class="icon">😴</div><h3>Fatiga</h3><p>Turnos largos, sueño insuficiente, monotonía y presión por continuar.</p></div>
+      <div class="card" onclick="toggleCard(this)"><div class="icon">⏱️</div><h3>Afán</h3><p>Metas, tiempos irreales, entregas, citas o presión del cliente.</p></div>
+      <div class="card" onclick="toggleCard(this)"><div class="icon">🔁</div><h3>Rutina</h3><p>Exceso de confianza en trayectos conocidos y automatismos inseguros.</p></div>
+      <div class="card" onclick="toggleCard(this)"><div class="icon">🚚</div><h3>Punto ciego</h3><p>Reversa, maniobras en patios, cargue, descargue o convivencia vial.</p></div>
+      <div class="card" onclick="toggleCard(this)"><div class="icon">🧑‍💼</div><h3>Presión organizacional</h3><p>“Responde ya”, “llega como sea”, “todavía aguanta”.</p></div>
+    </div>
+    <div class="navRow"><button class="cta secondary" onclick="go(0)">← Atrás</button><button class="cta primary" onclick="go(2)">Continuar →</button></div>
+  </div>
+</section>
+
+<section id="s2" class="screen">
+  <div class="panel">
+    <h2 class="sectionTitle">2. Decide en segundos</h2>
+    <p class="sub">Una situación cotidiana. Tres decisiones posibles. ¿Qué harías?</p>
+    <div class="scenarioBox">
+      <div class="scene"><div class="badge">ESCENARIO 01</div><h2>Tu jefe escribe: “Necesito ese dato YA”.</h2><p>Vas conduciendo hacia una visita. El mensaje entra justo antes de una intersección.</p></div>
+      <div><div class="choices">
+        <button class="choice" onclick="answer(0)">A. Respondo rápido; son solo 10 segundos.</button>
+        <button class="choice" onclick="answer(1)">B. Dicto el mensaje por voz mientras sigo conduciendo.</button>
+        <button class="choice" onclick="answer(2)">C. No respondo. Me detengo en un lugar seguro cuando sea posible.</button>
+      </div>
+      <div id="fb" class="feedback"></div></div>
+    </div>
+    <div class="navRow"><button class="cta secondary" onclick="go(1)">← Atrás</button><button class="cta primary" onclick="go(3)">Analizar el sistema →</button></div>
+  </div>
+</section>
+
+<section id="s3" class="screen">
+  <div class="panel">
+    <h2 class="sectionTitle">3. Caza la barrera que falta 🔎</h2>
+    <p class="sub">No basta con decir “el conductor se distrajo”. Marca las barreras que reducirían el riesgo.</p>
+    <div class="barrierGrid">
+      <div class="barrier" onclick="this.classList.toggle('active')"><strong>📵 Política de no contacto en conducción</strong><br><span class="small">La organización define que llamadas y mensajes pueden esperar.</span></div>
+      <div class="barrier" onclick="this.classList.toggle('active')"><strong>🗺️ Planificación realista</strong><br><span class="small">Tiempos y rutas que no obliguen a compensar con velocidad o multitarea.</span></div>
+      <div class="barrier" onclick="this.classList.toggle('active')"><strong>🚘 Tecnología y vehículo seguro</strong><br><span class="small">Ayudas activas, conectividad configurada y condiciones técnicas adecuadas.</span></div>
+      <div class="barrier" onclick="this.classList.toggle('active')"><strong>🧠 Hábito protector</strong><br><span class="small">Señal clara: “vehículo en movimiento = teléfono fuera de alcance”.</span></div>
+      <div class="barrier" onclick="this.classList.toggle('active')"><strong>📊 Seguimiento organizacional</strong><br><span class="small">Observar patrones de presión, horarios, eventos y exposición, no solo sancionar.</span></div>
+      <div class="barrier" onclick="this.classList.toggle('active')"><strong>⚠️ Velocidad segura</strong><br><span class="small">Reducir la energía del impacto cuando el error ocurre.</span></div>
+    </div>
+    <div class="footerNote"><strong>Principio clave:</strong> si el error es previsible, la prevención no puede depender únicamente de “tener cuidado”.</div>
+    <div class="navRow"><button class="cta secondary" onclick="go(2)">← Atrás</button><button class="cta primary" onclick="go(4)">Construir mi hábito →</button></div>
+  </div>
+</section>
+
+<section id="s4" class="screen">
+  <div class="panel">
+    <h2 class="sectionTitle">4. Hackea tu hábito seguro 🧠</h2>
+    <p class="sub">Convierte una buena intención en una respuesta automática y observable.</p>
+    <div class="habitBuilder">
+      <div class="habitCol"><h3>1. Señal</h3><select id="signal" class="selectBox"><option>Al encender el vehículo</option><option>Cuando entra una llamada</option><option>Cuando siento sueño</option><option>Antes de reversar</option><option>Cuando voy tarde</option></select></div>
+      <div class="habitCol"><h3>2. Conducta segura</h3><select id="behavior" class="selectBox"><option>Guardo el teléfono fuera de alcance</option><option>Me detengo en un lugar seguro</option><option>Realizo una pausa y evalúo mi estado</option><option>Hago verificación 360°</option><option>Informo el retraso y no compenso con velocidad</option></select></div>
+      <div class="habitCol"><h3>3. Refuerzo</h3><select id="reward" class="selectBox"><option>Marco cumplimiento diario</option><option>Reconozco el hábito con mi equipo</option><option>Activo recordatorio visual</option><option>Registro cero distracciones</option><option>Comparto aprendizaje semanal</option></select></div>
+    </div>
+    <div class="actions"><button class="cta warn" onclick="buildHabit()">⚡ Crear mi piloto automático seguro</button></div>
+    <div id="habitOut" class="habitCard hidden"></div>
+    <div class="navRow"><button class="cta secondary" onclick="go(3)">← Atrás</button><button class="cta primary" onclick="go(5)">Ver mi resultado →</button></div>
+  </div>
+</section>
+
+<section id="s5" class="screen">
+  <div class="panel">
+    <h2 class="sectionTitle">5. Tu perfil de Sistema Seguro</h2>
+    <p class="sub">No medimos “quién se equivoca menos”. Medimos quién detecta riesgos y construye barreras.</p>
+    <div class="metricGrid">
+      <div class="metric"><span>🔎</span><strong id="m1">86</strong><small>Detector de riesgos</small></div>
+      <div class="metric"><span>🧱</span><strong id="m2">92</strong><small>Constructor de barreras</small></div>
+      <div class="metric"><span>🧠</span><strong id="m3">89</strong><small>Pensamiento sistémico</small></div>
+      <div class="metric"><span>⚡</span><strong id="m4">88</strong><small>Hábitos seguros</small></div>
+    </div>
+    <div class="habitCard" style="margin-top:24px"><div class="bigquote" style="font-size:34px">Las personas cometemos errores.<br><span style="color:#80e7de">El error no debería costarnos la vida.</span></div><p>Sistema Seguro anticipa el error, reduce la exposición, controla la energía y construye barreras antes de que ocurra una consecuencia grave.</p></div>
+    <div class="footerNote"><strong>Compromiso organizacional:</strong> no necesitamos conductores perfectos. Necesitamos decisiones, entornos, vehículos y hábitos capaces de proteger a personas reales.</div>
+    <div class="actions"><button class="cta primary" onclick="restart()">↻ Repetir experiencia</button><button class="cta secondary" onclick="window.print()">🖨️ Guardar resultado en PDF</button></div>
+  </div>
+</section>
+</main>
+</div>
+<script>
+let current=0;
+function go(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('s'+n).classList.add('active');current=n;let p=Math.round((n/5)*100);document.getElementById('bar').style.width=p+'%';document.getElementById('pct').textContent=p+'%';window.scrollTo({top:0,behavior:'smooth'});}
+function toggleCard(el){el.classList.toggle('selected')}
+function answer(i){let fb=document.getElementById('fb');fb.className='feedback show';if(i===2){fb.classList.add('good');fb.innerHTML='<strong>Buena decisión.</strong> El comportamiento protector es detenerse en un lugar seguro. Pero el análisis no termina ahí: ¿por qué la organización espera respuestas inmediatas de alguien que está conduciendo?';}else if(i===1){fb.classList.add('neutral');fb.innerHTML='<strong>Parece más seguro, pero sigue existiendo carga cognitiva.</strong> La conversación compite con la conducción. Sistema Seguro busca reducir exposición, no cambiar una distracción manual por otra mental.';}else{fb.classList.add('bad');fb.innerHTML='<strong>Este es el tipo de error cotidiano que el sistema debe anticipar.</strong> Diez segundos pueden ser suficientes para atravesar una intersección sin procesar información crítica. La solución no es solo “tener más cuidado”.';}}
+function buildHabit(){let s=document.getElementById('signal').value,b=document.getElementById('behavior').value,r=document.getElementById('reward').value;let out=document.getElementById('habitOut');out.classList.remove('hidden');out.innerHTML='<strong>MI PILOTO AUTOMÁTICO SEGURO</strong><h2>Cuando '+s.toLowerCase()+', '+b.toLowerCase()+'.</h2><p>Refuerzo: '+r+'.</p><p class="mini" style="color:#cce9e6">Repite esta secuencia hasta que la conducta protectora necesite cada vez menos deliberación.</p>';}
+function restart(){go(0);document.querySelectorAll('.selected,.active').forEach(e=>{if(e.classList.contains('card'))e.classList.remove('selected')});document.getElementById('fb').className='feedback';document.getElementById('habitOut').classList.add('hidden')}
+</script>
+</body>
+</html>
