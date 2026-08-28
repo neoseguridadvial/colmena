@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguridad Vial: STOP vs NO STOP</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        stopRed: '#DC2626',
+                        goGreen: '#16A34A',
+                        warnAmber: '#D97706',
+                        roadDark: '#1E293B',
+                        asphalt: '#0F172A',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        .octagonal {
+            clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+        }
+        .triangle-down {
+            clip-path: polygon(50% 100%, 0 0, 100% 0);
+        }
+        .road-stripes {
+            background-image: repeating-linear-gradient(to bottom, #facc15 0, #facc15 30px, transparent 30px, transparent 60px);
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 0.4; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+        .pulse-slow {
+            animation: pulse-ring 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-red-500 selection:text-white">
+
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between h-16 sm:h-20">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('simulador')">
+                <div class="w-10 h-10 bg-red-600 octagonal flex items-center justify-center font-black text-white text-xs border-2 border-white shadow-lg tracking-tighter">
+                    STOP
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
+                        VialCheck <span class="bg-red-600/20 text-red-400 text-xs px-2 py-0.5 rounded-full border border-red-500/30">STOP vs NO STOP</span>
+                    </h1>
+                    <p class="text-xs text-slate-400 hidden sm:block">Laboratorio Interactivo de Conducción y Conciencia Vial</p>
+                </div>
+            </div>
+
+            <!-- Navegación de Pestañas -->
+            <nav class="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm font-semibold overflow-x-auto py-2">
+                <button onclick="switchTab('simulador')" id="tab-btn-simulador" class="tab-btn px-3 py-2 rounded-lg bg-red-600 text-white shadow flex items-center gap-1.5 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>Simulador</span>
+                </button>
+                <button onclick="switchTab('fisica')" id="tab-btn-fisica" class="tab-btn px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center gap-1.5 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <span>Física del STOP</span>
+                </button>
+                <button onclick="switchTab('guia')" id="tab-btn-guia" class="tab-btn px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center gap-1.5 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    <span>Reglas Clave</span>
+                </button>
+                <button onclick="switchTab('test')" id="tab-btn-test" class="tab-btn px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center gap-1.5 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>Test Vial</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- ========================================================================= -->
+        <!-- SECCIÓN 1: SIMULADOR DE DECISIÓN RÁPIDA (STOP vs NO STOP) -->
+        <!-- ========================================================================= -->
+        <section id="section-simulador" class="space-y-6">
+            <!-- Banner de contexto -->
+            <div class="bg-gradient-to-r from-red-950/70 via-slate-900 to-emerald-950/70 border border-slate-800 p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                        <span class="inline-block w-3 h-3 rounded-full bg-red-500 animate-ping"></span>
+                        Desafío de Reacción: ¿Parar a 0 km/h o Continuar?
+                    </h2>
+                    <p class="text-sm text-slate-300 mt-1">
+                        Un <span class="text-red-400 font-bold">STOP</span> exige la <strong>detención total del vehículo (0 km/h)</strong> durante 3 segundos, aunque no venga nadie. En un <span class="text-emerald-400 font-bold">NO STOP (Ceda/Avanzar)</span>, debes avanzar o moderar la marcha sin detenerte innecesariamente para no entorpecer ni provocar colisiones por alcance.
+                    </p>
+                </div>
+                <!-- Marcador del Juego -->
+                <div class="flex items-center gap-4 bg-slate-950/80 px-4 py-2.5 rounded-xl border border-slate-700 shrink-0">
+                    <div class="text-center">
+                        <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Aciertos</span>
+                        <p id="score-val" class="text-2xl font-black text-emerald-400 font-mono">0</p>
+                    </div>
+                    <div class="h-8 w-px bg-slate-800"></div>
+                    <div class="text-center">
+                        <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Racha</span>
+                        <p id="streak-val" class="text-2xl font-black text-yellow-400 font-mono">0🔥</p>
+                    </div>
+                    <div class="h-8 w-px bg-slate-800"></div>
+                    <div class="text-center">
+                        <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Vidas</span>
+                        <p id="lives-val" class="text-2xl font-black text-red-500 font-mono">❤️❤️❤️</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Escenario y Tarjeta de Decisión -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Columna Izquierda: Escenario Visual Interactivo -->
+                <div class="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden min-h-[420px]">
+                    <!-- Barra de Tiempo -->
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mb-4">
+                        <div id="sim-timer" class="bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 h-full w-full transition-all duration-100 ease-linear"></div>
+                    </div>
+
+                    <!-- Escenario Gráfico Dinámico -->
+                    <div id="scenario-card" class="bg-slate-950 border border-slate-800 rounded-xl p-6 flex flex-col items-center justify-center text-center relative z-10 transition-all duration-300">
+                        <div id="scenario-badge" class="mb-3 px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                            Cruce Vial Urbano #1
+                        </div>
+
+                        <!-- Ilustración Dinámica SVG / Icono del Escenario -->
+                        <div id="scenario-visual" class="w-28 h-28 sm:w-36 sm:h-36 flex items-center justify-center my-2 p-2 bg-slate-900/90 rounded-2xl border border-slate-800 shadow-inner">
+                            <!-- SVG insertado por JS -->
+                        </div>
+
+                        <h3 id="scenario-title" class="text-lg sm:text-2xl font-extrabold text-white mt-3">
+                            Llegas a una intersección con señal octogonal roja y línea transversal continua.
+                        </h3>
+                        <p id="scenario-desc" class="text-sm text-slate-300 mt-2 max-w-lg">
+                            Miras a ambos lados y la calle transversal está completamente vacía y despejada a 100 metros.
+                        </p>
+                    </div>
+
+                    <!-- Botonera de Decisión -->
+                    <div class="grid grid-cols-2 gap-4 mt-6">
+                        <button onclick="handleDecision(true)" id="btn-action-stop" class="group relative py-4 sm:py-5 px-4 rounded-xl bg-gradient-to-b from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-black text-base sm:text-xl tracking-wider shadow-lg shadow-red-950/60 active:scale-95 transition-all flex flex-col items-center justify-center border-2 border-red-400/40">
+                            <span class="flex items-center gap-2">
+                                <span class="w-4 h-4 bg-white octagonal inline-block"></span>
+                                ¡STOP TOTAL!
+                            </span>
+                            <span class="text-[11px] font-normal text-red-100 opacity-90">Detención 0 km/h obligatoria</span>
+                        </button>
+
+                        <button onclick="handleDecision(false)" id="btn-action-nostop" class="group relative py-4 sm:py-5 px-4 rounded-xl bg-gradient-to-b from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black text-base sm:text-xl tracking-wider shadow-lg shadow-emerald-950/60 active:scale-95 transition-all flex flex-col items-center justify-center border-2 border-emerald-400/40">
+                            <span class="flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
+                                NO STOP / AVANZAR
+                            </span>
+                            <span class="text-[11px] font-normal text-emerald-100 opacity-90">Ceder paso / Continuar sin detener</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Panel de Explicación & Concepto Educativo -->
+                <div class="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between shadow-xl">
+                    <div>
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                            <h4 class="text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                                Dictamen Técnico
+                            </h4>
+                            <span id="feedback-badge" class="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-800 text-slate-400">
+                                Esperando decisión
+                            </span>
+                        </div>
+
+                        <!-- Contenido Explicativo -->
+                        <div id="feedback-content" class="space-y-3">
+                            <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 text-sm leading-relaxed">
+                                <p class="font-semibold text-white mb-1">¿Sabías qué es el "Rolling Stop" o Stop a la Americana?</p>
+                                <p class="text-xs text-slate-400">
+                                    Reducir la velocidad a 5-10 km/h sin clavar los frenos a 0 km/h es una infracción grave y la principal causa de atropellos a ciclistas y peatones en cruces con visibilidad engañosa.
+                                </p>
+                            </div>
+
+                            <div class="p-3 bg-red-950/30 border border-red-900/40 rounded-lg text-xs text-red-300 flex items-start gap-2">
+                                <span class="text-base leading-none">⚠️</span>
+                                <span><strong>Regla de oro:</strong> En la señal de STOP, la detención es obligatoria siempre, <em>sin excepción de si hay o no tránsito visible</em>.</span>
+                            </div>
+
+                            <div class="p-3 bg-emerald-950/30 border border-emerald-900/40 rounded-lg text-xs text-emerald-300 flex items-start gap-2">
+                                <span class="text-base leading-none">✅</span>
+                                <span><strong>Regla Ceda el Paso:</strong> Si la visibilidad es perfecta y no hay nadie con prioridad, detenerse por completo puede causar un choque por alcance del coche de atrás.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botón Siguiente Escenario -->
+                    <div class="mt-6 pt-4 border-t border-slate-800">
+                        <button onclick="nextScenario()" id="btn-next-scenario" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm transition flex items-center justify-center gap-2 opacity-50 cursor-not-allowed" disabled>
+                            <span>Siguiente Situación</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SECCIÓN 2: LABORATORIO DE FÍSICA DEL STOP (Distancia de Frenado) -->
+        <!-- ========================================================================= -->
+        <section id="section-fisica" class="space-y-6 hidden">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="max-w-3xl">
+                    <span class="text-xs font-bold text-red-400 uppercase tracking-wider bg-red-950/50 px-2.5 py-1 rounded border border-red-800/40">Física Vial & Percepción</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white mt-2">¿Por qué un STOP a tiempo salva vidas?</h2>
+                    <p class="text-sm text-slate-300 mt-1">
+                        Experimenta cómo la velocidad, el tiempo de reacción humana y el estado del asfalto convierten un "freno suave" en un choque fatal.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-6">
+                    <!-- Controles de la Simulación -->
+                    <div class="lg:col-span-5 space-y-5 bg-slate-950 p-5 rounded-xl border border-slate-800">
+                        <!-- Control: Velocidad -->
+                        <div>
+                            <div class="flex justify-between items-center text-sm font-bold text-slate-300 mb-1">
+                                <span>Velocidad de aproximación:</span>
+                                <span id="val-speed" class="text-emerald-400 font-mono text-base font-black">50 km/h</span>
+                            </div>
+                            <input type="range" id="slider-speed" min="20" max="120" step="5" value="50" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500" oninput="updatePhysics()">
+                            <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                                <span>20 km/h (Zona Escolar)</span>
+                                <span>50 km/h (Ciudad)</span>
+                                <span>90 km/h (Carretera)</span>
+                                <span>120 km/h</span>
+                            </div>
+                        </div>
+
+                        <!-- Control: Estado del Conductor -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-300 mb-2">Estado del Conductor (Tiempo de Reacción):</label>
+                            <select id="select-driver" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 focus:ring-2 focus:ring-red-500" onchange="updatePhysics()">
+                                <option value="0.8">🟢 Alerta y enfocado (0.8 segundos)</option>
+                                <option value="1.5">🟡 Mirando el móvil / Distraído (1.5 segundos)</option>
+                                <option value="2.2">🔴 Fatiga severa o Alcohol 0.5g/l (2.2 segundos)</option>
+                            </select>
+                        </div>
+
+                        <!-- Control: Estado del Asfalto -->
+                        <div>
+                            <label class="block text-sm font-bold text-slate-300 mb-2">Condiciones de la Vía:</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button type="button" onclick="setRoadSurface('seco')" id="road-seco" class="road-btn py-2 px-3 text-xs font-bold rounded-lg bg-red-600 text-white border border-red-500">
+                                    ☀️ Asfalto Seco
+                                </button>
+                                <button type="button" onclick="setRoadSurface('mojado')" id="road-mojado" class="road-btn py-2 px-3 text-xs font-bold rounded-lg bg-slate-800 text-slate-300 border border-slate-700">
+                                    🌧️ Lluvia / Mojado
+                                </button>
+                                <button type="button" onclick="setRoadSurface('hielo')" id="road-hielo" class="road-btn py-2 px-3 text-xs font-bold rounded-lg bg-slate-800 text-slate-300 border border-slate-700">
+                                    ❄️ Hielo / Nieve
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Botón de Simular Frenada -->
+                        <button onclick="runBrakeSimulation()" id="btn-run-brake" class="w-full py-3 bg-red-600 hover:bg-red-500 text-white font-black text-sm rounded-xl transition shadow-lg shadow-red-950 flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
+                            ¡EJECUTAR TEST DE DETENCIÓN!
+                        </button>
+                    </div>
+
+                    <!-- Visualización Canvas y Desglose Métrico -->
+                    <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
+                        <!-- Canvas Interactivo -->
+                        <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 relative h-64 overflow-hidden flex flex-col justify-center">
+                            <canvas id="brakeCanvas" class="w-full h-full block rounded-lg"></canvas>
+                        </div>
+
+                        <!-- Tarjetas de Métricas -->
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl text-center">
+                                <span class="text-[11px] text-amber-400 font-bold uppercase tracking-wider block">D. Reacción</span>
+                                <p id="metric-reaction" class="text-xl font-black text-white font-mono mt-1">11.1 m</p>
+                                <span class="text-[10px] text-slate-400">Antes de pisar freno</span>
+                            </div>
+                            <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl text-center">
+                                <span class="text-[11px] text-red-400 font-bold uppercase tracking-wider block">D. Frenado</span>
+                                <p id="metric-braking" class="text-xl font-black text-white font-mono mt-1">13.8 m</p>
+                                <span class="text-[10px] text-slate-400">Desaceleración física</span>
+                            </div>
+                            <div class="bg-slate-950 border border-red-900/40 p-3 rounded-xl text-center bg-red-950/20">
+                                <span class="text-[11px] text-red-500 font-black uppercase tracking-wider block">DISTANCIA TOTAL</span>
+                                <p id="metric-total" class="text-2xl font-black text-red-400 font-mono mt-1">24.9 m</p>
+                                <span class="text-[10px] text-slate-300">Detención completa</span>
+                            </div>
+                        </div>
+
+                        <!-- Veredicto de Seguridad -->
+                        <div id="physics-verdict" class="p-3.5 bg-slate-950 rounded-xl border border-slate-800 text-xs text-slate-300">
+                            A <strong class="text-white">50 km/h</strong> necesitas al menos <strong>25 metros</strong> para detenerte completamente. Si inicias el frenado en el cruce sin respetar el STOP previo, invadirás el paso peatonal a más de 30 km/h.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SECCIÓN 3: GUÍA VISUAL & NORMAS VIALES (STOP vs NO STOP) -->
+        <!-- ========================================================================= -->
+        <section id="section-guia" class="space-y-6 hidden">
+            <!-- Cabecera -->
+            <div class="text-center max-w-3xl mx-auto space-y-2">
+                <span class="text-xs font-extrabold text-amber-400 uppercase tracking-widest bg-amber-950/40 px-3 py-1 rounded-full border border-amber-800/40">Código de Circulación Universal</span>
+                <h2 class="text-2xl sm:text-4xl font-black text-white">STOP vs CEDA EL PASO: Cuándo Parar y Cuándo No</h2>
+                <p class="text-sm text-slate-400">Conoce los criterios jurídicos y de seguridad activa para evitar multas graves y siniestros viales.</p>
+            </div>
+
+            <!-- Comparador Directo: Dos Columnas -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Columna STOP OBLIGATORIO -->
+                <div class="bg-gradient-to-b from-red-950/40 to-slate-900 border-2 border-red-600/50 rounded-2xl p-6 space-y-5 shadow-xl">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-16 h-16 bg-red-600 octagonal flex items-center justify-center font-black text-white text-base border-2 border-white shadow-lg shrink-0">
+                            STOP
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-red-400 uppercase">Señal R-2 / Detención Absoluta</span>
+                            <h3 class="text-xl font-black text-white">SIEMPRE STOP (0 km/h)</h3>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Obliga a <strong>detener por completo la marcha</strong> del vehículo en la línea de detención (o antes de la intersección si no hay línea) y ceder el paso a todos los vehículos y peatones.
+                    </p>
+
+                    <div class="space-y-3 text-xs">
+                        <div class="p-3 rounded-lg bg-slate-950 border border-red-900/40 flex items-start gap-3">
+                            <span class="text-lg">🛑</span>
+                            <div>
+                                <strong class="text-red-300 block mb-0.5">La prueba del velocímetro:</strong>
+                                La aguja debe marcar exactamente <span class="underline font-bold text-white">0 km/h</span>. Si el coche sigue rodando a 2 km/h, legalmente no se ha realizado el STOP.
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-lg bg-slate-950 border border-red-900/40 flex items-start gap-3">
+                            <span class="text-lg">👀</span>
+                            <div>
+                                <strong class="text-red-300 block mb-0.5">Protocolo de Doble STOP:</strong>
+                                Si en la línea de detención no hay visibilidad suficiente, haz un primer STOP en la línea, avanza despacio y haz un <strong class="text-white">segundo STOP</strong> donde tengas visión total.
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-lg bg-slate-950 border border-red-900/40 flex items-start gap-3">
+                            <span class="text-lg">🚦</span>
+                            <div>
+                                <strong class="text-red-300 block mb-0.5">Semáforo Rojo o Agente con brazo en alto:</strong>
+                                Equivale a un STOP terminante para todos los usuarios que se aproximen de frente.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna NO STOP (Ceda el Paso / Continuar) -->
+                <div class="bg-gradient-to-b from-emerald-950/40 to-slate-900 border-2 border-emerald-600/50 rounded-2xl p-6 space-y-5 shadow-xl">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-16 h-16 bg-white triangle-down flex items-center justify-center p-1 border-2 border-red-600 shadow-lg shrink-0">
+                            <div class="w-10 h-10 bg-red-600 triangle-down flex items-center justify-center"></div>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-emerald-400 uppercase">Señal R-1 / Prioridad Condicional</span>
+                            <h3 class="text-xl font-black text-white">NO STOP (Ceda / Fluidez)</h3>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-slate-300 leading-relaxed">
+                        Obliga a <strong>moderar la velocidad</strong> y detenerse <span class="underline text-amber-300 font-semibold">únicamente si se aproximan vehículos o peatones</span> a los que se deba ceder el paso.
+                    </p>
+
+                    <div class="space-y-3 text-xs">
+                        <div class="p-3 rounded-lg bg-slate-950 border border-emerald-900/40 flex items-start gap-3">
+                            <span class="text-lg">🔄</span>
+                            <div>
+                                <strong class="text-emerald-300 block mb-0.5">Glorietas / Rotondas:</strong>
+                                Si la rotonda está vacía, <strong>no te detengas a 0 km/h</strong>. Modera la velocidad e incorpórate suavemente para mantener la fluidez y evitar colisiones traseras.
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-lg bg-slate-950 border border-emerald-900/40 flex items-start gap-3">
+                            <span class="text-lg">⚡</span>
+                            <div>
+                                <strong class="text-emerald-300 block mb-0.5">Carril de Aceleración en Autovía:</strong>
+                                ¡Nunca te detengas al inicio del carril! Usa toda la longitud para igualar la velocidad del tráfico principal y encajarte sin frenar en seco.
+                            </div>
+                        </div>
+                        <div class="p-3 rounded-lg bg-slate-950 border border-emerald-900/40 flex items-start gap-3">
+                            <span class="text-lg">🟡</span>
+                            <div>
+                                <strong class="text-emerald-300 block mb-0.5">Luz Amarilla Intermitente:</strong>
+                                Significa extremar la precaución y ceder el paso, pero no obliga a parar si el cruce está libre.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Matriz Rápida de Situaciones -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+                <h4 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"></path></svg>
+                    Resumen de Acción Rápida
+                </h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-950 text-slate-400 uppercase font-bold border-b border-slate-800">
+                            <tr>
+                                <th class="p-3">Escenario Vial</th>
+                                <th class="p-3 text-center">Acción Legal</th>
+                                <th class="p-3">Consecuencia del error</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800">
+                            <tr>
+                                <td class="p-3 font-semibold text-white">Señal STOP con visibilidad perfecta y calle vacía</td>
+                                <td class="p-3 text-center"><span class="px-2 py-1 bg-red-600/30 text-red-400 border border-red-500/40 rounded font-bold">STOP TOTAL</span></td>
+                                <td class="p-3 text-slate-400">Multa grave de tránsito, pérdida de puntos e impacto con peatones en ángulo muerto.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-semibold text-white">Señal de CEDA EL PASO sin tráfico en 200m</td>
+                                <td class="p-3 text-center"><span class="px-2 py-1 bg-emerald-600/30 text-emerald-400 border border-emerald-500/40 rounded font-bold">NO STOP (Avanzar)</span></td>
+                                <td class="p-3 text-slate-400">Frenar en seco sin motivo provoca alcances del vehículo que viene detrás.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-semibold text-white">Autobús Escolar con luces rojas intermitentes activas</td>
+                                <td class="p-3 text-center"><span class="px-2 py-1 bg-red-600/30 text-red-400 border border-red-500/40 rounded font-bold">STOP TOTAL</span></td>
+                                <td class="p-3 text-slate-400">Riesgo altísimo de atropello a menores cruzando por delante o detrás del autobús.</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 font-semibold text-white">Paso a Nivel con barreras bajando o luces rojas</td>
+                                <td class="p-3 text-center"><span class="px-2 py-1 bg-red-600/30 text-red-400 border border-red-500/40 rounded font-bold">STOP TOTAL</span></td>
+                                <td class="p-3 text-slate-400">Accidente ferroviario catastrófico e insuperable.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SECCIÓN 4: TEST VIAL DE LICENCIA (Evaluación) -->
+        <!-- ========================================================================= -->
+        <section id="section-test" class="space-y-6 hidden">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl max-w-3xl mx-auto">
+                <!-- Progreso del Test -->
+                <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                    <div>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Evaluación Oficial</span>
+                        <h3 class="text-xl font-black text-white">Test de Certificación Vial: STOP y Prioridades</h3>
+                    </div>
+                    <span id="quiz-progress-badge" class="px-3 py-1 bg-red-950 text-red-400 border border-red-800/50 rounded-full text-xs font-mono font-bold">
+                        Pregunta 1 de 5
+                    </span>
+                </div>
+
+                <!-- Contenedor de la Pregunta -->
+                <div id="quiz-container" class="space-y-5">
+                    <div id="quiz-question-box" class="p-4 bg-slate-950 rounded-xl border border-slate-800">
+                        <p id="quiz-question-text" class="text-base font-bold text-white leading-relaxed">
+                            ¿Qué debes hacer ante una señal de STOP si la línea de detención está ubicada 3 metros antes de una esquina sin visibilidad?
+                        </p>
+                    </div>
+
+                    <!-- Opciones de Respuesta -->
+                    <div id="quiz-options-list" class="space-y-3">
+                        <!-- Opciones generadas por JS -->
+                    </div>
+
+                    <!-- Feedback de la Pregunta -->
+                    <div id="quiz-feedback" class="hidden p-4 rounded-xl text-xs leading-relaxed border"></div>
+
+                    <!-- Botón de Siguiente Pregunta / Finalizar -->
+                    <div class="flex justify-end pt-2">
+                        <button onclick="handleNextQuizQuestion()" id="btn-quiz-next" class="px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-bold text-xs sm:text-sm rounded-xl transition shadow-lg disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+                            Siguiente Pregunta
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Resultado Final (Oculto por defecto) -->
+                <div id="quiz-results" class="hidden text-center space-y-6 py-6">
+                    <div class="w-20 h-20 mx-auto rounded-full bg-slate-950 border-4 border-emerald-500 flex items-center justify-center text-3xl">
+                        🏆
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-black text-white">¡Examen Vial Completado!</h4>
+                        <p id="quiz-final-score" class="text-slate-300 text-sm mt-1">Has acertado 5 de 5 preguntas (100%)</p>
+                    </div>
+
+                    <div id="certificate-box" class="p-6 bg-slate-950 border-2 border-dashed border-amber-500/60 rounded-2xl max-w-md mx-auto text-left relative overflow-hidden">
+                        <div class="absolute -right-8 -top-8 w-24 h-24 bg-amber-500/10 rounded-full"></div>
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+                            <span class="text-[10px] uppercase font-bold text-amber-400">Certificado de Excelencia Vial</span>
+                            <span class="text-[10px] text-slate-500 font-mono" id="cert-date">2026</span>
+                        </div>
+                        <p class="text-xs text-slate-400">Se certifica que el usuario comprende la diferencia crítica entre:</p>
+                        <p class="text-sm font-black text-white my-1">Detención Completa a 0 km/h (STOP) vs Ceda el Paso</p>
+                        <p class="text-[11px] text-emerald-400 font-semibold">✓ Cero tolerancia al Rolling Stop peligroso.</p>
+                    </div>
+
+                    <button onclick="restartQuiz()" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl transition">
+                        Repetir Examen
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER EDUCATIVO -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p>© 2026 Seguridad Vial Interactiva · Promoviendo el respeto al STOP total y la cero siniestralidad.</p>
+            <div class="flex items-center space-x-4 text-slate-400">
+                <span>🛑 Parar es salvar vidas</span>
+                <span>•</span>
+                <span>🚗 Conducción preventiva</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================================================= -->
+    <!-- LOGICA JAVASCRIPT & AUDIO API -->
+    <!-- ========================================================================= -->
+    <script>
+        // --- Web Audio API para Efectos de Sonido ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playBeep(freq = 440, type = 'sine', duration = 0.15) {
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                // Audio no disponible
+            }
+        }
+
+        function playSuccessSound() {
+            playBeep(587.33, 'triangle', 0.1); // D5
+            setTimeout(() => playBeep(880, 'triangle', 0.25), 100); // A5
+        }
+
+        function playErrorSound() {
+            playBeep(220, 'sawtooth', 0.2);
+            setTimeout(() => playBeep(164.81, 'sawtooth', 0.3), 150);
+        }
+
+        function playBrakeSound() {
+            playBeep(300, 'sawtooth', 0.4);
+        }
+
+        // --- SISTEMA DE PESTAÑAS ---
+        function switchTab(tabId) {
+            const tabs = ['simulador', 'fisica', 'guia', 'test'];
+            tabs.forEach(t => {
+                const sec = document.getElementById(`section-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (t === tabId) {
+                    sec.classList.remove('hidden');
+                    btn.classList.add('bg-red-600', 'text-white', 'shadow');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    sec.classList.add('hidden');
+                    btn.classList.remove('bg-red-600', 'text-white', 'shadow');
+                    btn.classList.add('text-slate-400');
+                }
+            });
+
+            if (tabId === 'fisica') {
+                setTimeout(initPhysicsCanvas, 50);
+            }
+        }
+
+        // --- BASE DE DATOS DE ESCENARIOS (SIMULADOR) ---
+        const scenarios = [
+            {
+                id: 1,
+                title: "Intersección urbana con Señal de STOP y visibilidad despejada",
+                desc: "Llegas a un cruce con señal octogonal STOP y línea blanca transversal en el suelo. Miras a ambos lados y no viene absolutamente ningún vehículo.",
+                isStop: true,
+                badge: "Señal R-2 · Cruce Urbano",
+                iconSvg: `<svg class="w-20 h-20 text-red-500 animate-bounce" viewBox="0 0 100 100" fill="currentColor">
+                    <polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="#DC2626" stroke="#FFFFFF" stroke-width="4"/>
+                    <text x="50" y="58" font-size="22" font-weight="900" fill="#FFFFFF" text-anchor="middle" font-family="sans-serif">STOP</text>
+                </svg>`,
+                reason: "¡CORRECTO! En un STOP la detención completa a 0 km/h es SIEMPRE obligatoria, aunque no venga nadie en 1 km. Evita el mortal 'rolling stop'."
+            },
+            {
+                id: 2,
+                title: "Entrada a una Glorieta (Rotonda) sin tráfico dentro",
+                desc: "Te aproximas al anillo de la rotonda con señal triangular de Ceda el Paso. Divisas perfectamente que no hay ningún vehículo circulando en el anillo.",
+                isStop: false,
+                badge: "Señal R-1 · Rotonda Fluida",
+                iconSvg: `<svg class="w-20 h-20 text-emerald-400" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6">
+                    <circle cx="50" cy="50" r="38" stroke-dasharray="8 6" />
+                    <polygon points="50,15 45,28 55,28" fill="currentColor" />
+                    <polygon points="85,50 72,45 72,55" fill="currentColor" />
+                    <polygon points="50,85 55,72 45,72" fill="currentColor" />
+                </svg>`,
+                reason: "¡CORRECTO! En rotondas con Ceda el Paso, si no hay vehículos, debes incorporarte con fluidez sin detenerte a 0 km/h para no provocar choques por alcance."
+            },
+            {
+                id: 3,
+                title: "Paso de Peatones con peatón esperando en el bordillo",
+                desc: "Te aproximas a un paso de cebra marcado en el asfalto. Un transeúnte con un carrito de bebé se dispone a cruzar con un pie en la calzada.",
+                isStop: true,
+                badge: "Prioridad Peatonal",
+                iconSvg: `<svg class="w-20 h-20 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="5" r="2" fill="currentColor"/>
+                    <path d="M10 22l2-7 3 3v6"/>
+                    <path d="M7 13l3-3 4 1 3 4"/>
+                </svg>`,
+                reason: "¡CORRECTO! Los peatones tienen prioridad absoluta en los pasos designados. Debes detener completamente el coche hasta que hayan cruzado con seguridad."
+            },
+            {
+                id: 4,
+                title: "Carril de Incorporación a Autopista despejado",
+                desc: "Circulas por el carril de aceleración para entrar a la autopista a 80 km/h. Miras por el retrovisor y hay un hueco enorme y seguro en el carril derecho.",
+                isStop: false,
+                badge: "Autovía · Aceleración",
+                iconSvg: `<svg class="w-20 h-20 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19L19 4M19 4v9M19 4H10" />
+                </svg>`,
+                reason: "¡CORRECTO! En carriles de incorporación NUNCA debes parar si tienes espacio. Debes acelerar para igualar la velocidad de la vía e incorporarte con seguridad."
+            },
+            {
+                id: 5,
+                title: "Paso a Nivel Ferroviario con semáforo rojo titilante",
+                desc: "Llegas a un cruce con vías de tren. La barrera aún está arriba, pero las luces rojas intermitentes acaban de encenderse y suena una campana.",
+                isStop: true,
+                badge: "Paso a Nivel de Tren",
+                iconSvg: `<svg class="w-20 h-20 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12" stroke-width="3"/>
+                    <circle cx="12" cy="12" r="10" stroke="currentColor"/>
+                </svg>`,
+                reason: "¡CORRECTO! Las luces rojas intermitentes en un paso a nivel exigen detención inmediata previa a las vías. Intentar ganarle al tren es un error mortal."
+            },
+            {
+                id: 6,
+                title: "Semáforo con Luz Ámbar Intermitente y cruce despejado",
+                desc: "Llegas a un cruce donde el semáforo parpadea en color amarillo/ámbar. No hay peatones ni otros coches en las vías transversales.",
+                isStop: false,
+                badge: "Semáforo Ámbar Intermitente",
+                iconSvg: `<svg class="w-20 h-20 text-yellow-400 pulse-slow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="6" y="2" width="12" height="20" rx="3" fill="#1E293B"/>
+                    <circle cx="12" cy="12" r="3" fill="#F59E0B" stroke="#F59E0B"/>
+                </svg>`,
+                reason: "¡CORRECTO! El ámbar intermitente exige extremar la precaución y ceder el paso si hubiera alguien, pero NO obliga a parar si el cruce está totalmente libre."
+            }
+        ];
+
+        let currentScenarioIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let lives = 3;
+        let timerInterval = null;
+        let timeLeft = 100;
+        let canAnswer = true;
+
+        function loadScenario(index) {
+            const sc = scenarios[index];
+            document.getElementById('scenario-badge').innerText = sc.badge;
+            document.getElementById('scenario-title').innerText = sc.title;
+            document.getElementById('scenario-desc').innerText = sc.desc;
+            document.getElementById('scenario-visual').innerHTML = sc.iconSvg;
+            
+            // Reset feedback
+            document.getElementById('feedback-badge').className = "px-2 py-0.5 rounded text-[11px] font-bold bg-slate-800 text-slate-400";
+            document.getElementById('feedback-badge').innerText = "Decide antes que expire el tiempo";
+            
+            // Reset Botón siguiente
+            const btnNext = document.getElementById('btn-next-scenario');
+            btnNext.disabled = true;
+            btnNext.classList.add('opacity-50', 'cursor-not-allowed');
+
+            canAnswer = true;
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 100;
+            const timerBar = document.getElementById('sim-timer');
+            timerBar.style.width = '100%';
+            
+            timerInterval = setInterval(() => {
+                timeLeft -= 1.25;
+                timerBar.style.width = `${Math.max(0, timeLeft)}%`;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    if (canAnswer) {
+                        handleTimeOut();
+                    }
+                }
+            }, 100);
+        }
+
+        function handleDecision(userChoseStop) {
+            if (!canAnswer) return;
+            canAnswer = false;
+            clearInterval(timerInterval);
+
+            const sc = scenarios[currentScenarioIndex];
+            const isCorrect = (userChoseStop === sc.isStop);
+            const feedbackBadge = document.getElementById('feedback-badge');
+            const feedbackContent = document.getElementById('feedback-content');
+
+            if (isCorrect) {
+                score += 100;
+                streak++;
+                playSuccessSound();
+                feedbackBadge.className = "px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800";
+                feedbackBadge.innerText = "¡ACIERTO VIAL (+100)!";
+            } else {
+                streak = 0;
+                lives--;
+                playErrorSound();
+                feedbackBadge.className = "px-2 py-0.5 rounded text-[11px] font-bold bg-red-950 text-red-400 border border-red-800";
+                feedbackBadge.innerText = "¡DECISIÓN INCORRECTA (-1 Vida)!";
+            }
+
+            // Explicación técnica detallada
+            feedbackContent.innerHTML = `
+                <div class="p-4 rounded-xl ${isCorrect ? 'bg-emerald-950/40 border-emerald-800/60' : 'bg-red-950/40 border-red-800/60'} border text-sm leading-relaxed">
+                    <p class="font-black ${isCorrect ? 'text-emerald-300' : 'text-red-300'} text-base mb-1">
+                        ${isCorrect ? '✓ Excelente Juicio de Conducción' : '✗ Infracción / Riesgo de Colisión'}
+                    </p>
+                    <p class="text-xs text-slate-200">${sc.reason}</p>
+                </div>
+            `;
+
+            updateScoreboard();
+
+            // Activar botón siguiente
+            const btnNext = document.getElementById('btn-next-scenario');
+            btnNext.disabled = false;
+            btnNext.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            if (lives <= 0) {
+                setTimeout(gameOver, 800);
+            }
+        }
+
+        function handleTimeOut() {
+            canAnswer = false;
+            streak = 0;
+            lives--;
+            playErrorSound();
+            const sc = scenarios[currentScenarioIndex];
+            
+            const feedbackBadge = document.getElementById('feedback-badge');
+            feedbackBadge.className = "px-2 py-0.5 rounded text-[11px] font-bold bg-red-950 text-red-400 border border-red-800";
+            feedbackBadge.innerText = "¡TIEMPO AGOTADO (-1 Vida)!";
+
+            document.getElementById('feedback-content').innerHTML = `
+                <div class="p-4 rounded-xl bg-red-950/40 border border-red-800 text-sm leading-relaxed">
+                    <p class="font-black text-red-300 text-base mb-1">Dudar en una intersección es peligroso</p>
+                    <p class="text-xs text-slate-200">La respuesta correcta era: <strong>${sc.isStop ? 'STOP TOTAL' : 'NO STOP / AVANZAR'}</strong>. ${sc.reason}</p>
+                </div>
+            `;
+            updateScoreboard();
+            
+            const btnNext = document.getElementById('btn-next-scenario');
+            btnNext.disabled = false;
+            btnNext.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            if (lives <= 0) {
+                setTimeout(gameOver, 800);
+            }
+        }
+
+        function updateScoreboard() {
+            document.getElementById('score-val').innerText = score;
+            document.getElementById('streak-val').innerText = `${streak}🔥`;
+            let hearts = '';
+            for (let i = 0; i < lives; i++) hearts += '❤️';
+            for (let i = lives; i < 3; i++) hearts += '🖤';
+            document.getElementById('lives-val').innerText = hearts;
+        }
+
+        function nextScenario() {
+            currentScenarioIndex = (currentScenarioIndex + 1) % scenarios.length;
+            loadScenario(currentScenarioIndex);
+        }
+
+        function gameOver() {
+            const feedbackContent = document.getElementById('feedback-content');
+            feedbackContent.innerHTML = `
+                <div class="p-4 rounded-xl bg-red-900 border border-red-700 text-center text-white">
+                    <p class="text-lg font-black">¡Fin de la Partida!</p>
+                    <p class="text-xs mt-1">Has perdido todas tus vidas por infracciones viales graves.</p>
+                    <button onclick="resetGame()" class="mt-3 px-4 py-2 bg-white text-red-900 text-xs font-black rounded-lg uppercase tracking-wider shadow">Reintentar Simulador</button>
+                </div>
+            `;
+            const btnNext = document.getElementById('btn-next-scenario');
+            btnNext.disabled = true;
+            btnNext.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+
+        function resetGame() {
+            score = 0;
+            streak = 0;
+            lives = 3;
+            currentScenarioIndex = 0;
+            updateScoreboard();
+            loadScenario(0);
+        }
+
+        // --- SECCIÓN 2: SIMULADOR DE FÍSICA DEL STOP (CANVAS) ---
+        let roadFriction = 0.75; // Seco: 0.75, Mojado: 0.4, Hielo: 0.15
+        let animationFrameId = null;
+        let carX = 20;
+        let isSimulatingBrake = false;
+
+        function setRoadSurface(surface) {
+            const btns = ['seco', 'mojado', 'hielo'];
+            btns.forEach(s => {
+                const b = document.getElementById(`road-${s}`);
+                if (s === surface) {
+                    b.classList.add('bg-red-600', 'text-white');
+                    b.classList.remove('bg-slate-800', 'text-slate-300');
+                } else {
+                    b.classList.remove('bg-red-600', 'text-white');
+                    b.classList.add('bg-slate-800', 'text-slate-300');
+                }
+            });
+
+            if (surface === 'seco') roadFriction = 0.75;
+            if (surface === 'mojado') roadFriction = 0.40;
+            if (surface === 'hielo') roadFriction = 0.15;
+
+            updatePhysics();
+        }
+
+        function updatePhysics() {
+            const speedKmh = parseFloat(document.getElementById('slider-speed').value);
+            const reactionTime = parseFloat(document.getElementById('select-driver').value);
+            document.getElementById('val-speed').innerText = `${speedKmh} km/h`;
+
+            // Conversión: v en m/s
+            const speedMs = speedKmh / 3.6;
+
+            // Distancia de Reacción = v * t
+            const dReaction = speedMs * reactionTime;
+
+            // Distancia de Frenado = v^2 / (2 * g * mu) (g = 9.81 m/s^2)
+            const g = 9.81;
+            const dBraking = (speedMs * speedMs) / (2 * g * roadFriction);
+
+            const dTotal = dReaction + dBraking;
+
+            document.getElementById('metric-reaction').innerText = `${dReaction.toFixed(1)} m`;
+            document.getElementById('metric-braking').innerText = `${dBraking.toFixed(1)} m`;
+            document.getElementById('metric-total').innerText = `${dTotal.toFixed(1)} m`;
+
+            const verdict = document.getElementById('physics-verdict');
+            if (dTotal > 40) {
+                verdict.innerHTML = `⚠️ <strong class="text-red-400">Peligro Crítico:</strong> Con ${dTotal.toFixed(1)}m de distancia total, si no frenas con antelación invadirás el cruce a gran velocidad, haciendo imposible respetar el STOP.`;
+            } else {
+                verdict.innerHTML = `✅ Con <strong>${dTotal.toFixed(1)}m</strong> de distancia total, una frenada progresiva permite llegar a <strong>0 km/h</strong> justo en la línea blanca del STOP sin invadir la calzada.`;
+            }
+
+            drawBrakeCanvas(0, dReaction, dBraking, dTotal);
+        }
+
+        function initPhysicsCanvas() {
+            const canvas = document.getElementById('brakeCanvas');
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            updatePhysics();
+        }
+
+        function drawBrakeCanvas(progress = 0, dR = 10, dB = 15, dT = 25) {
+            const canvas = document.getElementById('brakeCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Fondo Carretera
+            ctx.fillStyle = "#1E293B";
+            ctx.fillRect(0, h * 0.35, w, h * 0.5);
+
+            // Líneas de asfalto
+            ctx.strokeStyle = "#475569";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(0, h * 0.35);
+            ctx.lineTo(w, h * 0.35);
+            ctx.moveTo(0, h * 0.85);
+            ctx.lineTo(w, h * 0.85);
+            ctx.stroke();
+
+            // Línea de STOP / Cruce al final
+            const stopLineX = w - 80;
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillRect(stopLineX, h * 0.35, 8, h * 0.5);
+
+            // Señal de STOP gráfica en el canvas
+            ctx.fillStyle = "#DC2626";
+            ctx.beginPath();
+            const signX = stopLineX + 30;
+            const signY = h * 0.25;
+            ctx.arc(signX, signY, 16, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#FFFFFF";
+            ctx.font = "bold 9px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("STOP", signX, signY + 3);
+
+            // Marcador de Distancia Escala
+            const scale = (stopLineX - 60) / Math.max(dT, 45);
+            const carStartX = 30;
+            const currentCarX = carStartX + (stopLineX - carStartX) * progress;
+
+            // Dibujar Coche
+            ctx.fillStyle = progress > 0.9 && dT > 45 ? "#EF4444" : "#38BDF8";
+            ctx.beginPath();
+            ctx.roundRect(currentCarX, h * 0.5 - 12, 36, 22, 5);
+            ctx.fill();
+
+            // Ruedas
+            ctx.fillStyle = "#0F172A";
+            ctx.fillRect(currentCarX + 4, h * 0.5 + 8, 8, 4);
+            ctx.fillRect(currentCarX + 24, h * 0.5 + 8, 8, 4);
+
+            // Luces de Freno
+            if (progress > 0.3) {
+                ctx.fillStyle = "#EF4444";
+                ctx.fillRect(currentCarX - 2, h * 0.5 - 8, 3, 6);
+                ctx.shadowColor = "#EF4444";
+                ctx.shadowBlur = 10;
+                ctx.fillRect(currentCarX - 2, h * 0.5 - 8, 3, 6);
+                ctx.shadowBlur = 0;
+            }
+
+            // Etiquetas de tramos
+            ctx.font = "10px sans-serif";
+            ctx.fillStyle = "#94A3B8";
+            ctx.textAlign = "left";
+            ctx.fillText(`Inicio`, 20, h * 0.95);
+            ctx.textAlign = "right";
+            ctx.fillText(`Línea STOP (0 km/h)`, stopLineX + 50, h * 0.95);
+        }
+
+        function runBrakeSimulation() {
+            if (isSimulatingBrake) return;
+            isSimulatingBrake = true;
+            playBrakeSound();
+
+            let progress = 0;
+            const speedKmh = parseFloat(document.getElementById('slider-speed').value);
+            const reactionTime = parseFloat(document.getElementById('select-driver').value);
+            const speedMs = speedKmh / 3.6;
+            const dReaction = speedMs * reactionTime;
+            const dBraking = (speedMs * speedMs) / (2 * 9.81 * roadFriction);
+            const dTotal = dReaction + dBraking;
+
+            const animInterval = setInterval(() => {
+                progress += 0.025;
+                drawBrakeCanvas(Math.min(progress, 1), dReaction, dBraking, dTotal);
+
+                if (progress >= 1) {
+                    clearInterval(animInterval);
+                    isSimulatingBrake = false;
+                }
+            }, 25);
+        }
+
+        // --- SECCIÓN 4: TEST VIAL INTERACTIVO ---
+        const quizQuestions = [
+            {
+                q: "¿Qué velocidad exacta debe registrar tu velocímetro al llegar a una señal de STOP?",
+                options: [
+                    "0 km/h absoluto (detención física total de todas las ruedas)",
+                    "Menos de 10 km/h si veo que no viene nadie",
+                    "Cualquier velocidad que me permita reaccionar",
+                    "Basta con meter primera marcha sin parar el coche"
+                ],
+                correct: 0,
+                explanation: "La ley internacional de tránsito exige que en la señal de STOP la velocidad sea 0 km/h. Un 'Stop rodante' es ilegal y peligroso."
+            },
+            {
+                q: "Si la línea transversal de STOP está 4 metros antes de la esquina y desde ahí no tienes visibilidad del tráfico cruzado, ¿cómo procedes?",
+                options: [
+                    "Ignoras la línea y frenas directamente en medio del cruce",
+                    "Haces el primer STOP en la línea y un segundo STOP donde tengas visibilidad completa",
+                    "Pitas para avisar y pasas sin detenerte",
+                    "Te detienes únicamente si ves venir un autobús"
+                ],
+                correct: 1,
+                explanation: "Esta maniobra se denomina 'Doble STOP': se cumple con la línea legal y luego se avanza lentamente para realizar una segunda detención con visión despejada."
+            },
+            {
+                q: "¿En cuál de estas situaciones NO estás obligado a detener el vehículo a 0 km/h?",
+                options: [
+                    "Señal octogonal roja con letras blancas STOP",
+                    "Semáforo con flecha verde de giro continuo",
+                    "Paso a nivel con barrera bajando",
+                    "Policía de tráfico con el brazo levantado verticalmente"
+                ],
+                correct: 1,
+                explanation: "La luz verde (o flecha verde) concede prioridad de paso, por lo que detenerse sin motivo entorpece la circulación y genera riesgo de alcance."
+            },
+            {
+                q: "¿Cuál es la diferencia jurídica principal entre la señal de STOP (R-2) y la de CEDA EL PASO (R-1)?",
+                options: [
+                    "El STOP solo aplica para camiones y el Ceda para coches",
+                    "El STOP obliga a detenerse siempre; el Ceda solo si se aproximan otros vehículos prioritarios",
+                    "Son idénticas, solo cambia el diseño geométrico",
+                    "El Ceda el paso exige apagar el motor"
+                ],
+                correct: 1,
+                explanation: "El STOP exige parada incondicional (0 km/h). El Ceda el Paso exige ceder la preferencia, permitiendo el paso continuo si no hay conflicto."
+            },
+            {
+                q: "Te aproximas a una rotonda sin vehículos en su interior con señal de CEDA EL PASO. ¿Qué debes hacer?",
+                options: [
+                    "Detenerte en seco 3 segundos antes de entrar",
+                    "Moderar la velocidad e ingresar de forma fluida sin detenerte",
+                    "Poner las luces de emergencia y pasar",
+                    "Ceder el paso a los coches que vienen detrás de ti"
+                ],
+                correct: 1,
+                explanation: "En glorietas libres de tráfico, no debes parar a 0 km/h: mantén la marcha y entra con precaución para preservar la fluidez de la vía."
+            }
+        ];
+
+        let quizCurrentIndex = 0;
+        let quizScore = 0;
+        let quizAnswered = false;
+
+        function loadQuizQuestion(index) {
+            quizAnswered = false;
+            const q = quizQuestions[index];
+            document.getElementById('quiz-progress-badge').innerText = `Pregunta ${index + 1} de ${quizQuestions.length}`;
+            document.getElementById('quiz-question-text').innerText = q.q;
+
+            const optionsList = document.getElementById('quiz-options-list');
+            optionsList.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const optBtn = document.createElement('button');
+                optBtn.className = "w-full text-left p-3.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 text-xs sm:text-sm font-medium transition flex items-center justify-between";
+                optBtn.innerHTML = `<span>${opt}</span><span class="w-5 h-5 rounded-full border border-slate-700 flex items-center justify-center text-[10px] text-slate-500 font-bold">${String.fromCharCode(65 + idx)}</span>`;
+                optBtn.onclick = () => selectQuizOption(idx, optBtn);
+                optionsList.appendChild(optBtn);
+            });
+
+            document.getElementById('quiz-feedback').className = "hidden";
+            document.getElementById('btn-quiz-next').disabled = true;
+        }
+
+        function selectQuizOption(selectedIdx, btnElement) {
+            if (quizAnswered) return;
+            quizAnswered = true;
+
+            const q = quizQuestions[quizCurrentIndex];
+            const isCorrect = (selectedIdx === q.correct);
+            const feedbackEl = document.getElementById('quiz-feedback');
+
+            if (isCorrect) {
+                quizScore++;
+                playSuccessSound();
+                btnElement.classList.remove('bg-slate-950', 'border-slate-800');
+                btnElement.classList.add('bg-emerald-950/60', 'border-emerald-600', 'text-emerald-200');
+                feedbackEl.className = "p-4 rounded-xl bg-emerald-950/40 border border-emerald-800 text-emerald-300 text-xs leading-relaxed";
+                feedbackEl.innerHTML = `<strong>¡Respuesta Correcta!</strong> ${q.explanation}`;
+            } else {
+                playErrorSound();
+                btnElement.classList.remove('bg-slate-950', 'border-slate-800');
+                btnElement.classList.add('bg-red-950/60', 'border-red-600', 'text-red-200');
+                feedbackEl.className = "p-4 rounded-xl bg-red-950/40 border border-red-800 text-red-300 text-xs leading-relaxed";
+                feedbackEl.innerHTML = `<strong>Incorrecto:</strong> ${q.explanation}`;
+            }
+
+            document.getElementById('btn-quiz-next').disabled = false;
+        }
+
+        function handleNextQuizQuestion() {
+            quizCurrentIndex++;
+            if (quizCurrentIndex < quizQuestions.length) {
+                loadQuizQuestion(quizCurrentIndex);
+            } else {
+                showQuizResults();
+            }
+        }
+
+        function showQuizResults() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('quiz-results').classList.remove('hidden');
+            const pct = Math.round((quizScore / quizQuestions.length) * 100);
+            document.getElementById('quiz-final-score').innerText = `Has acertado ${quizScore} de ${quizQuestions.length} preguntas (${pct}%)`;
+            document.getElementById('cert-date').innerText = new Date().toLocaleDateString();
+        }
+
+        function restartQuiz() {
+            quizCurrentIndex = 0;
+            quizScore = 0;
+            document.getElementById('quiz-container').classList.remove('hidden');
+            document.getElementById('quiz-results').classList.add('hidden');
+            loadQuizQuestion(0);
+        }
+
+        // Inicialización al cargar la página
+        window.onload = function() {
+            loadScenario(0);
+            loadQuizQuestion(0);
+            window.addEventListener('resize', initPhysicsCanvas);
+        };
+    </script>
+</body>
+</html>
