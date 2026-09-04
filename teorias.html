@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratorio de Psicología del Riesgo Vial | Colmena Seguros</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            colmena: {
+              yellow: '#FFB800',
+              yellowHover: '#E5A600',
+              yellowLight: '#FFF9E6',
+              aqua: '#00A3A6',
+              aquaHover: '#008587',
+              aquaLight: '#E6F8F8',
+              aquaDark: '#005D5F',
+              dark: '#1A242F',
+              gray: '#607274'
+            }
+          },
+          fontFamily: {
+            title: ['Montserrat', 'sans-serif'],
+            body: ['Nunito', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Efecto Flip Card 3D */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+    .flip-card-inner {
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .flip-card.flipped .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    /* Scrollbar con paleta Colmena */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F8FAFC;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #00A3A6;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #FFB800;
+    }
+
+    /* Barra termostato y medidores */
+    .transition-width {
+      transition: width 0.4s ease-in-out, background-color 0.4s ease;
+    }
+  </style>
+</head>
+<body class="bg-white text-colmena-dark font-body antialiased flex flex-col min-h-screen selection:bg-colmena-yellow selection:text-black">
+
+  <!-- NAVBAR SUPERIOR -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b-2 border-colmena-aqua shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <!-- Logo Colmena Seguros -->
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-colmena-yellow flex items-center justify-center shadow-md border-2 border-colmena-aqua">
+            <i class="fa-solid fa-brain text-2xl text-colmena-dark"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-title font-extrabold text-xl sm:text-2xl tracking-tight text-colmena-dark">COLMENA</span>
+              <span class="text-xs sm:text-sm font-bold bg-colmena-aqua text-white px-2 py-0.5 rounded-full uppercase tracking-wider">Seguros</span>
+            </div>
+            <p class="text-xs text-colmena-gray font-semibold hidden sm:block">Laboratorio de Modelos Comportamentales y Factor Humano en Movilidad</p>
+          </div>
+        </div>
+
+        <!-- Navegación Desktop -->
+        <nav class="hidden xl:flex items-center gap-1 font-title text-xs sm:text-sm font-bold">
+          <button onclick="switchTab('wilde')" class="px-3 py-2 rounded-xl hover:bg-colmena-aquaLight hover:text-colmena-aqua transition">1. Wilde (Homeostasis)</button>
+          <button onclick="switchTab('naatanen')" class="px-3 py-2 rounded-xl hover:bg-colmena-aquaLight hover:text-colmena-aqua transition">2. Näätänen & Summala</button>
+          <button onclick="switchTab('fuller')" class="px-3 py-2 rounded-xl hover:bg-colmena-aquaLight hover:text-colmena-aqua transition">3. Fuller (TCI)</button>
+          <button onclick="switchTab('botticher')" class="px-3 py-2 rounded-xl hover:bg-colmena-aquaLight hover:text-colmena-aqua transition">4. Bötticher & Van der Molen</button>
+          <button onclick="switchTab('michon')" class="px-3 py-2 rounded-xl hover:bg-colmena-aquaLight hover:text-colmena-aqua transition">5. Michon (GDE)</button>
+        </nav>
+
+        <div class="flex items-center gap-2">
+          <button onclick="openModal('modalMarcoPsicologia')" class="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-colmena-yellow text-colmena-dark font-title font-bold text-xs sm:text-sm shadow hover:bg-colmena-yellowHover transition flex items-center gap-1.5 active:scale-95">
+            <i class="fa-solid fa-circle-question"></i>
+            <span class="hidden sm:inline">¿Por qué</span> la mente falla?
+          </button>
+          <button onclick="toggleMobileMenu()" class="xl:hidden p-2.5 rounded-xl border border-gray-200 text-colmena-dark hover:bg-gray-100">
+            <i class="fa-solid fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Menú Desplegable Móvil -->
+    <div id="mobileMenu" class="hidden xl:hidden bg-white border-b border-gray-200 px-4 pt-2 pb-5 space-y-2 shadow-lg">
+      <button onclick="switchTab('wilde'); toggleMobileMenu();" class="block w-full text-left px-4 py-2 text-xs sm:text-sm font-title font-bold rounded-lg hover:bg-colmena-aquaLight">1. Homeostasis del Riesgo (Gerald Wilde)</button>
+      <button onclick="switchTab('naatanen'); toggleMobileMenu();" class="block w-full text-left px-4 py-2 text-xs sm:text-sm font-title font-bold rounded-lg hover:bg-colmena-aquaLight">2. Campo de Cero Riesgo (Näätänen & Summala)</button>
+      <button onclick="switchTab('fuller'); toggleMobileMenu();" class="block w-full text-left px-4 py-2 text-xs sm:text-sm font-title font-bold rounded-lg hover:bg-colmena-aquaLight">3. Amenaza-Evitación y Modelo TCI (Ray Fuller)</button>
+      <button onclick="switchTab('botticher'); toggleMobileMenu();" class="block w-full text-left px-4 py-2 text-xs sm:text-sm font-title font-bold rounded-lg hover:bg-colmena-aquaLight">4. Modelo Jerárquico (Bötticher y Van der Molen)</button>
+      <button onclick="switchTab('michon'); toggleMobileMenu();" class="block w-full text-left px-4 py-2 text-xs sm:text-sm font-title font-bold rounded-lg hover:bg-colmena-aquaLight">5. Jerarquía de Conducción y GDE (Jens Michon)</button>
+      <button onclick="scrollToSection('diagnostico'); toggleMobileMenu();" class="block w-full text-left px-4 py-2 text-xs sm:text-sm font-title font-bold rounded-lg bg-colmena-yellow text-colmena-dark">
+        <i class="fa-solid fa-clipboard-check mr-2"></i> Reto y Diagnóstico Práctico
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="relative overflow-hidden bg-gradient-to-b from-colmena-aquaLight/40 via-white to-white py-10 lg:py-14 border-b border-gray-100">
+    <div class="absolute -right-20 -top-20 w-80 h-80 bg-colmena-yellow/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -left-20 bottom-0 w-80 h-80 bg-colmena-aqua/15 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+      <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-colmena-yellowLight border border-colmena-yellow text-colmena-dark text-xs sm:text-sm font-bold mb-4 shadow-sm">
+        <i class="fa-solid fa-id-card-clip text-colmena-aqua"></i>
+        <span>Más del 80% de los siniestros viales radican en el Comportamiento Humano</span>
+      </div>
+
+      <h1 class="text-3xl sm:text-5xl font-title font-black text-colmena-dark tracking-tight leading-tight max-w-4xl mx-auto">
+        Psicología del Riesgo Vial: <span class="text-colmena-aqua underline decoration-colmena-yellow decoration-4 underline-offset-4">Modelos Explicativos</span> y Talleres Prácticos
+      </h1>
+
+      <p class="mt-4 text-sm sm:text-base text-colmena-gray max-w-3xl mx-auto leading-relaxed">
+        ¿Por qué un conductor acelera más cuando su vehículo tiene más asistentes de seguridad? ¿Por qué la rutina elimina el miedo a chocar? Experimenta en simuladores interactivos las teorías de <strong>Wilde</strong>, <strong>Näätänen & Summala</strong>, <strong>Fuller</strong>, <strong>Bötticher & Van der Molen</strong> y <strong>Michon</strong>.
+      </p>
+
+      <!-- Resumen visual de las 5 escuelas -->
+      <div class="mt-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <button onclick="switchTab('wilde')" class="bg-white p-3.5 rounded-2xl border-2 border-colmena-yellow/60 shadow-sm hover:shadow-md transition text-left">
+          <span class="text-[10px] font-bold text-colmena-gray uppercase">Compensación</span>
+          <div class="font-title font-black text-xs sm:text-sm text-colmena-dark mt-0.5">Homeostasis (Wilde)</div>
+        </button>
+        <button onclick="switchTab('naatanen')" class="bg-white p-3.5 rounded-2xl border-2 border-colmena-aqua/50 shadow-sm hover:shadow-md transition text-left">
+          <span class="text-[10px] font-bold text-colmena-gray uppercase">Burbuja Segura</span>
+          <div class="font-title font-black text-xs sm:text-sm text-colmena-dark mt-0.5">Cero Riesgo (N & S)</div>
+        </button>
+        <button onclick="switchTab('fuller')" class="bg-white p-3.5 rounded-2xl border-2 border-colmena-yellow/60 shadow-sm hover:shadow-md transition text-left">
+          <span class="text-[10px] font-bold text-colmena-gray uppercase">Demanda vs Capacidad</span>
+          <div class="font-title font-black text-xs sm:text-sm text-colmena-dark mt-0.5">TCI (Ray Fuller)</div>
+        </button>
+        <button onclick="switchTab('botticher')" class="bg-white p-3.5 rounded-2xl border-2 border-colmena-aqua/50 shadow-sm hover:shadow-md transition text-left">
+          <span class="text-[10px] font-bold text-colmena-gray uppercase">Decisión en Cascada</span>
+          <div class="font-title font-black text-xs sm:text-sm text-colmena-dark mt-0.5">Bötticher & V.d. Molen</div>
+        </button>
+        <button onclick="switchTab('michon')" class="bg-white p-3.5 rounded-2xl border-2 border-colmena-yellow/60 shadow-sm hover:shadow-md transition text-left col-span-2 sm:col-span-1">
+          <span class="text-[10px] font-bold text-colmena-gray uppercase">Pirámide Conductual</span>
+          <div class="font-title font-black text-xs sm:text-sm text-colmena-dark mt-0.5">Michon & GDE</div>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN DINÁMICA DE TALLERES -->
+  <main class="flex-grow py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+
+    <!-- Selector de Pestañas con estilo Colmena -->
+    <div class="flex overflow-x-auto pb-4 gap-2 justify-start lg:justify-center border-b border-gray-200 mb-8 no-scrollbar">
+      <button onclick="switchTab('wilde')" id="tabBtn-wilde" class="tab-btn px-4 py-3 rounded-2xl font-title font-bold text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap transition bg-colmena-aqua text-white shadow-md">
+        <i class="fa-solid fa-temperature-half"></i> 1. Homeostasis (Wilde)
+      </button>
+      <button onclick="switchTab('naatanen')" id="tabBtn-naatanen" class="tab-btn px-4 py-3 rounded-2xl font-title font-bold text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap transition bg-gray-100 text-colmena-dark hover:bg-gray-200">
+        <i class="fa-solid fa-shield-cat"></i> 2. Cero Riesgo (Näätänen & Summala)
+      </button>
+      <button onclick="switchTab('fuller')" id="tabBtn-fuller" class="tab-btn px-4 py-3 rounded-2xl font-title font-bold text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap transition bg-gray-100 text-colmena-dark hover:bg-gray-200">
+        <i class="fa-solid fa-scale-unbalanced"></i> 3. Amenaza - Evitación TCI (Fuller)
+      </button>
+      <button onclick="switchTab('botticher')" id="tabBtn-botticher" class="tab-btn px-4 py-3 rounded-2xl font-title font-bold text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap transition bg-gray-100 text-colmena-dark hover:bg-gray-200">
+        <i class="fa-solid fa-sitemap"></i> 4. Bötticher & Van der Molen
+      </button>
+      <button onclick="switchTab('michon')" id="tabBtn-michon" class="tab-btn px-4 py-3 rounded-2xl font-title font-bold text-xs sm:text-sm flex items-center gap-2 whitespace-nowrap transition bg-gray-100 text-colmena-dark hover:bg-gray-200">
+        <i class="fa-solid fa-layer-group"></i> 5. Michon & Matriz GDE
+      </button>
+    </div>
+
+    <!-- ==============================================
+         TALLER 1: HOMEOSTASIS DEL RIESGO (WILDE)
+         ============================================== -->
+    <div id="content-wilde" class="tab-content block space-y-8 animate-fadeIn">
+      <!-- Ficha Conceptual -->
+      <div class="bg-gradient-to-r from-colmena-yellowLight via-white to-colmena-aquaLight p-6 sm:p-8 rounded-3xl border-2 border-colmena-yellow shadow-sm">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+          <div>
+            <span class="px-3 py-1 bg-colmena-yellow text-colmena-dark font-bold text-xs uppercase rounded-full tracking-wider">Teoría de Compensación del Riesgo</span>
+            <h2 class="text-2xl sm:text-3xl font-title font-black text-colmena-dark mt-2">
+              Teoría de la Homeostasis del Riesgo (Gerald J.S. Wilde)
+            </h2>
+            <p class="text-xs sm:text-sm text-colmena-gray mt-2 max-w-3xl leading-relaxed">
+              El conductor posee un <strong>nivel interno meta de riesgo que está dispuesto a tolerar</strong>. Si la tecnología del vehículo o la carretera le hace sentir "demasiado seguro", compensará aumentando la velocidad o distrayéndose para volver a equilibrar su termostato psicológico.
+            </p>
+          </div>
+          <button onclick="openModal('modalWildeDetail')" class="px-4 py-2.5 rounded-xl bg-white border border-colmena-aqua text-colmena-aqua font-title font-bold text-xs hover:bg-colmena-aqua hover:text-white transition shadow-sm whitespace-nowrap flex items-center gap-2">
+            <i class="fa-solid fa-circle-info"></i> Los 4 Factores de Wilde
+          </button>
+        </div>
+      </div>
+
+      <!-- Tarjetas Giratorias 3D: Paradojas de Wilde -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-title font-extrabold text-lg sm:text-xl text-colmena-dark flex items-center gap-2">
+            <i class="fa-solid fa-rotate text-colmena-yellow"></i> Tarjetas Flip-Flop: Paradojas de la Compensación
+          </h3>
+          <span class="text-xs text-colmena-gray">Toca para girar la tarjeta</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <!-- Card Wilde 1 -->
+          <div class="flip-card h-80 cursor-pointer perspective-1000" onclick="toggleFlip(this)">
+            <div class="flip-card-inner relative w-full h-full transform-style-3d shadow-md rounded-3xl">
+              <!-- Front -->
+              <div class="absolute inset-0 backface-hidden bg-white border-2 border-colmena-yellow rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Caso 1: Vehículo con Frenos ABS</span>
+                    <i class="fa-solid fa-hand-pointer text-xs text-colmena-gray animate-bounce"></i>
+                  </div>
+                  <div class="w-12 h-12 rounded-2xl bg-colmena-yellow/20 flex items-center justify-center text-colmena-yellowHover text-2xl mb-3">
+                    <i class="fa-solid fa-car-side"></i>
+                  </div>
+                  <h4 class="font-title font-bold text-base text-colmena-dark">Estudio Histórico de Taxis en Múnich</h4>
+                  <p class="text-xs text-colmena-gray mt-2 leading-relaxed">
+                    Se instalaron frenos antibloqueo (ABS) en la mitad de una flota de taxis. Se esperaba una reducción drástica de colisiones. ¿Qué ocurrió en realidad?
+                  </p>
+                </div>
+                <span class="text-xs font-bold text-colmena-aqua flex items-center justify-between">
+                  <span>Descubrir resultado de Wilde</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </span>
+              </div>
+              <!-- Back -->
+              <div class="absolute inset-0 backface-hidden rotate-y-180 bg-colmena-dark text-white rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-colmena-yellow text-colmena-dark text-[10px] font-bold px-2 py-0.5 rounded-full">Efecto Compensación</span>
+                  <h4 class="font-title font-bold text-base text-white mt-2">Tasa de Siniestros Idéntica</h4>
+                  <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                    Los conductores con ABS manejaban a mayor velocidad, frenaban más tarde y guardaban menor distancia, porque confiaban ciegamente en el sistema. Su <em>nivel de riesgo meta</em> no había variado.
+                  </p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/10 text-[11px] text-colmena-yellow">
+                  <strong>Conclusión PESV:</strong> La tecnología sin inducción conductual estimula la temeridad.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Wilde 2 -->
+          <div class="flip-card h-80 cursor-pointer perspective-1000" onclick="toggleFlip(this)">
+            <div class="flip-card-inner relative w-full h-full transform-style-3d shadow-md rounded-3xl">
+              <div class="absolute inset-0 backface-hidden bg-white border-2 border-colmena-aqua rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="bg-teal-100 text-teal-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Caso 2: Vía Perimetral de 4 Carriles</span>
+                    <i class="fa-solid fa-hand-pointer text-xs text-colmena-gray animate-bounce"></i>
+                  </div>
+                  <div class="w-12 h-12 rounded-2xl bg-colmena-aqua/20 flex items-center justify-center text-colmena-aqua text-2xl mb-3">
+                    <i class="fa-solid fa-road"></i>
+                  </div>
+                  <h4 class="font-title font-bold text-base text-colmena-dark">Ampliación de Calzada y Pavimento Óptimo</h4>
+                  <p class="text-xs text-colmena-gray mt-2 leading-relaxed">
+                    Una vía peligrosa y angosta es ensanchada e iluminada para reducir la mortalidad. Sin embargo, los accidentes mortales no bajan al ritmo previsto.
+                  </p>
+                </div>
+                <span class="text-xs font-bold text-colmena-aqua flex items-center justify-between">
+                  <span>Descubrir por qué</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </span>
+              </div>
+              <div class="absolute inset-0 backface-hidden rotate-y-180 bg-colmena-aquaDark text-white rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Exceso de Confianza</span>
+                  <h4 class="font-title font-bold text-base text-white mt-2">Disminución del Riesgo Percibido</h4>
+                  <p class="text-xs text-teal-100 mt-2 leading-relaxed">
+                    Al percibir la vía amplia y libre de baches, el cerebro interpreta que el riesgo cayó por debajo de su umbral aceptable, acelerando de 60 km/h a 110 km/h y manipulando el teléfono.
+                  </p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/10 text-[11px] text-white">
+                  <strong>Acción Clave:</strong> Instalar reductores físicos, cámaras y radares pedagógicos.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Wilde 3 -->
+          <div class="flip-card h-80 cursor-pointer perspective-1000" onclick="toggleFlip(this)">
+            <div class="flip-card-inner relative w-full h-full transform-style-3d shadow-md rounded-3xl">
+              <div class="absolute inset-0 backface-hidden bg-white border-2 border-colmena-yellow rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Caso 3: Bonificaciones por Entrega</span>
+                    <i class="fa-solid fa-hand-pointer text-xs text-colmena-gray animate-bounce"></i>
+                  </div>
+                  <div class="w-12 h-12 rounded-2xl bg-colmena-yellow/20 flex items-center justify-center text-colmena-yellowHover text-2xl mb-3">
+                    <i class="fa-solid fa-sack-dollar"></i>
+                  </div>
+                  <h4 class="font-title font-bold text-base text-colmena-dark">Incentivos Económicos Equivocados</h4>
+                  <p class="text-xs text-colmena-gray mt-2 leading-relaxed">
+                    Una empresa premia con dinero al conductor que complete más despachos en el menor tiempo posible.
+                  </p>
+                </div>
+                <span class="text-xs font-bold text-colmena-aqua flex items-center justify-between">
+                  <span>Efecto en el Riesgo Meta</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </span>
+              </div>
+              <div class="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-slate-900 to-colmena-dark text-white rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-colmena-yellow text-colmena-dark text-[10px] font-bold px-2 py-0.5 rounded-full">Modificación de la Meta</span>
+                  <h4 class="font-title font-bold text-base text-white mt-2">El Riesgo Aceptado se Dispara</h4>
+                  <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                    El beneficio económico de correr supera al costo subjetivo de un posible choque. El chofer eleva voluntariamente su nivel meta de riesgo.
+                  </p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/10 text-[11px] text-colmena-yellow">
+                  <strong>Lección de Wilde:</strong> Para bajar siniestros, premia no tener infracciones ni aceleraciones bruscas.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Simulador Interactivo: Termostato de Riesgo de Wilde -->
+      <div class="bg-white rounded-3xl border-2 border-colmena-yellow p-6 sm:p-8 shadow-md">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 gap-2">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider text-colmena-yellowHover">Taller Práctico #1</span>
+            <h3 class="text-xl sm:text-2xl font-title font-black text-colmena-dark">Simulador del Termostato de Wilde en Tiempo Real</h3>
+          </div>
+          <span class="text-xs font-bold px-3 py-1 rounded-full bg-colmena-yellowLight text-colmena-dark border border-colmena-yellow">
+            Mecanismo Homeostático
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <div class="lg:col-span-2 space-y-5">
+            <div>
+              <div class="flex justify-between items-center text-xs font-bold text-colmena-dark uppercase mb-1">
+                <span>1. Nivel de Asistencias Tecnológicas del Vehículo (ABS, ADAS, Airbags):</span>
+                <span id="labelValSeguridad" class="text-colmena-aqua font-mono font-black text-sm">Media (50%)</span>
+              </div>
+              <input type="range" id="inputSeguridad" min="10" max="100" value="50" oninput="updateWildeSimulator()" class="w-full accent-colmena-aqua cursor-pointer">
+              <p class="text-[11px] text-colmena-gray mt-1">A mayor tecnología, menor sensación subjetiva de peligro inmediato.</p>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center text-xs font-bold text-colmena-dark uppercase mb-1">
+                <span>2. Presión de Entrega / Incentivo por Rapidez (Prisa del conductor):</span>
+                <span id="labelValPrisa" class="text-colmena-yellowHover font-mono font-black text-sm">Media (40%)</span>
+              </div>
+              <input type="range" id="inputPrisa" min="0" max="100" value="40" oninput="updateWildeSimulator()" class="w-full accent-colmena-yellow cursor-pointer">
+              <p class="text-[11px] text-colmena-gray mt-1">Eleva el nivel meta de riesgo que el chofer está dispuesto a tolerar.</p>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center text-xs font-bold text-colmena-dark uppercase mb-1">
+                <span>3. Severidad del Control y Telemetría Corporativa (Auditoría GPS):</span>
+                <span id="labelValControl" class="text-colmena-dark font-mono font-black text-sm">Moderada (50%)</span>
+              </div>
+              <input type="range" id="inputControl" min="0" max="100" value="50" oninput="updateWildeSimulator()" class="w-full accent-colmena-dark cursor-pointer">
+              <p class="text-[11px] text-colmena-gray mt-1">Aumenta el costo de cometer infracciones, forzando a bajar el riesgo meta.</p>
+            </div>
+          </div>
+
+          <!-- Panel Termostato -->
+          <div class="bg-slate-50 rounded-3xl p-5 border-2 border-gray-200 flex flex-col justify-between">
+            <div>
+              <div class="text-xs font-extrabold text-colmena-gray uppercase">Estado del Conductor</div>
+              <div id="wildeEstadoConducta" class="text-xl font-title font-black text-colmena-aqua mt-1">Compensación Equilibrada</div>
+              
+              <!-- Termostato Visual -->
+              <div class="mt-4">
+                <div class="flex justify-between text-[11px] font-bold text-colmena-gray mb-1">
+                  <span>Velocidad Real Compensada</span>
+                  <span id="wildeVelocidadKm" class="font-mono text-colmena-dark font-black">75 km/h</span>
+                </div>
+                <div class="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+                  <div id="wildeBarraVelocidad" class="h-full bg-colmena-aqua transition-width" style="width: 55%;"></div>
+                </div>
+              </div>
+
+              <div class="mt-4 space-y-2 text-xs">
+                <div class="flex justify-between">
+                  <span class="text-colmena-gray">Riesgo Subjetivo Percibido:</span>
+                  <strong id="wildeValRiesgoPercibido" class="font-mono text-colmena-dark">45 / 100</strong>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-colmena-gray">Nivel de Riesgo Meta (Tolerado):</span>
+                  <strong id="wildeValRiesgoMeta" class="font-mono text-colmena-dark">48 / 100</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-gray-200">
+              <div class="text-[11px] font-bold text-colmena-dark mb-1">Diagnóstico según Wilde:</div>
+              <p id="wildeDiagnostico" class="text-xs text-colmena-gray leading-snug">
+                El conductor no compensa en exceso gracias al monitoreo activo por GPS.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==============================================
+         TALLER 2: CAMPO DE CERO RIESGO (NÄÄTÄNEN & SUMMALA)
+         ============================================== -->
+    <div id="content-naatanen" class="tab-content hidden space-y-8 animate-fadeIn">
+      <div class="bg-gradient-to-r from-colmena-aquaLight via-white to-white p-6 sm:p-8 rounded-3xl border-2 border-colmena-aqua shadow-sm">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+          <div>
+            <span class="px-3 py-1 bg-colmena-aqua text-white font-bold text-xs uppercase rounded-full tracking-wider">Modelo del Cero Riesgo Subjetivo</span>
+            <h2 class="text-2xl sm:text-3xl font-title font-black text-colmena-dark mt-2">
+              Modelo de Campo de Cero Riesgo (Risto Näätänen & Heikki Summala)
+            </h2>
+            <p class="text-xs sm:text-sm text-colmena-gray mt-2 max-w-3xl leading-relaxed">
+              Los conductores no buscan un riesgo constante, sino viajar en una <strong>zona de "Cero Miedo"</strong> (*Field of Safe Driving*). Sin embargo, la repetición y la rutina diaria extinguen las respuestas biológicas de alerta (habituación), provocando que reduzcan las distancias de seguridad hasta que una sorpresa rompe la burbuja.
+            </p>
+          </div>
+          <button onclick="openModal('modalNaatanenDetail')" class="px-4 py-2.5 rounded-xl bg-colmena-yellow text-colmena-dark font-title font-bold text-xs hover:bg-colmena-yellowHover transition shadow-sm whitespace-nowrap flex items-center gap-2">
+            <i class="fa-solid fa-book-open"></i> Motivos Extra-Viales
+          </button>
+        </div>
+      </div>
+
+      <!-- Tarjetas Giratorias: Mecanismos del Cero Riesgo -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-title font-extrabold text-lg sm:text-xl text-colmena-dark flex items-center gap-2">
+            <i class="fa-solid fa-shield-halved text-colmena-aqua"></i> Tarjetas Flip-Flop: La Trampa de la Habituación
+          </h3>
+          <span class="text-xs text-colmena-gray">Gira para explorar los conceptos</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <!-- Card NS 1 -->
+          <div class="flip-card h-80 cursor-pointer perspective-1000" onclick="toggleFlip(this)">
+            <div class="flip-card-inner relative w-full h-full transform-style-3d shadow-md rounded-3xl">
+              <div class="absolute inset-0 backface-hidden bg-white border-2 border-colmena-aqua rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-teal-100 text-teal-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Concepto Central</span>
+                  <div class="w-12 h-12 rounded-2xl bg-colmena-aqua/20 flex items-center justify-center text-colmena-aqua text-2xl my-3">
+                    <i class="fa-solid fa-bullseye"></i>
+                  </div>
+                  <h4 class="font-title font-bold text-base text-colmena-dark">Campo de Conducción Segura</h4>
+                  <p class="text-xs text-colmena-gray mt-2 leading-relaxed">
+                    Es la envolvente geométrica que el conductor percibe como libre de obstáculos para avanzar sin colisionar en los próximos segundos.
+                  </p>
+                </div>
+                <span class="text-xs font-bold text-colmena-aqua flex items-center justify-between">
+                  <span>¿Qué pasa en la práctica?</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </span>
+              </div>
+              <div class="absolute inset-0 backface-hidden rotate-y-180 bg-colmena-aquaDark text-white rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Percepción Distorsionada</span>
+                  <h4 class="font-title font-bold text-base text-white mt-2">La "Burbuja" se Estrecha</h4>
+                  <p class="text-xs text-teal-100 mt-2 leading-relaxed">
+                    Con la experiencia, el conductor cree que necesita mucho menos espacio para frenar. Reduce la distancia de seguimiento a menos de 1 segundo sin sentir ningún sobresalto.
+                  </p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/10 text-[11px] text-white">
+                  <strong>Peligro:</strong> El umbral de alarma solo saltará cuando el frenazo frontal sea inminente.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card NS 2 -->
+          <div class="flip-card h-80 cursor-pointer perspective-1000" onclick="toggleFlip(this)">
+            <div class="flip-card-inner relative w-full h-full transform-style-3d shadow-md rounded-3xl">
+              <div class="absolute inset-0 backface-hidden bg-white border-2 border-colmena-yellow rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Fenómeno Psicológico</span>
+                  <div class="w-12 h-12 rounded-2xl bg-colmena-yellow/20 flex items-center justify-center text-colmena-yellowHover text-2xl my-3">
+                    <i class="fa-solid fa-bed"></i>
+                  </div>
+                  <h4 class="font-title font-bold text-base text-colmena-dark">Extinción del Miedo (Habituación)</h4>
+                  <p class="text-xs text-colmena-gray mt-2 leading-relaxed">
+                    ¿Por qué un chofer con 10 años de experiencia maneja mirando el celular o pegado a otros autos sin sentir ansiedad?
+                  </p>
+                </div>
+                <span class="text-xs font-bold text-colmena-aqua flex items-center justify-between">
+                  <span>Ver explicación de Summala</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </span>
+              </div>
+              <div class="absolute inset-0 backface-hidden rotate-y-180 bg-colmena-dark text-white rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-colmena-yellow text-colmena-dark text-[10px] font-bold px-2 py-0.5 rounded-full">Falsa Seguridad</span>
+                  <h4 class="font-title font-bold text-base text-white mt-2">Ausencia de Consecuencia Inmediata</h4>
+                  <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                    El cerebro humano asocia la falta de choque cotidiano con "control y maestría". El reflejo de miedo se extingue por completo, sustituido por el automatismo.
+                  </p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/10 text-[11px] text-colmena-yellow">
+                  <strong>Medida PESV:</strong> Talleres de sensibilización con simuladores de impacto real a 30 km/h.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card NS 3 -->
+          <div class="flip-card h-80 cursor-pointer perspective-1000" onclick="toggleFlip(this)">
+            <div class="flip-card-inner relative w-full h-full transform-style-3d shadow-md rounded-3xl">
+              <div class="absolute inset-0 backface-hidden bg-white border-2 border-colmena-aqua rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-teal-100 text-teal-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Distractores Vitales</span>
+                  <div class="w-12 h-12 rounded-2xl bg-colmena-aqua/20 flex items-center justify-center text-colmena-aqua text-2xl my-3">
+                    <i class="fa-solid fa-phone-slash"></i>
+                  </div>
+                  <h4 class="font-title font-bold text-base text-colmena-dark">Motivos Extra-Viales</h4>
+                  <p class="text-xs text-colmena-gray mt-2 leading-relaxed">
+                    El conductor no conduce para "estar seguro", conduce para llegar a su cita, escuchar música, discutir con un cliente o adelantar a quien lo incomodó.
+                  </p>
+                </div>
+                <span class="text-xs font-bold text-colmena-aqua flex items-center justify-between">
+                  <span>Impacto en la Conducción</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </span>
+              </div>
+              <div class="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-teal-800 to-colmena-dark text-white rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Ceguera Inatencional</span>
+                  <h4 class="font-title font-bold text-base text-white mt-2">Secuestro de la Atención</h4>
+                  <p class="text-xs text-teal-100 mt-2 leading-relaxed">
+                    Los motivos ajenos a la vía dominan la memoria de trabajo. La capacidad de detectar una frenada súbita pasa de 0.8 segundos a más de 2.5 segundos.
+                  </p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/10 text-[11px] text-white">
+                  <strong>Control Técnico:</strong> Políticas de cabina estéril y manos libres prohibido.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Taller Práctico: Simulador de la Burbuja de Cero Riesgo -->
+      <div class="bg-white rounded-3xl border-2 border-colmena-aqua p-6 sm:p-8 shadow-md">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 gap-2">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider text-colmena-aqua">Taller Práctico #2</span>
+            <h3 class="text-xl sm:text-2xl font-title font-black text-colmena-dark">Simulador de Distancia de Seguimiento y Umbral de Alarma</h3>
+          </div>
+          <span class="text-xs font-semibold text-colmena-gray">Modelo de Näätänen & Summala</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <div class="lg:col-span-2 space-y-5">
+            <div>
+              <div class="flex justify-between items-center text-xs font-bold text-colmena-dark uppercase mb-1">
+                <span>Distancia al vehículo de adelante:</span>
+                <span id="labelDistancia" class="text-colmena-aqua font-mono font-black text-sm">18 metros (~1.2 seg)</span>
+              </div>
+              <input type="range" id="inputDistancia" min="5" max="60" value="18" oninput="updateNaatanenSim()" class="w-full accent-colmena-aqua cursor-pointer">
+              <div class="flex justify-between text-[10px] text-colmena-gray">
+                <span>5 m (Riesgo Crítico)</span>
+                <span>25 m (Regla 2 Segundos)</span>
+                <span>50 m (Zona 100% Segura)</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center text-xs font-bold text-colmena-dark uppercase mb-1">
+                <span>Velocidad de Circulación:</span>
+                <span id="labelVelocidadNS" class="text-colmena-dark font-mono font-black text-sm">70 km/h</span>
+              </div>
+              <input type="range" id="inputVelocidadNS" min="30" max="120" value="70" oninput="updateNaatanenSim()" class="w-full accent-colmena-yellow cursor-pointer">
+            </div>
+
+            <!-- Botón de Susto / Frenazo Súbito -->
+            <button onclick="triggerFrenazoInesperado()" class="w-full py-3 rounded-2xl bg-colmena-yellow text-colmena-dark font-title font-bold text-xs sm:text-sm hover:bg-colmena-yellowHover transition shadow flex items-center justify-center gap-2">
+              <i class="fa-solid fa-triangle-exclamation"></i> ¡Simular Frenazo de Emergencia Imprevisto!
+            </button>
+          </div>
+
+          <!-- Visualizador de la Burbuja -->
+          <div id="boxNaatanen" class="bg-gradient-to-br from-teal-50 to-emerald-50 border-2 border-colmena-aqua rounded-3xl p-5 flex flex-col justify-between">
+            <div>
+              <div class="text-xs font-extrabold uppercase tracking-wider text-colmena-gray">Estado Subjetivo del Conductor</div>
+              <div id="nsEstadoTexto" class="text-xl font-title font-black text-colmena-aqua mt-1">Conduciendo en Cero Miedo</div>
+              
+              <div class="mt-4 p-3 rounded-2xl bg-white/80 border border-gray-200 text-xs space-y-2">
+                <div class="flex justify-between">
+                  <span class="text-colmena-gray">Distancia de Frenado Requerida:</span>
+                  <strong id="nsDistanciaFrenado" class="font-mono font-bold text-colmena-dark">28.5 m</strong>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-colmena-gray">Tiempo de Respuesta Disponible:</span>
+                  <strong id="nsTiempoDisponible" class="font-mono font-bold text-colmena-dark">0.92 seg</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-teal-200">
+              <div class="text-[11px] font-bold text-colmena-dark mb-1">Diagnóstico de la Burbuja:</div>
+              <p id="nsDiagnostico" class="text-xs text-colmena-gray leading-snug">
+                El conductor no experimenta alarma consciente, pero físicamente está en zona de choque si el vehículo delantero se detiene en seco.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==============================================
+         TALLER 3: AMENAZA-EVITACIÓN Y MODELO TCI (FULLER)
+         ============================================== -->
+    <div id="content-fuller" class="tab-content hidden space-y-8 animate-fadeIn">
+      <div class="bg-gradient-to-r from-yellow-50 via-white to-amber-50 p-6 sm:p-8 rounded-3xl border-2 border-colmena-yellow shadow-sm">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+          <div>
+            <span class="px-3 py-1 bg-colmena-yellow text-colmena-dark font-bold text-xs uppercase rounded-full tracking-wider">Modelo Demanda vs. Capacidad (TCI)</span>
+            <h2 class="text-2xl sm:text-3xl font-title font-black text-colmena-dark mt-2">
+              Teoría de Amenaza-Evitación y Modelo TCI (Ray Fuller)
+            </h2>
+            <p class="text-xs sm:text-sm text-colmena-gray mt-2 max-w-3xl leading-relaxed">
+              Ray Fuller describe la conducción como un combate continuo entre la <strong>Demanda de la Tarea</strong> (vía, clima, tráfico y velocidad) y la <strong>Capacidad del Conductor</strong> (experiencia, reflejos, fatiga y sobriedad). Cuando la demanda supera la capacidad, sobreviene la colisión. La <em>velocidad</em> es el único calibrador en tiempo real.
+            </p>
+          </div>
+          <button onclick="openModal('modalFullerDetail')" class="px-4 py-2.5 rounded-xl bg-colmena-aqua text-white font-title font-bold text-xs hover:bg-colmena-aquaDark transition shadow-sm whitespace-nowrap flex items-center gap-2">
+            <i class="fa-solid fa-chart-line"></i> Curva de TCI de Fuller
+          </button>
+        </div>
+      </div>
+
+      <!-- Tarjetas Giratorias: Pilares del TCI -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-title font-extrabold text-lg sm:text-xl text-colmena-dark flex items-center gap-2">
+            <i class="fa-solid fa-gauge-high text-colmena-yellow"></i> Tarjetas Flip-Flop: Demanda, Capacidad y Velocidad
+          </h3>
+          <span class="text-xs text-colmena-gray">Toca para girar</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <!-- Card Fuller 1 -->
+          <div class="flip-card h-80 cursor-pointer perspective-1000" onclick="toggleFlip(this)">
+            <div class="flip-card-inner relative w-full h-full transform-style-3d shadow-md rounded-3xl">
+              <div class="absolute inset-0 backface-hidden bg-white border-2 border-colmena-yellow rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Fuerza 1: Exigencia</span>
+                  <div class="w-12 h-12 rounded-2xl bg-colmena-yellow/20 flex items-center justify-center text-colmena-yellowHover text-2xl my-3">
+                    <i class="fa-solid fa-mountain"></i>
+                  </div>
+                  <h4 class="font-title font-bold text-base text-colmena-dark">Demanda de la Tarea (Task Demand)</h4>
+                  <p class="text-xs text-colmena-gray mt-2 leading-relaxed">
+                    Determinado por la geometría de la carretera, lluvia, niebla, densidad de peatones, ciclistas y, ante todo, la velocidad a la que se avanza.
+                  </p>
+                </div>
+                <span class="text-xs font-bold text-colmena-aqua flex items-center justify-between">
+                  <span>¿Cómo crece la demanda?</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </span>
+              </div>
+              <div class="absolute inset-0 backface-hidden rotate-y-180 bg-colmena-dark text-white rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-colmena-yellow text-colmena-dark text-[10px] font-bold px-2 py-0.5 rounded-full">Exponencial</span>
+                  <h4 class="font-title font-bold text-base text-white mt-2">Multiplicación por la Velocidad</h4>
+                  <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                    Al duplicar la velocidad, los bits de información visual por segundo que el ojo debe procesar se triplican, y la energía cinética del impacto se cuadruplica.
+                  </p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/10 text-[11px] text-colmena-yellow">
+                  <strong>Efecto Túnel:</strong> A 100 km/h, el campo de visión periférico se reduce de 180° a menos de 45°.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Fuller 2 -->
+          <div class="flip-card h-80 cursor-pointer perspective-1000" onclick="toggleFlip(this)">
+            <div class="flip-card-inner relative w-full h-full transform-style-3d shadow-md rounded-3xl">
+              <div class="absolute inset-0 backface-hidden bg-white border-2 border-colmena-aqua rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-teal-100 text-teal-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Fuerza 2: Recursos Humanos</span>
+                  <div class="w-12 h-12 rounded-2xl bg-colmena-aqua/20 flex items-center justify-center text-colmena-aqua text-2xl my-3">
+                    <i class="fa-solid fa-battery-half"></i>
+                  </div>
+                  <h4 class="font-title font-bold text-base text-colmena-dark">Capacidad del Conductor (Capability)</h4>
+                  <p class="text-xs text-colmena-gray mt-2 leading-relaxed">
+                    Suma de habilidades psicomotoras, agudeza visual, nivel de descanso, madurez emocional y ausencia de fármacos o alcohol.
+                  </p>
+                </div>
+                <span class="text-xs font-bold text-colmena-aqua flex items-center justify-between">
+                  <span>¿Por qué colapsa?</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </span>
+              </div>
+              <div class="absolute inset-0 backface-hidden rotate-y-180 bg-colmena-aquaDark text-white rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Fatiga = Alcohol</span>
+                  <h4 class="font-title font-bold text-base text-white mt-2">Deterioro Fisiológico</h4>
+                  <p class="text-xs text-teal-100 mt-2 leading-relaxed">
+                    Estar despierto 17 horas continuas reduce la capacidad psicomotriz al nivel equivalente a tener 0.05 g/dL de alcohol en sangre.
+                  </p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/10 text-[11px] text-white">
+                  <strong>Control PESV:</strong> Máximo 8 horas de turno al volante con pausas de 20 minutos cada 2 horas.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Fuller 3 -->
+          <div class="flip-card h-80 cursor-pointer perspective-1000" onclick="toggleFlip(this)">
+            <div class="flip-card-inner relative w-full h-full transform-style-3d shadow-md rounded-3xl">
+              <div class="absolute inset-0 backface-hidden bg-white border-2 border-colmena-yellow rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded-full">El Regulador Maestro</span>
+                  <div class="w-12 h-12 rounded-2xl bg-colmena-yellow/20 flex items-center justify-center text-colmena-yellowHover text-2xl my-3">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                  </div>
+                  <h4 class="font-title font-bold text-base text-colmena-dark">La Velocidad como Compensador TCI</h4>
+                  <p class="text-xs text-colmena-gray mt-2 leading-relaxed">
+                    ¿Qué puede hacer el chofer cuando llueve a cántaros o se siente fatigado? La velocidad es el único control que adapta la demanda en tiempo real.
+                  </p>
+                </div>
+                <span class="text-xs font-bold text-colmena-aqua flex items-center justify-between">
+                  <span>Mecanismo TCI</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </span>
+              </div>
+              <div class="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-amber-600 to-colmena-dark text-white rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-colmena-yellow text-colmena-dark text-[10px] font-bold px-2 py-0.5 rounded-full">Autorregulación</span>
+                  <h4 class="font-title font-bold text-base text-white mt-2">Bajar la Velocidad = Salvar la Vida</h4>
+                  <p class="text-xs text-amber-100 mt-2 leading-relaxed">
+                    Si la capacidad disminuye por cansancio, bajar la velocidad de 80 a 50 km/h reduce la demanda de la tarea en un 40%, devolviendo el vehículo a la zona segura.
+                  </p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/10 text-[11px] text-colmena-yellow">
+                  <strong>Regla de Oro:</strong> Quien no baja la velocidad cuando llueve, fuerza el colapso de su capacidad.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Simulador TCI: Balanza Dinámica Demanda vs Capacidad -->
+      <div class="bg-white rounded-3xl border-2 border-colmena-yellow p-6 sm:p-8 shadow-md">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 gap-2">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider text-colmena-yellowHover">Taller Práctico #3</span>
+            <h3 class="text-xl sm:text-2xl font-title font-black text-colmena-dark">Balanza Dinámica Demanda de la Tarea vs. Capacidad (TCI)</h3>
+          </div>
+          <span class="text-xs font-bold px-3 py-1 rounded-full bg-colmena-yellowLight text-colmena-dark border border-colmena-yellow">
+            Simulador de Sobrecarga Cognitiva
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <div class="lg:col-span-2 space-y-4">
+            <!-- Factores de Demanda -->
+            <div class="bg-amber-50/60 p-4 rounded-2xl border border-amber-200">
+              <span class="text-xs font-extrabold text-amber-900 uppercase block mb-3">Factores que aumentan la Demanda:</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <div class="flex justify-between text-xs font-bold text-colmena-dark mb-1">
+                    <span>Velocidad de Circulación:</span>
+                    <span id="fullerLabelVel" class="text-amber-700 font-mono font-black">80 km/h</span>
+                  </div>
+                  <input type="range" id="fullerVel" min="30" max="130" value="80" oninput="calculateFullerTCI()" class="w-full accent-amber-600 cursor-pointer">
+                </div>
+                <div>
+                  <div class="flex justify-between text-xs font-bold text-colmena-dark mb-1">
+                    <span>Condición Vía / Clima:</span>
+                    <span id="fullerLabelClima" class="text-amber-700 font-mono font-black">Lluvia Moderada</span>
+                  </div>
+                  <select id="fullerClima" onchange="calculateFullerTCI()" class="w-full bg-white border border-gray-300 rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:outline-none">
+                    <option value="10">Vía seca, despejada y recta (+10 Demanda)</option>
+                    <option value="25" selected>Lluvia moderada y curvas (+25 Demanda)</option>
+                    <option value="45">Aguacero torrencial, niebla densa (+45 Demanda)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Factores de Capacidad -->
+            <div class="bg-teal-50/60 p-4 rounded-2xl border border-teal-200">
+              <span class="text-xs font-extrabold text-colmena-aquaDark uppercase block mb-3">Factores que reducen la Capacidad Humana:</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <div class="flex justify-between text-xs font-bold text-colmena-dark mb-1">
+                    <span>Horas de Conducción Continua:</span>
+                    <span id="fullerLabelHoras" class="text-colmena-aqua font-mono font-black">4 horas</span>
+                  </div>
+                  <input type="range" id="fullerHoras" min="1" max="12" value="4" oninput="calculateFullerTCI()" class="w-full accent-colmena-aqua cursor-pointer">
+                </div>
+                <div>
+                  <div class="flex justify-between text-xs font-bold text-colmena-dark mb-1">
+                    <span>Distracción / Estado Mental:</span>
+                    <span id="fullerLabelDistr" class="text-colmena-aqua font-mono font-black">Atención Plena</span>
+                  </div>
+                  <select id="fullerDistr" onchange="calculateFullerTCI()" class="w-full bg-white border border-gray-300 rounded-xl px-2.5 py-1.5 text-xs font-semibold focus:outline-none">
+                    <option value="0" selected>Concentrado en la ruta (100% Capacidad)</option>
+                    <option value="20">Hablando por manos libres (-20% Capacidad)</option>
+                    <option value="40">Manipulando WhatsApp / Redes (-40% Capacidad)</option>
+                    <option value="50">Somnoliento / Cabeceando (-50% Capacidad)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resultado Balanza TCI -->
+          <div id="fullerBoxResultado" class="bg-gradient-to-br from-teal-50 to-amber-50 border-2 border-colmena-yellow rounded-3xl p-5 flex flex-col justify-between">
+            <div>
+              <div class="text-xs font-extrabold uppercase tracking-wider text-colmena-gray">Balance Fuller TCI</div>
+              <div id="fullerZonaTitulo" class="text-xl font-title font-black text-amber-600 mt-1">Zona de Esfuerzo Aceptable</div>
+              
+              <!-- Gráfico de Balanza Comparativa -->
+              <div class="mt-4 space-y-3">
+                <div>
+                  <div class="flex justify-between text-xs font-bold text-colmena-dark mb-1">
+                    <span>Demanda de la Tarea:</span>
+                    <span id="valDemandaNum" class="font-mono text-amber-700">65 / 100</span>
+                  </div>
+                  <div class="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div id="barDemanda" class="h-full bg-amber-500 transition-width" style="width: 65%;"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-xs font-bold text-colmena-dark mb-1">
+                    <span>Capacidad Disponible del Chofer:</span>
+                    <span id="valCapacidadNum" class="font-mono text-colmena-aqua">75 / 100</span>
+                  </div>
+                  <div class="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div id="barCapacidad" class="h-full bg-colmena-aqua transition-width" style="width: 75%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-gray-200">
+              <div class="text-[11px] font-bold text-colmena-dark mb-1">Diagnóstico TCI:</div>
+              <p id="fullerDiagnostico" class="text-xs text-colmena-gray leading-snug">
+                La capacidad supera a la demanda. El conductor mantiene el margen de control necesario para sortear imprevistos.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==============================================
+         TALLER 4: MODELO JERÁRQUICO (BÖTTICHER Y VAN DER MOLEN)
+         ============================================== -->
+    <div id="content-botticher" class="tab-content hidden space-y-8 animate-fadeIn">
+      <div class="bg-gradient-to-r from-teal-50 via-white to-white p-6 sm:p-8 rounded-3xl border-2 border-colmena-aqua shadow-sm">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+          <div>
+            <span class="px-3 py-1 bg-colmena-aqua text-white font-bold text-xs uppercase rounded-full tracking-wider">Teoría de Sistemas y Procesamiento Jerárquico</span>
+            <h2 class="text-2xl sm:text-3xl font-title font-black text-colmena-dark mt-2">
+              Modelo Jerárquico de Bötticher y Van der Molen (1986)
+            </h2>
+            <p class="text-xs sm:text-sm text-colmena-gray mt-2 max-w-3xl leading-relaxed">
+              El comportamiento en el tránsito no ocurre en un solo plano mental, sino en una <strong>estructura jerárquica en cascada</strong>: las decisiones del nivel superior (Estratégico) determinan y restringen lo que ocurre en los niveles inferiores (Táctico y Operacional). Un siniestro al frenar rara vez es un fallo de reflejos: es un fallo de planificación previa.
+            </p>
+          </div>
+          <button onclick="openModal('modalBotticherDetail')" class="px-4 py-2.5 rounded-xl bg-colmena-yellow text-colmena-dark font-title font-bold text-xs hover:bg-colmena-yellowHover transition shadow-sm whitespace-nowrap flex items-center gap-2">
+            <i class="fa-solid fa-sitemap"></i> Ver Estructura en Cascada
+          </button>
+        </div>
+      </div>
+
+      <!-- Tarjetas Giratorias: Los 3 Niveles Jerárquicos -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-title font-extrabold text-lg sm:text-xl text-colmena-dark flex items-center gap-2">
+            <i class="fa-solid fa-arrows-split-up-and-left text-colmena-aqua"></i> Tarjetas Flip-Flop: Los Tres Niveles de Decisión
+          </h3>
+          <span class="text-xs text-colmena-gray">Gira para comparar los niveles</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <!-- Card Bötticher 1 -->
+          <div class="flip-card h-80 cursor-pointer perspective-1000" onclick="toggleFlip(this)">
+            <div class="flip-card-inner relative w-full h-full transform-style-3d shadow-md rounded-3xl">
+              <div class="absolute inset-0 backface-hidden bg-white border-2 border-colmena-yellow rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Nivel 1 (Superior)</span>
+                  <div class="w-12 h-12 rounded-2xl bg-colmena-yellow/20 flex items-center justify-center text-colmena-yellowHover text-2xl my-3">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                  </div>
+                  <h4 class="font-title font-bold text-base text-colmena-dark">Nivel Estratégico (Planificación)</h4>
+                  <p class="text-xs text-colmena-gray mt-2 leading-relaxed">
+                    Decisiones tomadas antes de encender el vehículo: selección de ruta, horario de salida, estado de descanso y modo de transporte.
+                  </p>
+                </div>
+                <span class="text-xs font-bold text-colmena-aqua flex items-center justify-between">
+                  <span>¿Qué error se comete aquí?</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </span>
+              </div>
+              <div class="absolute inset-0 backface-hidden rotate-y-180 bg-colmena-dark text-white rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-colmena-yellow text-colmena-dark text-[10px] font-bold px-2 py-0.5 rounded-full">Fallo Raíz</span>
+                  <h4 class="font-title font-bold text-base text-white mt-2">Salir con Retraso o sin Dormir</h4>
+                  <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                    Si el chofer inicia su jornada tras dormir solo 4 horas y con un horario de entrega irreal, arruina por completo su margen de seguridad en los niveles inferiores.
+                  </p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/10 text-[11px] text-colmena-yellow">
+                  <strong>PESV:</strong> Planificación de rutas, rutogramas y horarios realistas.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Bötticher 2 -->
+          <div class="flip-card h-80 cursor-pointer perspective-1000" onclick="toggleFlip(this)">
+            <div class="flip-card-inner relative w-full h-full transform-style-3d shadow-md rounded-3xl">
+              <div class="absolute inset-0 backface-hidden bg-white border-2 border-colmena-aqua rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-teal-100 text-teal-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Nivel 2 (Intermedio)</span>
+                  <div class="w-12 h-12 rounded-2xl bg-colmena-aqua/20 flex items-center justify-center text-colmena-aqua text-2xl my-3">
+                    <i class="fa-solid fa-compass"></i>
+                  </div>
+                  <h4 class="font-title font-bold text-base text-colmena-dark">Nivel Táctico (Maniobras)</h4>
+                  <p class="text-xs text-colmena-gray mt-2 leading-relaxed">
+                    Decisiones conscientes durante la marcha: velocidad crucero elegida, distancias de seguimiento, cambios de carril y adelantamientos.
+                  </p>
+                </div>
+                <span class="text-xs font-bold text-colmena-aqua flex items-center justify-between">
+                  <span>¿Qué error se comete aquí?</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </span>
+              </div>
+              <div class="absolute inset-0 backface-hidden rotate-y-180 bg-colmena-aquaDark text-white rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Fallo Táctico</span>
+                  <h4 class="font-title font-bold text-base text-white mt-2">Pegarse a 1 Metro o Adelantar en Doble Línea</h4>
+                  <p class="text-xs text-teal-100 mt-2 leading-relaxed">
+                    Condicionado por el retraso estratégico, el chofer decide no guardar distancia ni ceder el paso, eliminando todo tiempo de reacción física.
+                  </p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/10 text-[11px] text-white">
+                  <strong>Control:</strong> Telemetría GPS con alertas de distancia de proximidad.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Bötticher 3 -->
+          <div class="flip-card h-80 cursor-pointer perspective-1000" onclick="toggleFlip(this)">
+            <div class="flip-card-inner relative w-full h-full transform-style-3d shadow-md rounded-3xl">
+              <div class="absolute inset-0 backface-hidden bg-white border-2 border-colmena-yellow rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Nivel 3 (Inmediato)</span>
+                  <div class="w-12 h-12 rounded-2xl bg-colmena-yellow/20 flex items-center justify-center text-colmena-yellowHover text-2xl my-3">
+                    <i class="fa-solid fa-bolt"></i>
+                  </div>
+                  <h4 class="font-title font-bold text-base text-colmena-dark">Nivel Operacional (Milisegundos)</h4>
+                  <p class="text-xs text-colmena-gray mt-2 leading-relaxed">
+                    Movimientos sensoriomotores reflejos: presión del pedal de freno, correcciones milimétricas de volante para mantenerse en el carril.
+                  </p>
+                </div>
+                <span class="text-xs font-bold text-colmena-aqua flex items-center justify-between">
+                  <span>La Falacia del Reflejo</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </span>
+              </div>
+              <div class="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-slate-900 to-colmena-dark text-white rounded-3xl p-6 flex flex-col justify-between">
+                <div>
+                  <span class="bg-colmena-yellow text-colmena-dark text-[10px] font-bold px-2 py-0.5 rounded-full">Consecuencia Inevitable</span>
+                  <h4 class="font-title font-bold text-base text-white mt-2">"No alcancé a frenar"</h4>
+                  <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                    Decir que el choque fue por "falta de reflejos" es un error grave. Ningún reflejo humano puede evitar un choque si la decisión táctica y estratégica fue errónea.
+                  </p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-white/10 text-[11px] text-colmena-yellow">
+                  <strong>Enfoque Sistémico:</strong> Trabajar en la causa raíz, no en los reflejos.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Taller Práctico: Rastreador de Decisión en Cascada -->
+      <div class="bg-white rounded-3xl border-2 border-colmena-aqua p-6 sm:p-8 shadow-md">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 gap-2">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider text-colmena-aqua">Taller Práctico #4</span>
+            <h3 class="text-xl sm:text-2xl font-title font-black text-colmena-dark">Rastreador de Causa Raíz en Cascada (Bötticher y Van der Molen)</h3>
+          </div>
+          <span class="text-xs font-semibold text-colmena-gray">Selecciona el fallo para auditar la cadena</span>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-3">
+            <label class="block text-xs font-bold text-colmena-dark uppercase">Selecciona el evento visible del siniestro:</label>
+            <button onclick="selectBotticherCase(1)" id="btnBot-1" class="bot-btn w-full text-left p-3.5 rounded-2xl border-2 border-colmena-aqua bg-colmena-aquaLight text-xs font-bold text-colmena-dark transition">
+              Caso A: Choque por alcance en descenso ("El camión no frenó a tiempo")
+            </button>
+            <button onclick="selectBotticherCase(2)" id="btnBot-2" class="bot-btn w-full text-left p-3.5 rounded-2xl border border-gray-200 hover:border-colmena-aqua text-xs font-bold text-colmena-dark transition">
+              Caso B: Volcamiento lateral en curva peligrosa con pavimento mojado
+            </button>
+            <button onclick="selectBotticherCase(3)" id="btnBot-3" class="bot-btn w-full text-left p-3.5 rounded-2xl border border-gray-200 hover:border-colmena-aqua text-xs font-bold text-colmena-dark transition">
+              Caso C: Atropello a ciclista en intersección urbana
+            </button>
+          </div>
+
+          <!-- Panel de Desglose en Cascada -->
+          <div class="bg-slate-50 border-2 border-colmena-aqua rounded-3xl p-5 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold text-colmena-aqua uppercase">Auditoría Jerárquica del Fallo</span>
+              <i class="fa-solid fa-network-wired text-colmena-yellow"></i>
+            </div>
+
+            <!-- Nivel Estratégico -->
+            <div class="p-3 bg-white rounded-xl border border-amber-200 text-xs">
+              <strong class="text-amber-800 uppercase block text-[11px] mb-0.5">1. Nivel Estratégico (Causa Raíz Organizacional):</strong>
+              <p id="botEstr" class="text-colmena-dark font-medium">Asignación de viaje sin verificar horas de sueño; salida con 45 minutos de retraso por trámites de bodega.</p>
+            </div>
+
+            <!-- Nivel Táctico -->
+            <div class="p-3 bg-white rounded-xl border border-teal-200 text-xs">
+              <strong class="text-colmena-aquaDark uppercase block text-[11px] mb-0.5">2. Nivel Táctico (Decisión de Maniobra):</strong>
+              <p id="botTact" class="text-colmena-dark font-medium">Conducir a 75 km/h en zona de 40 km/h y pegarse a menos de 5 metros del bus de enfrente para no perder impulso.</p>
+            </div>
+
+            <!-- Nivel Operacional -->
+            <div class="p-3 bg-white rounded-xl border border-red-200 text-xs">
+              <strong class="text-red-700 uppercase block text-[11px] mb-0.5">3. Nivel Operacional (Fallo Inmediato):</strong>
+              <p id="botOper" class="text-colmena-dark font-medium">Pisa el freno a fondo tarde: el tiempo de reacción (0.9s) consume más distancia que la disponible físicamente.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==============================================
+         TALLER 5: JENS MICHON Y MATRIZ GDE (GADGET)
+         ============================================== -->
+    <div id="content-michon" class="tab-content hidden space-y-8 animate-fadeIn">
+      <div class="bg-gradient-to-r from-colmena-yellowLight via-white to-colmena-aquaLight p-6 sm:p-8 rounded-3xl border-2 border-colmena-yellow shadow-sm">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+          <div>
+            <span class="px-3 py-1 bg-colmena-yellow text-colmena-dark font-bold text-xs uppercase rounded-full tracking-wider">Modelo Complementario Fundamental</span>
+            <h2 class="text-2xl sm:text-3xl font-title font-black text-colmena-dark mt-2">
+              Jerarquía de Jens Michon (1985) y Matriz GDE (Goals for Driver Education)
+            </h2>
+            <p class="text-xs sm:text-sm text-colmena-gray mt-2 max-w-3xl leading-relaxed">
+              El modelo jerárquico de <strong>Jens Michon</strong> estructuró las escalas temporales de la conducción (Estratégica en horas, Táctica en segundos y Operacional en milisegundos). Posteriormente, el proyecto europeo GADGET creó la <strong>Matriz GDE</strong>, demostrando que <em>la personalidad, los valores y las metas de vida</em> del conductor condicionan su seguridad vial más que sus destrezas al volante.
+            </p>
+          </div>
+          <button onclick="openModal('modalMichonDetail')" class="px-4 py-2.5 rounded-xl bg-colmena-aqua text-white font-title font-bold text-xs hover:bg-colmena-aquaDark transition shadow-sm whitespace-nowrap flex items-center gap-2">
+            <i class="fa-solid fa-layer-group"></i> Los 4 Niveles GDE
+          </button>
+        </div>
+      </div>
+
+      <!-- Pirámide Interactiva GDE -->
+      <div class="bg-white rounded-3xl border-2 border-colmena-yellow p-6 sm:p-8 shadow-md">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 gap-2">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider text-colmena-yellowHover">Taller Práctico #5</span>
+            <h3 class="text-xl sm:text-2xl font-title font-black text-colmena-dark">Explorador Interactivo de la Pirámide GDE (Gadget)</h3>
+          </div>
+          <span class="text-xs font-semibold text-colmena-gray">Haz clic en cada nivel para descubrir su impacto</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6 items-center">
+          <!-- Pirámide Gráfica de 4 Niveles -->
+          <div class="lg:col-span-6 space-y-3">
+            <!-- Nivel 4 -->
+            <button onclick="selectGDENivel(4)" id="btnGDE-4" class="gde-btn w-full p-4 rounded-2xl bg-gradient-to-r from-red-500 to-amber-500 text-white text-left font-title font-bold text-xs sm:text-sm shadow hover:scale-[1.02] transition flex justify-between items-center">
+              <span>Nivel 4: Metas de Vida, Personalidad y Valores</span>
+              <i class="fa-solid fa-heart text-white/80"></i>
+            </button>
+            <!-- Nivel 3 -->
+            <button onclick="selectGDENivel(3)" id="btnGDE-3" class="gde-btn w-full p-4 rounded-2xl bg-gradient-to-r from-colmena-yellow to-amber-400 text-colmena-dark text-left font-title font-bold text-xs sm:text-sm shadow hover:scale-[1.02] transition flex justify-between items-center opacity-85">
+              <span>Nivel 3: Objetivos y Contexto del Viaje</span>
+              <i class="fa-solid fa-route text-colmena-dark/80"></i>
+            </button>
+            <!-- Nivel 2 -->
+            <button onclick="selectGDENivel(2)" id="btnGDE-2" class="gde-btn w-full p-4 rounded-2xl bg-gradient-to-r from-colmena-aqua to-teal-600 text-white text-left font-title font-bold text-xs sm:text-sm shadow hover:scale-[1.02] transition flex justify-between items-center opacity-85">
+              <span>Nivel 2: Dominio de Situaciones de Tráfico</span>
+              <i class="fa-solid fa-traffic-light text-white/80"></i>
+            </button>
+            <!-- Nivel 1 -->
+            <button onclick="selectGDENivel(1)" id="btnGDE-1" class="gde-btn w-full p-4 rounded-2xl bg-gradient-to-r from-slate-700 to-colmena-dark text-white text-left font-title font-bold text-xs sm:text-sm shadow hover:scale-[1.02] transition flex justify-between items-center opacity-85">
+              <span>Nivel 1: Control Básico del Vehículo</span>
+              <i class="fa-solid fa-car text-white/80"></i>
+            </button>
+          </div>
+
+          <!-- Ficha de Detalle del Nivel GDE -->
+          <div class="lg:col-span-6 bg-slate-50 border-2 border-colmena-yellow rounded-3xl p-6">
+            <span id="gdeBadge" class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-red-100 text-red-700 inline-block mb-2">Cúspide Conductual</span>
+            <h4 id="gdeTitulo" class="font-title font-black text-lg sm:text-xl text-colmena-dark">
+              Nivel 4: Metas de Vida y Personalidad
+            </h4>
+            <p id="gdeDescrip" class="text-xs text-colmena-gray mt-2 leading-relaxed">
+              Incluye autocontrol, tolerancia a la frustración, tendencia a buscar sensaciones de peligro, presión de amigos y respeto a las normas sociales. Es el nivel que más predice si una persona sufrirá un siniestro a lo largo de su vida.
+            </p>
+            <div class="mt-4 pt-3 border-t border-gray-200">
+              <strong class="text-xs font-bold text-colmena-dark block mb-1">Intervención en el PESV (Colmena Seguros):</strong>
+              <p id="gdePESV" class="text-xs text-colmena-aqua font-semibold bg-white p-3 rounded-xl border border-gray-200">
+                Pruebas psicotécnicas rigurosas de personalidad vial, programas de inteligencia emocional y prevención de la agresividad al volante.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RETO EVALUATIVO Y REPORTE DE CERTIFICACIÓN -->
+    <section id="diagnostico" class="py-12">
+      <div class="bg-gradient-to-br from-colmena-aquaLight via-white to-colmena-yellowLight border-2 border-colmena-aqua rounded-3xl p-6 sm:p-10 shadow-lg">
+        <div class="text-center max-w-2xl mx-auto mb-8">
+          <span class="px-3 py-1 rounded-full bg-colmena-yellow text-colmena-dark font-bold text-xs uppercase tracking-wider">Validación de Conocimientos</span>
+          <h2 class="text-2xl sm:text-3xl font-title font-black text-colmena-dark mt-2">
+            Reto de Autodiagnóstico en Psicología del Riesgo Vial
+          </h2>
+          <p class="text-xs sm:text-sm text-colmena-gray mt-1">
+            Responde las preguntas sobre las 5 metodologías conductuales y genera tu constancia de taller.
+          </p>
+        </div>
+
+        <form id="quizPsicoForm" onsubmit="evaluarQuizPsicologico(event)" class="space-y-5 max-w-3xl mx-auto">
+          <!-- P1: Wilde -->
+          <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+            <p class="font-title font-bold text-xs sm:text-sm text-colmena-dark mb-2.5">
+              1. Según la Teoría de Homeostasis del Riesgo de Gerald Wilde, ¿qué sucede si dotamos a una flota con tecnología de punta (radares ADAS, frenado autónomo) sin modificar la cultura ni los incentivos de la empresa?
+            </p>
+            <div class="space-y-2 text-xs">
+              <label class="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-gray-100">
+                <input type="radio" name="pq1" value="A" required class="accent-colmena-aqua">
+                <span>A) Los accidentes bajan automáticamente al 0% porque el vehículo frena solo.</span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-gray-100">
+                <input type="radio" name="pq1" value="B" class="accent-colmena-aqua">
+                <span>B) Los conductores compensan la mayor seguridad conduciendo más rápido o distraídos para mantener su nivel de riesgo meta.</span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-gray-100">
+                <input type="radio" name="pq1" value="C" class="accent-colmena-aqua">
+                <span>C) El conductor se asusta y reduce voluntariamente su velocidad a 30 km/h.</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- P2: Näätänen y Summala -->
+          <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+            <p class="font-title font-bold text-xs sm:text-sm text-colmena-dark mb-2.5">
+              2. ¿Por qué en el Modelo de Campo de Cero Riesgo de Näätänen y Summala se afirma que los conductores experimentados son propensos a seguir de cerca a otros vehículos?
+            </p>
+            <div class="space-y-2 text-xs">
+              <label class="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-gray-100">
+                <input type="radio" name="pq2" value="A" required class="accent-colmena-aqua">
+                <span>A) Porque la habituación repetida sin choque extingue la respuesta de miedo y reduce su burbuja de seguridad subjetiva.</span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-gray-100">
+                <input type="radio" name="pq2" value="B" class="accent-colmena-aqua">
+                <span>B) Porque desean conscientemente estrellarse para cobrar el seguro.</span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-gray-100">
+                <input type="radio" name="pq2" value="C" class="accent-colmena-aqua">
+                <span>C) Porque los vehículos modernos tienen un imán de proximidad.</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- P3: Fuller TCI -->
+          <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+            <p class="font-title font-bold text-xs sm:text-sm text-colmena-dark mb-2.5">
+              3. En el Modelo TCI de Ray Fuller, si un conductor sufre fatiga extrema por 9 horas continuas al volante, ¿cuál es la única variable que puede ajustar en ruta para devolver la tarea a su zona de control?
+            </p>
+            <div class="space-y-2 text-xs">
+              <label class="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-gray-100">
+                <input type="radio" name="pq3" value="A" required class="accent-colmena-aqua">
+                <span>A) Subir el volumen de la radio.</span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-gray-100">
+                <input type="radio" name="pq3" value="B" class="accent-colmena-aqua">
+                <span>B) Reducir la velocidad (disminuye drásticamente la demanda de información y tiempo requerida).</span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-gray-100">
+                <input type="radio" name="pq3" value="C" class="accent-colmena-aqua">
+                <span>C) Acelerar para llegar más rápido a dormir.</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- P4: Bötticher y Michon -->
+          <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+            <p class="font-title font-bold text-xs sm:text-sm text-colmena-dark mb-2.5">
+              4. De acuerdo con Bötticher, Van der Molen y Jens Michon, ¿dónde se originó un siniestro en el que el chofer "no alcanzó a frenar en la curva"?
+            </p>
+            <div class="space-y-2 text-xs">
+              <label class="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-gray-100">
+                <input type="radio" name="pq4" value="A" required class="accent-colmena-aqua">
+                <span>A) En el nivel operacional únicamente, por tener reflejos lentos.</span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-gray-100">
+                <input type="radio" name="pq4" value="B" class="accent-colmena-aqua">
+                <span>B) En los niveles estratégico (salir con retraso/fatiga) y táctico (velocidad inapropiada), que restringieron al nivel operacional.</span>
+              </label>
+              <label class="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer border border-gray-100">
+                <input type="radio" name="pq4" value="C" class="accent-colmena-aqua">
+                <span>C) Fue un acto fortuito del destino sin explicación técnica.</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3 items-center justify-between pt-3">
+            <button type="submit" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-colmena-aqua text-white font-title font-bold text-xs sm:text-sm shadow hover:bg-colmena-aquaDark transition">
+              <i class="fa-solid fa-graduation-cap mr-2"></i> Evaluar Mis Respuestas
+            </button>
+            <button type="button" onclick="window.print()" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-colmena-yellow text-colmena-dark font-title font-bold text-xs sm:text-sm hover:bg-colmena-yellowHover transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-print"></i> Imprimir Constancia de Taller
+            </button>
+          </div>
+        </form>
+
+        <div id="quizPsicoResult" class="hidden mt-6 p-6 rounded-3xl text-center max-w-2xl mx-auto border-2 animate-fadeIn"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-colmena-dark text-white py-10 border-t-4 border-colmena-yellow mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+        <div>
+          <div class="flex items-center justify-center md:justify-start gap-2">
+            <span class="font-title font-black text-2xl text-white">COLMENA</span>
+            <span class="text-xs font-bold bg-colmena-aqua text-white px-2.5 py-0.5 rounded-full uppercase">Seguros</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-2 max-w-md">
+            Promoviendo la gestión del factor humano y la cultura del autocuidado vial en Colombia bajo la Resolución 40595 de 2022 (PESV).
+          </p>
+        </div>
+        <div class="text-xs text-slate-400 space-y-1">
+          <p class="font-bold text-colmena-yellow">Modelos Abordados:</p>
+          <p>Wilde • Näätänen & Summala • Fuller (TCI) • Bötticher & Van der Molen • Michon (GDE)</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==============================================
+       MODALES EMERGENTES DE PROFUNDIZACIÓN
+       ============================================== -->
+
+  <!-- Modal: Marco General Psicología Vial -->
+  <div id="modalMarcoPsicologia" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl border-2 border-colmena-yellow max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+        <h3 class="font-title font-black text-lg text-colmena-dark flex items-center gap-2">
+          <i class="fa-solid fa-brain text-colmena-aqua"></i> ¿Por qué la mente humana comete errores en la vía?
+        </h3>
+        <button onclick="closeModal('modalMarcoPsicologia')" class="text-colmena-gray hover:text-colmena-dark text-xl p-1">&times;</button>
+      </div>
+      <div class="mt-4 space-y-3 text-xs sm:text-sm text-colmena-gray leading-relaxed">
+        <p>
+          En seguridad vial tradicional se creía que los conductores chocaban por "desconocer las normas de tránsito". Sin embargo, las investigaciones psicológicas de las últimas décadas demostraron que casi el 90% de los infractores <strong>conocen perfectamente la ley</strong>, pero deciden violarla debido a:
+        </p>
+        <ul class="list-disc pl-5 space-y-1 text-xs">
+          <li><strong>Sesgo de invulnerabilidad:</strong> "A mí nunca me va a pasar, yo domino mi máquina".</li>
+          <li><strong>Compensación homeostática de riesgo:</strong> Si el vehículo es más seguro, aumentan la velocidad.</li>
+          <li><strong>Extinción del miedo biológico:</strong> La rutina hace que seguir pegado al vehículo de adelante no genere ansiedad.</li>
+          <li><strong>Sobrecarga cognitiva (TCI):</strong> El cerebro se satura de estímulos y su tiempo de procesamiento colapsa.</li>
+        </ul>
+      </div>
+      <div class="mt-6 flex justify-end">
+        <button onclick="closeModal('modalMarcoPsicologia')" class="px-5 py-2.5 rounded-xl bg-colmena-aqua text-white font-title font-bold text-xs">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Wilde Detail -->
+  <div id="modalWildeDetail" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl border-2 border-colmena-yellow max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+        <h3 class="font-title font-black text-lg text-colmena-dark flex items-center gap-2">
+          <i class="fa-solid fa-temperature-half text-colmena-yellowHover"></i> Los 4 Factores Motivacionales de Wilde
+        </h3>
+        <button onclick="closeModal('modalWildeDetail')" class="text-colmena-gray hover:text-colmena-dark text-xl p-1">&times;</button>
+      </div>
+      <div class="mt-4 space-y-3 text-xs sm:text-sm text-colmena-gray">
+        <p>Wilde demostró que el <strong>nivel de riesgo meta</strong> no se cambia con sermones, sino alterando las fuerzas motivacionales:</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div class="p-3 bg-red-50 rounded-xl border border-red-200">
+            <strong class="text-red-700 block">1. Beneficios de correr:</strong>
+            Ahorrar tiempo, cumplir metas de despacho, sentirse hábil, adrenalina.
+          </div>
+          <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">
+            <strong class="text-amber-800 block">2. Costos de correr:</strong>
+            Multas de fotodetección, suspensión de licencia, daño al camión, despido.
+          </div>
+          <div class="p-3 bg-teal-50 rounded-xl border border-teal-200">
+            <strong class="text-colmena-aquaDark block">3. Beneficios de la cautela:</strong>
+            Bonos económicos por cero infracciones, tranquilidad, menor fatiga.
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-gray-200">
+            <strong class="text-colmena-dark block">4. Costos de la cautela:</strong>
+            Aburrimiento, quejas de clientes por retrasos si los tiempos son irreales.
+          </div>
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end">
+        <button onclick="closeModal('modalWildeDetail')" class="px-5 py-2.5 rounded-xl bg-colmena-yellow text-colmena-dark font-title font-bold text-xs">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Naatanen Detail -->
+  <div id="modalNaatanenDetail" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl border-2 border-colmena-aqua max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+        <h3 class="font-title font-black text-lg text-colmena-dark flex items-center gap-2">
+          <i class="fa-solid fa-shield-cat text-colmena-aqua"></i> Motivos Extra-Viales en Näätänen y Summala
+        </h3>
+        <button onclick="closeModal('modalNaatanenDetail')" class="text-colmena-gray hover:text-colmena-dark text-xl p-1">&times;</button>
+      </div>
+      <div class="mt-4 space-y-3 text-xs sm:text-sm text-colmena-gray">
+        <p>
+          Näätänen y Summala demostraron que el conductor rara vez tiene como objetivo consciente "manejar con seguridad":
+        </p>
+        <p class="text-xs">
+          El acto de conducir es instrumental para satisfacer <strong>motivos extra-viales</strong>:
+        </p>
+        <ul class="list-disc pl-5 space-y-1 text-xs">
+          <li><strong>Prisa por llegar:</strong> Querer terminar el turno para irse a casa o a almorzar.</li>
+          <li><strong>Estatus y competencia:</strong> No dejar que otro vehículo lo adelante en una glorieta.</li>
+          <li><strong>Comunicación social:</strong> Atender una llamada urgente o responder un audio de WhatsApp.</li>
+        </ul>
+        <p class="text-xs font-bold text-colmena-dark">
+          Mientras nada amenace el "campo de cero riesgo", el chofer priorizará sus motivos extra-viales sobre la atención en la vía.
+        </p>
+      </div>
+      <div class="mt-6 flex justify-end">
+        <button onclick="closeModal('modalNaatanenDetail')" class="px-5 py-2.5 rounded-xl bg-colmena-aqua text-white font-title font-bold text-xs">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Fuller Detail -->
+  <div id="modalFullerDetail" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl border-2 border-colmena-yellow max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+        <h3 class="font-title font-black text-lg text-colmena-dark flex items-center gap-2">
+          <i class="fa-solid fa-scale-unbalanced text-colmena-yellowHover"></i> El Modelo TCI (Task-Capability Interface)
+        </h3>
+        <button onclick="closeModal('modalFullerDetail')" class="text-colmena-gray hover:text-colmena-dark text-xl p-1">&times;</button>
+      </div>
+      <div class="mt-4 space-y-3 text-xs sm:text-sm text-colmena-gray">
+        <p>Ray Fuller resume la seguridad vial en una ecuación de tres zonas:</p>
+        <ol class="list-decimal pl-5 space-y-2 text-xs">
+          <li><strong>Zona de Confort (Demanda &lt; Capacidad):</strong> El chofer conduce de forma relajada y tiene margen sobrado para frenar o esquivar.</li>
+          <li><strong>Zona de Esfuerzo (Demanda ≈ Capacidad):</strong> El chofer nota que el tráfico o el clima exigen concentración absoluta; experimenta tensión muscular y estrés.</li>
+          <li><strong>Zona de Pérdida de Control (Demanda &gt; Capacidad):</strong> La cantidad de información supera la capacidad cerebral. La colisión es físicamente inevitable.</li>
+        </ol>
+      </div>
+      <div class="mt-6 flex justify-end">
+        <button onclick="closeModal('modalFullerDetail')" class="px-5 py-2.5 rounded-xl bg-colmena-yellow text-colmena-dark font-title font-bold text-xs">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Botticher Detail -->
+  <div id="modalBotticherDetail" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl border-2 border-colmena-aqua max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+        <h3 class="font-title font-black text-lg text-colmena-dark flex items-center gap-2">
+          <i class="fa-solid fa-sitemap text-colmena-aqua"></i> La Estructura en Cascada de Bötticher
+        </h3>
+        <button onclick="closeModal('modalBotticherDetail')" class="text-colmena-gray hover:text-colmena-dark text-xl p-1">&times;</button>
+      </div>
+      <div class="mt-4 space-y-3 text-xs sm:text-sm text-colmena-gray">
+        <p>Bötticher y Van der Molen enseñan que culpar al conductor por "no reaccionar a tiempo" es un grave error de análisis:</p>
+        <p class="text-xs">
+          El 95% de los fallos operacionales (bloqueo de frenos, maniobra en falso) son consecuencia inevitable de una pésima decisión táctica (ir a 90 km/h pegado al de adelante) condicionada por una pésima decisión estratégica (asignar una entrega a las 8:00 AM saliendo a las 7:30 AM en plena hora pico).
+        </p>
+      </div>
+      <div class="mt-6 flex justify-end">
+        <button onclick="closeModal('modalBotticherDetail')" class="px-5 py-2.5 rounded-xl bg-colmena-aqua text-white font-title font-bold text-xs">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Michon Detail -->
+  <div id="modalMichonDetail" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl border-2 border-colmena-yellow max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+        <h3 class="font-title font-black text-lg text-colmena-dark flex items-center gap-2">
+          <i class="fa-solid fa-layer-group text-colmena-yellowHover"></i> La Matriz GDE de la Comunidad Europea
+        </h3>
+        <button onclick="closeModal('modalMichonDetail')" class="text-colmena-gray hover:text-colmena-dark text-xl p-1">&times;</button>
+      </div>
+      <div class="mt-4 space-y-3 text-xs sm:text-sm text-colmena-gray">
+        <p>El consorcio GADGET formuló la Matriz GDE partiendo de Jens Michon:</p>
+        <ul class="list-disc pl-5 space-y-1 text-xs">
+          <li><strong>Nivel 4 (Metas de vida):</strong> ¿Por qué conduzco como conduzco? (Valores, autocontrol, presión social).</li>
+          <li><strong>Nivel 3 (Contexto de viaje):</strong> ¿Por qué ruta voy, en qué estado anímico y con quién?</li>
+          <li><strong>Nivel 2 (Tráfico):</strong> ¿Cómo interactúo con motos, ciclistas y peatones en glorietas?</li>
+          <li><strong>Nivel 1 (Vehículo):</strong> ¿Cómo opero el pedal, la palanca y el volante?</li>
+        </ul>
+      </div>
+      <div class="mt-6 flex justify-end">
+        <button onclick="closeModal('modalMichonDetail')" class="px-5 py-2.5 rounded-xl bg-colmena-yellow text-colmena-dark font-title font-bold text-xs">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT DE CONTROL Y SIMULADORES -->
+  <script>
+    // 1. Efecto Flip Card 3D
+    function toggleFlip(cardElement) {
+      cardElement.classList.toggle('flipped');
+    }
+
+    // 2. Control de Pestañas
+    function switchTab(tabId) {
+      const contents = document.querySelectorAll('.tab-content');
+      contents.forEach(content => {
+        content.classList.add('hidden');
+        content.classList.remove('block');
+      });
+
+      const buttons = document.querySelectorAll('.tab-btn');
+      buttons.forEach(btn => {
+        btn.classList.remove('bg-colmena-aqua', 'text-white', 'shadow-md');
+        btn.classList.add('bg-gray-100', 'text-colmena-dark');
+      });
+
+      const activeContent = document.getElementById('content-' + tabId);
+      if (activeContent) {
+        activeContent.classList.remove('hidden');
+        activeContent.classList.add('block');
+      }
+
+      const activeBtn = document.getElementById('tabBtn-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-gray-100', 'text-colmena-dark');
+        activeBtn.classList.add('bg-colmena-aqua', 'text-white', 'shadow-md');
+      }
+    }
+
+    // 3. Simulador de Wilde (Termostato Homeostático)
+    function updateWildeSimulator() {
+      const seg = parseInt(document.getElementById('inputSeguridad').value);
+      const prisa = parseInt(document.getElementById('inputPrisa').value);
+      const control = parseInt(document.getElementById('inputControl').value);
+
+      document.getElementById('labelValSeguridad').innerText = `${seg}%`;
+      document.getElementById('labelValPrisa').innerText = `${prisa}%`;
+      document.getElementById('labelValControl').innerText = `${control}%`;
+
+      // Riesgo percibido disminuye con la seguridad vehicular
+      const riesgoPercibido = Math.max(10, Math.round(100 - (seg * 0.75)));
+      // Riesgo meta aumenta con la prisa y disminuye con el control telemático
+      const riesgoMeta = Math.max(15, Math.round(30 + (prisa * 0.6) - (control * 0.4)));
+
+      document.getElementById('wildeValRiesgoPercibido').innerText = `${riesgoPercibido} / 100`;
+      document.getElementById('wildeValRiesgoMeta').innerText = `${riesgoMeta} / 100`;
+
+      // Cálculo de velocidad compensada
+      // Si riesgo percibido < riesgo meta, acelera para compensar
+      const diferencia = riesgoMeta - riesgoPercibido;
+      const baseVelocidad = 60;
+      let velCompensada = Math.round(baseVelocidad + (diferencia * 0.75));
+      velCompensada = Math.max(40, Math.min(130, velCompensada));
+
+      document.getElementById('wildeVelocidadKm').innerText = `${velCompensada} km/h`;
+      const barra = document.getElementById('wildeBarraVelocidad');
+      const porcentajeBarra = Math.min(100, Math.round((velCompensada / 130) * 100));
+      barra.style.width = `${porcentajeBarra}%`;
+
+      const estadoTexto = document.getElementById('wildeEstadoConducta');
+      const diagTexto = document.getElementById('wildeDiagnostico');
+
+      if (velCompensada > 95) {
+        estadoTexto.innerText = 'Compensación Temeraria (Exceso de Velocidad)';
+        estadoTexto.className = 'text-xl font-title font-black text-red-600 mt-1';
+        barra.className = 'h-full bg-red-600 transition-width';
+        diagTexto.innerText = 'Peligro inminente: La alta tecnología vehicular y la prisa hicieron que el chofer compense acelerando a fondo. Urge auditoría por GPS.';
+      } else if (velCompensada >= 75) {
+        estadoTexto.innerText = 'Compensación Moderada';
+        estadoTexto.className = 'text-xl font-title font-black text-amber-600 mt-1';
+        barra.className = 'h-full bg-amber-500 transition-width';
+        diagTexto.innerText = 'El chofer mantiene velocidad ágil pero controlada. El monitoreo corporativo frena un exceso mayor.';
+      } else {
+        estadoTexto.innerText = 'Homeostasis Prudente y Segura';
+        estadoTexto.className = 'text-xl font-title font-black text-colmena-aqua mt-1';
+        barra.className = 'h-full bg-colmena-aqua transition-width';
+        diagTexto.innerText = 'La estricta supervisión de la empresa elevó el costo de cometer infracciones, manteniendo el termostato en nivel seguro.';
+      }
+    }
+
+    // 4. Simulador de Näätänen & Summala
+    function updateNaatanenSim() {
+      const dist = parseInt(document.getElementById('inputDistancia').value);
+      const vel = parseInt(document.getElementById('inputVelocidadNS').value);
+
+      document.getElementById('labelDistancia').innerText = `${dist} metros (~${(dist / (vel / 3.6)).toFixed(1)} seg)`;
+      document.getElementById('labelVelocidadNS').innerText = `${vel} km/h`;
+
+      // Tiempo disponible para reaccionar antes de chocar
+      const velocidadMs = vel / 3.6;
+      const tiempoDisponible = dist / velocidadMs;
+      // Distancia de frenado físico estimada (reacción 1s + fricción f=0.7)
+      const distFrenado = (velocidadMs * 1.0) + ((velocidadMs * velocidadMs) / (2 * 9.8 * 0.7));
+
+      document.getElementById('nsDistanciaFrenado').innerText = `${distFrenado.toFixed(1)} m`;
+      document.getElementById('nsTiempoDisponible').innerText = `${tiempoDisponible.toFixed(2)} seg`;
+
+      const box = document.getElementById('boxNaatanen');
+      const texto = document.getElementById('nsEstadoTexto');
+      const diag = document.getElementById('nsDiagnostico');
+
+      if (dist < distFrenado) {
+        box.className = 'bg-gradient-to-br from-red-50 to-amber-50 border-2 border-red-300 rounded-3xl p-5 flex flex-col justify-between';
+        texto.innerText = 'Burbuja Rota: ¡Colisión Segura!';
+        texto.className = 'text-xl font-title font-black text-red-600 mt-1';
+        diag.innerText = 'El chofer cree que viaja en "riesgo cero" por complacencia, pero la distancia física es inferior a la distancia de frenado de emergencia.';
+      } else {
+        box.className = 'bg-gradient-to-br from-teal-50 to-emerald-50 border-2 border-colmena-aqua rounded-3xl p-5 flex flex-col justify-between';
+        texto.innerText = 'Conduciendo en Cero Miedo Consciente';
+        texto.className = 'text-xl font-title font-black text-colmena-aqua mt-1';
+        diag.innerText = 'La distancia de seguridad cubre el tiempo de percepción y frenada mecánica en caso de que el vehículo delantero se detenga en seco.';
+      }
+    }
+
+    function triggerFrenazoInesperado() {
+      const dist = parseInt(document.getElementById('inputDistancia').value);
+      const vel = parseInt(document.getElementById('inputVelocidadNS').value);
+      const velocidadMs = vel / 3.6;
+      const distFrenado = (velocidadMs * 1.0) + ((velocidadMs * velocidadMs) / (2 * 9.8 * 0.7));
+
+      if (dist < distFrenado) {
+        alertCustom('¡SINIESTRO POR ALCANCE!', `A ${vel} km/h necesitabas ${distFrenado.toFixed(1)} metros para detenerte, pero solo guardabas ${dist} metros. La habituación te hizo creer erróneamente que nunca frenarían en seco.`);
+      } else {
+        alertCustom('¡MANIOBRA EXITOSA!', `Gracias a guardar ${dist} metros de distancia preventiva (por encima de los ${distFrenado.toFixed(1)} metros requeridos), te detuviste a salvo sin chocar.`);
+      }
+    }
+
+    // 5. Simulador Fuller TCI
+    function calculateFullerTCI() {
+      const vel = parseInt(document.getElementById('fullerVel').value);
+      const clima = parseInt(document.getElementById('fullerClima').value);
+      const horas = parseInt(document.getElementById('fullerHoras').value);
+      const distr = parseInt(document.getElementById('fullerDistr').value);
+
+      document.getElementById('fullerLabelVel').innerText = `${vel} km/h`;
+      document.getElementById('fullerLabelHoras').innerText = `${horas} horas continuas`;
+
+      // Cálculo de Demanda (0 - 100)
+      const demanda = Math.min(100, Math.round((vel * 0.5) + clima));
+      // Cálculo de Capacidad (0 - 100)
+      const perdidaFatiga = horas * 4.5;
+      const capacidad = Math.max(10, Math.round(100 - perdidaFatiga - distr));
+
+      document.getElementById('valDemandaNum').innerText = `${demanda} / 100`;
+      document.getElementById('valCapacidadNum').innerText = `${capacidad} / 100`;
+
+      document.getElementById('barDemanda').style.width = `${demanda}%`;
+      document.getElementById('barCapacidad').style.width = `${capacidad}%`;
+
+      const box = document.getElementById('fullerBoxResultado');
+      const titulo = document.getElementById('fullerZonaTitulo');
+      const diag = document.getElementById('fullerDiagnostico');
+
+      if (demanda > capacidad) {
+        box.className = 'bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-400 rounded-3xl p-5 flex flex-col justify-between';
+        titulo.innerText = 'Zona de Pérdida de Control (Demanda > Capacidad)';
+        titulo.className = 'text-xl font-title font-black text-red-600 mt-1';
+        diag.innerText = 'La exigencia del trayecto sobrepasó los recursos biológicos del chofer. Sobrecarga cognitiva: siniestro inminente a menos que baje la velocidad de inmediato.';
+      } else if (demanda > (capacidad - 20)) {
+        box.className = 'bg-gradient-to-br from-yellow-50 to-amber-50 border-2 border-colmena-yellow rounded-3xl p-5 flex flex-col justify-between';
+        titulo.innerText = 'Zona de Esfuerzo / Tensión Psicológica';
+        titulo.className = 'text-xl font-title font-black text-amber-600 mt-1';
+        diag.innerText = 'El conductor está forzando sus límites. Siente fatiga ocular y estrés. Se requiere una pausa activa en los próximos 15 minutos.';
+      } else {
+        box.className = 'bg-gradient-to-br from-teal-50 to-white border-2 border-colmena-aqua rounded-3xl p-5 flex flex-col justify-between';
+        titulo.innerText = 'Zona de Confort y Flujo Seguro';
+        titulo.className = 'text-xl font-title font-black text-colmena-aqua mt-1';
+        diag.innerText = 'Capacidad ampliamente superior a la demanda. Conducción fluida y margen temporal suficiente ante imprevistos.';
+      }
+    }
+
+    // 6. Casos Bötticher y Van der Molen
+    const botticherData = {
+      1: {
+        estr: 'Asignación de viaje sin verificar horas de sueño; salida con 45 minutos de retraso por trámites de bodega.',
+        tact: 'Conducir a 75 km/h en zona de 40 km/h y pegarse a menos de 5 metros del bus de enfrente para no perder impulso.',
+        oper: 'Pisa el freno a fondo tarde: el tiempo de reacción (0.9s) consume más distancia que la disponible físicamente.'
+      },
+      2: {
+        estr: 'No consultar el estado del tiempo meteorológico ni el estado de los neumáticos en la inspección preoperacional.',
+        tact: 'Tomar la curva cerrada a 80 km/h con pavimento mojado, ignorando la señal preventiva de curva peligrosa.',
+        oper: 'Giro brusco de volante e intento de corrección cuando las ruedas ya perdieron adherencia lateral (hidroplaneo).'
+      },
+      3: {
+        estr: 'Diseño de ruta comercial que obliga al conductor a ingresar a zonas peatonales de alta congestión en horas pico.',
+        tact: 'Avanzar a 50 km/h en calle angosta mirando el espejo izquierdo sin escanear el punto ciego derecho.',
+        oper: 'Bloqueo del pedal de freno milisegundos después de que el ciclista ingresa a la trayectoria del parachoques.'
+      }
+    };
+
+    function selectBotticherCase(id) {
+      const data = botticherData[id];
+      if (!data) return;
+
+      document.getElementById('botEstr').innerText = data.estr;
+      document.getElementById('botTact').innerText = data.tact;
+      document.getElementById('botOper').innerText = data.oper;
+
+      for (let i = 1; i <= 3; i++) {
+        const btn = document.getElementById('btnBot-' + i);
+        if (i === id) {
+          btn.className = 'bot-btn w-full text-left p-3.5 rounded-2xl border-2 border-colmena-aqua bg-colmena-aquaLight text-xs font-bold text-colmena-dark transition';
+        } else {
+          btn.className = 'bot-btn w-full text-left p-3.5 rounded-2xl border border-gray-200 hover:border-colmena-aqua text-xs font-bold text-colmena-dark transition';
+        }
+      }
+    }
+
+    // 7. Explorador GDE Michon
+    const gdeInfo = {
+      4: {
+        badge: 'Cúspide Conductual',
+        badgeClass: 'px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-red-100 text-red-700 inline-block mb-2',
+        titulo: 'Nivel 4: Metas de Vida, Personalidad y Valores',
+        desc: 'Incluye autocontrol, tolerancia a la frustración, tendencia a buscar sensaciones de peligro, presión de amigos y respeto a las normas sociales. Es el nivel que más predice si una persona sufrirá un siniestro a lo largo de su vida.',
+        pesv: 'Pruebas psicotécnicas rigurosas de personalidad vial, programas de inteligencia emocional y prevención de la agresividad al volante.'
+      },
+      3: {
+        badge: 'Contexto de Viaje',
+        badgeClass: 'px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-yellow-100 text-yellow-800 inline-block mb-2',
+        titulo: 'Nivel 3: Objetivos y Contexto del Desplazamiento',
+        desc: 'Analiza el motivo del viaje, la prisa, la fatiga del día, el horario nocturno, la influencia del estado anímico y la compañía de pasajeros en la cabina.',
+        pesv: 'Políticas de tiempos realistas de viaje, limitación de conducción nocturna y programas de gestión del sueño y la fatiga.'
+      },
+      2: {
+        badge: 'Táctica de Maniobra',
+        badgeClass: 'px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-teal-100 text-teal-800 inline-block mb-2',
+        titulo: 'Nivel 2: Dominio de Situaciones de Tráfico',
+        desc: 'Habilidad de anticipación visual, adaptación a la lluvia o calzada lisa, interacción con actores vulnerables (motos/peatones) y elección de distancias de seguridad.',
+        pesv: 'Cursos prácticos de manejo defensivo, simuladores de choque y auditorías en vía con telemetría telemática.'
+      },
+      1: {
+        badge: 'Habilidad Mecánica',
+        badgeClass: 'px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-slate-200 text-slate-800 inline-block mb-2',
+        titulo: 'Nivel 1: Control Básico del Vehículo',
+        desc: 'Acciones sensoriomotoras automáticas: mover el volante, accionar los pedales de embrague y freno, cambiar de marcha y calibrar espejos.',
+        pesv: 'Capacitación en inspección preoperacional diaria y verificación de licencias de conducción acordes a la tipología del vehículo.'
+      }
+    };
+
+    function selectGDENivel(nivel) {
+      const data = gdeInfo[nivel];
+      if (!data) return;
+
+      const badge = document.getElementById('gdeBadge');
+      badge.innerText = data.badge;
+      badge.className = data.badgeClass;
+
+      document.getElementById('gdeTitulo').innerText = data.titulo;
+      document.getElementById('gdeDescrip').innerText = data.desc;
+      document.getElementById('gdePESV').innerText = data.pesv;
+
+      for (let i = 1; i <= 4; i++) {
+        const btn = document.getElementById('btnGDE-' + i);
+        if (i === nivel) {
+          btn.style.opacity = '1';
+          btn.style.transform = 'scale(1.03)';
+        } else {
+          btn.style.opacity = '0.75';
+          btn.style.transform = 'scale(1)';
+        }
+      }
+    }
+
+    // 8. Quiz Psicológico
+    function evaluarQuizPsicologico(e) {
+      e.preventDefault();
+      const form = document.getElementById('quizPsicoForm');
+      const q1 = form.pq1.value;
+      const q2 = form.pq2.value;
+      const q3 = form.pq3.value;
+      const q4 = form.pq4.value;
+
+      let score = 0;
+      if (q1 === 'B') score++;
+      if (q2 === 'A') score++;
+      if (q3 === 'B') score++;
+      if (q4 === 'B') score++;
+
+      const resBox = document.getElementById('quizPsicoResult');
+      resBox.classList.remove('hidden');
+
+      if (score === 4) {
+        resBox.className = 'mt-6 p-6 rounded-3xl bg-teal-50 border-2 border-colmena-aqua text-center max-w-2xl mx-auto';
+        resBox.innerHTML = `
+          <div class="w-12 h-12 rounded-full bg-colmena-aqua text-white flex items-center justify-center mx-auto text-xl font-bold mb-2">
+            <i class="fa-solid fa-trophy"></i>
+          </div>
+          <h3 class="font-title font-black text-xl text-colmena-dark">¡Felicitaciones! Calificación: 100% (4/4)</h3>
+          <p class="text-xs text-colmena-gray mt-1">
+            Demuestras un dominio cabal de los modelos de Wilde, Näätänen & Summala, Fuller, Bötticher y Michon para la gestión del factor humano en movilidad segura.
+          </p>
+          <div class="mt-4 inline-block px-4 py-2 bg-colmena-yellow text-colmena-dark font-title font-bold text-xs rounded-xl shadow">
+            Taller Colmena Seguros Aprobado con Éxito
+          </div>
+        `;
+      } else {
+        resBox.className = 'mt-6 p-6 rounded-3xl bg-amber-50 border-2 border-colmena-yellow text-center max-w-2xl mx-auto';
+        resBox.innerHTML = `
+          <div class="w-12 h-12 rounded-full bg-colmena-yellow text-colmena-dark flex items-center justify-center mx-auto text-xl font-bold mb-2">
+            <i class="fa-solid fa-rotate-right"></i>
+          </div>
+          <h3 class="font-title font-black text-lg text-colmena-dark">Puntaje obtenido: ${score} de 4 correctas</h3>
+          <p class="text-xs text-colmena-gray mt-1">
+            Revisa los conceptos en las tarjetas giratorias de cada taller y vuelve a intentarlo para afianzar tus competencias.
+          </p>
+        `;
+      }
+    }
+
+    // 9. Modales
+    function openModal(modalId) {
+      const m = document.getElementById(modalId);
+      if (m) {
+        m.classList.remove('hidden');
+        m.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeModal(modalId) {
+      const m = document.getElementById(modalId);
+      if (m) {
+        m.classList.add('hidden');
+        m.classList.remove('flex');
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    // Cerrar modal al hacer clic en fondo
+    window.addEventListener('click', function(e) {
+      if (e.target.classList.contains('backdrop-blur-sm')) {
+        e.target.classList.add('hidden');
+        e.target.classList.remove('flex');
+        document.body.style.overflow = 'auto';
+      }
+    });
+
+    // 10. Mensaje personalizado (sin alert)
+    function alertCustom(titulo, mensaje) {
+      let modal = document.getElementById('customAlertModal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'customAlertModal';
+        modal.className = 'fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4';
+        modal.innerHTML = `
+          <div class="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl border-2 border-colmena-yellow text-center">
+            <div id="alertIcon" class="w-12 h-12 rounded-full bg-colmena-yellow text-colmena-dark flex items-center justify-center mx-auto text-xl font-bold mb-3">
+              <i class="fa-solid fa-bell"></i>
+            </div>
+            <h3 id="alertTitle" class="font-title font-black text-lg text-colmena-dark"></h3>
+            <p id="alertBody" class="text-xs text-colmena-gray mt-2 leading-relaxed"></p>
+            <button onclick="document.getElementById('customAlertModal').classList.add('hidden')" class="mt-5 px-6 py-2.5 rounded-xl bg-colmena-aqua text-white font-title font-bold text-xs hover:bg-colmena-aquaDark transition">
+              Aceptar
+            </button>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
+      document.getElementById('alertTitle').innerText = titulo;
+      document.getElementById('alertBody').innerText = mensaje;
+      modal.classList.remove('hidden');
+    }
+
+    // 11. Menú Móvil
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    }
+
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Inicio de Simuladores
+    window.onload = function() {
+      updateWildeSimulator();
+      updateNaatanenSim();
+      calculateFullerTCI();
+      selectGDENivel(4);
+    };
+  </script>
+</body>
+</html>
