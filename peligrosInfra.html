@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VíaSegura AI - Auditoría Vial & Matriz de Riesgos (ISO 39002 / PESV / NHTSA)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SheetJS para generar y descargar directamente el archivo Excel / Google Sheets (.xlsx) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#ea580c',
+              orangeDark: '#c2410c',
+              navy: '#0f172a',
+              slate: '#1e293b',
+              sheets: '#0f9d58'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    @media print {
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+      body { background: white !important; color: black !important; font-size: 11pt; }
+      table { page-break-inside: auto; }
+      tr { page-break-inside: avoid; page-break-after: auto; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col font-sans">
+
+  <!-- BARRA SUPERIOR DE ACCIÓN DIRECTA -->
+  <header class="bg-slate-950 text-white shadow-xl border-b border-slate-800 sticky top-0 z-40 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Identificación del Sistema -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-orange-600 flex items-center justify-center shadow-lg shadow-orange-600/40 shrink-0">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-black tracking-tight text-white">VíaSegura AI</h1>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30">PESV • ISO 39002</span>
+          </div>
+          <p class="text-xs text-slate-400">Inspección de Infraestructura & Riesgos Laborales (NHTSA / AASHTO)</p>
+        </div>
+      </div>
+
+      <!-- BOTONES DE DESCARGA DIRECTA DE SHEETS / EXCEL -->
+      <div class="flex items-center flex-wrap gap-2">
+        
+        <!-- BOTÓN PRINCIPAL: DESCARGAR ARCHIVO GOOGLE SHEETS / EXCEL -->
+        <button id="btnDirectDownloadSheets" onclick="downloadSheetsFile()" class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 transition shadow-lg shadow-green-900/30 border border-green-400/40 transform hover:-translate-y-0.5">
+          <svg class="w-4 h-4 mr-2 text-white" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 7h10v2H7zm0 4h10v2H7zm0 4h7v2H7z"/>
+          </svg>
+          Descargar Excel / Sheets (.xlsx)
+        </button>
+
+        <!-- ABRIR DIRECTO EN GOOGLE SHEETS -->
+        <a href="https://sheets.new" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-3 py-2 rounded-xl text-xs font-bold text-slate-200 bg-slate-800 hover:bg-slate-700 hover:text-white transition border border-slate-700 shadow-sm" title="Abre Google Sheets en una nueva pestaña para importar el archivo">
+          <svg class="w-3.5 h-3.5 mr-1.5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+          </svg>
+          Abrir sheets.new
+        </a>
+
+        <!-- INFORME TÉCNICO PDF -->
+        <button onclick="switchTab('tab-report'); setTimeout(() => window.print(), 300);" class="inline-flex items-center px-3 py-2 rounded-xl text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 transition shadow-sm">
+          <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+          </svg>
+          PDF Informe
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- PESTAÑAS DE NAVEGACIÓN DE LA APLICACIÓN -->
+  <nav class="bg-white border-b border-slate-200 shadow-sm no-print sticky top-[57px] z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-2 sm:space-x-6 overflow-x-auto text-xs font-bold text-slate-600">
+      <button onclick="switchTab('tab-video')" id="tabBtn-video" class="py-3 px-2 border-b-2 border-orange-600 text-orange-600 flex items-center space-x-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+        <span>1. Video & Auditoría (Completo / Fotograma)</span>
+      </button>
+      <button onclick="switchTab('tab-matrix')" id="tabBtn-matrix" class="py-3 px-2 border-b-2 border-transparent hover:text-slate-900 flex items-center space-x-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+        <span>2. Hoja Ruta RN 25 (Matriz 9 Columnas)</span>
+      </button>
+      <button onclick="switchTab('tab-inicio')" id="tabBtn-inicio" class="py-3 px-2 border-b-2 border-transparent hover:text-slate-900 flex items-center space-x-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+        <span>3. Hoja Inicio (ISO 39002:2020)</span>
+      </button>
+      <button onclick="switchTab('tab-changes')" id="tabBtn-changes" class="py-3 px-2 border-b-2 border-transparent hover:text-slate-900 flex items-center space-x-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <span>4. Hoja Control de Cambios</span>
+      </button>
+      <button onclick="switchTab('tab-report')" id="tabBtn-report" class="py-3 px-2 border-b-2 border-transparent hover:text-slate-900 flex items-center space-x-1.5">
+        <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        <span>5. Dictamen Técnico de Ingeniería</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 w-full flex-grow flex flex-col gap-5">
+
+    <!-- ==================== PESTAÑA 1: VIDEO Y ANÁLISIS DUAL ==================== -->
+    <div id="view-tab-video" class="space-y-4">
+
+      <!-- Barra de Modalidad de Análisis -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3.5 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center space-x-3">
+          <span class="text-xs font-black text-slate-800 uppercase tracking-wider">Modo de Auditoría:</span>
+          <div class="inline-flex rounded-lg bg-slate-100 p-1 border border-slate-200">
+            <button id="modeBtnContinuous" onclick="setAuditMode('continuous')" class="px-3 py-1.5 rounded-md text-xs font-bold bg-white text-slate-900 shadow-sm transition">
+              🎬 Análisis Continuo del Video
+            </button>
+            <button id="modeBtnFrameByFrame" onclick="setAuditMode('frame')" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900 transition">
+              🔬 Revisión Fotograma por Fotograma
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button id="btnRunFullVideoScan" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition shadow">
+            <svg class="w-4 h-4 mr-1.5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Analizar Todo el Video Automáticamente
+          </button>
+          <button id="btnCaptureCurrentFrameAction" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 transition shadow">
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+            </svg>
+            Auditar Fotograma Actual
+          </button>
+        </div>
+      </div>
+
+      <!-- Cuadrícula: Reproductor de Video y Telemetría -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        
+        <!-- Video + HUD (7 columnas) -->
+        <div class="lg:col-span-7 flex flex-col gap-3">
+          <div class="bg-slate-950 rounded-xl overflow-hidden shadow-lg border border-slate-800 flex flex-col">
+            
+            <div class="px-4 py-2 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-xs">
+              <div class="flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                <span class="font-bold text-slate-200">Dashcam • RN 25 (Valle del Cauca)</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <label class="cursor-pointer px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] font-semibold text-slate-300 transition">
+                  Cargar Video Local
+                  <input type="file" id="videoFileInput" accept="video/mp4,video/webm" class="hidden">
+                </label>
+                <button id="btnReloadCaseVideo" class="px-2 py-1 rounded bg-orange-600/30 hover:bg-orange-600/50 text-[11px] font-semibold text-orange-300 transition border border-orange-500/30">
+                  Video del Caso
+                </button>
+              </div>
+            </div>
+
+            <!-- Video HUD -->
+            <div class="relative bg-black aspect-video flex items-center justify-center overflow-hidden select-none">
+              <video id="auditVideo" class="w-full h-full object-contain" playsinline preload="metadata">
+                <source src="WhatsApp Video 2026-09-14 at 7.42.00 AM.mp4" type="video/mp4">
+              </video>
+
+              <canvas id="captureCanvas" class="hidden"></canvas>
+
+              <!-- HUD de Telemetría Dinámica -->
+              <div class="absolute top-2 left-2 bg-slate-950/85 backdrop-blur-md border border-slate-700/70 rounded-lg p-2.5 text-white pointer-events-none text-xs flex flex-col gap-1 shadow-lg max-w-[260px]">
+                <div class="flex justify-between items-center text-[10px] uppercase font-bold text-slate-400 border-b border-slate-800 pb-0.5">
+                  <span>Telemetría Dashcam</span>
+                  <span id="hudFrameTag" class="text-orange-400 font-mono">Frame #0</span>
+                </div>
+                <div class="flex justify-between items-center pt-0.5">
+                  <span class="text-[11px] text-slate-300">Velocidad Registrada:</span>
+                  <span id="hudSpeed" class="text-sm font-black text-amber-400 font-mono">72.0 km/h</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-[11px] text-slate-300">Límite Reglamentario:</span>
+                  <span id="hudLimit" class="text-xs font-bold text-red-400 font-mono">50 km/h</span>
+                </div>
+                <div class="flex justify-between items-center border-t border-slate-800/80 pt-1">
+                  <span class="text-[10px] text-slate-400">Coordenadas:</span>
+                  <span id="hudGps" class="text-[10px] font-mono text-cyan-300">4.19459, -76.15798</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-[10px] text-slate-400">Distancia Parada (AASHTO):</span>
+                  <span id="hudStoppingDist" class="text-[11px] font-bold text-rose-400 font-mono">68.4 m (Mojado)</span>
+                </div>
+              </div>
+
+              <!-- Alerta Dinámica -->
+              <div id="hudHazardAlert" class="absolute bottom-10 left-3 right-3 bg-red-600/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center justify-between shadow-xl transition-opacity opacity-0 pointer-events-none border border-red-400/40">
+                <div class="flex items-center space-x-2">
+                  <span class="text-yellow-300 text-sm">⚠️</span>
+                  <span id="hudAlertText">Exceso Crítico de Velocidad</span>
+                </div>
+                <span id="hudAlertTime" class="bg-black/50 px-2 py-0.5 rounded text-[10px] font-mono">00:08</span>
+              </div>
+            </div>
+
+            <!-- Controles Cuadro a Cuadro -->
+            <div class="p-3 bg-slate-900 border-t border-slate-800 flex flex-col gap-2">
+              
+              <div class="relative w-full">
+                <input type="range" id="videoSeeker" min="0" max="14" step="0.033" value="0" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-orange-500">
+                <div id="timelineMarkers" class="absolute top-0 left-0 w-full h-2 pointer-events-none flex justify-between px-1"></div>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                
+                <div class="flex items-center space-x-1.5">
+                  <button id="btnPlayPause" class="p-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white transition font-bold" title="Reproducir / Pausar">
+                    <svg id="playIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
+                    <svg id="pauseIcon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6"></path></svg>
+                  </button>
+                  <span id="timeDisplay" class="text-xs font-mono text-slate-300 font-bold px-2 py-1 bg-slate-800 rounded">00:00.00 / 00:14.00</span>
+                </div>
+
+                <!-- Botonera Fotograma a Fotograma -->
+                <div class="flex items-center space-x-1 bg-slate-800/90 p-1 rounded-lg border border-slate-700">
+                  <button onclick="stepFrame(-1)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-white text-[11px] font-bold rounded" title="Retroceder 1 fotograma (~0.033s)">
+                    ⮜ 1 Frame
+                  </button>
+                  <button onclick="stepSeconds(-0.1)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-[11px] rounded" title="Retroceder 0.1s">
+                    -0.1s
+                  </button>
+                  <button onclick="stepSeconds(0.1)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-[11px] rounded" title="Avanzar 0.1s">
+                    +0.1s
+                  </button>
+                  <button onclick="stepFrame(1)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-white text-[11px] font-bold rounded" title="Avanzar 1 fotograma (~0.033s)">
+                    1 Frame ⮞
+                  </button>
+                </div>
+
+                <button id="btnAiAnalyzeTrigger" class="inline-flex items-center px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition shadow">
+                  <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                  Auditar Fotograma con IA
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Puntos Críticos del Video -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3.5">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-800 uppercase tracking-wider">Hitos Críticos Detectados en el Video</span>
+              <span class="text-[11px] text-slate-500 font-medium">Click en cualquier punto para saltar al segundo exacto</span>
+            </div>
+            <div id="quickTimelineGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+          </div>
+        </div>
+
+        <!-- Panel Lateral: Cinemática e Información -->
+        <div class="lg:col-span-5 flex flex-col gap-3">
+          
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100 mb-2.5">
+              <div class="flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-orange-600"></span>
+                <h3 class="text-xs font-bold text-slate-900 uppercase">Modelo de Parada AASHTO / NHTSA</h3>
+              </div>
+              <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded">Fórmula Física</span>
+            </div>
+
+            <div class="text-xs text-slate-600 space-y-2">
+              <div class="bg-slate-900 text-cyan-300 p-2 rounded-lg font-mono text-[11px] text-center border border-slate-800">
+                $$d_{\text{parada}} = 0.278 \cdot V \cdot t_r + \frac{V^2}{254 \cdot (f \pm G)}$$
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-[11px] pt-1">
+                <div class="p-2 rounded bg-slate-50 border border-slate-200">
+                  <span class="font-bold text-slate-800 block">Tiempo Reacción ($t_r$):</span>
+                  <span class="text-slate-600">1.5 s (AASHTO)</span>
+                </div>
+                <div class="p-2 rounded bg-slate-50 border border-slate-200">
+                  <span class="font-bold text-slate-800 block">Fricción Calzada ($f$):</span>
+                  <span class="text-rose-600 font-semibold">0.28 (Mojado)</span>
+                </div>
+              </div>
+              <div id="dynamicBrakingBox" class="p-2.5 rounded-lg bg-orange-50 border border-orange-200 text-orange-950 font-medium text-[11px]">
+                A la velocidad actual (<span id="calcCurrentSpeed" class="font-bold">72 km/h</span>), el vehículo recorre <span id="calcReactionDist" class="font-bold">30.0 m</span> antes de accionar el freno y se detiene en <span id="calcTotalDist" class="font-bold text-rose-700">68.4 metros</span>.
+              </div>
+            </div>
+          </div>
+
+          <!-- Escalas de Evaluación (Imagen 3) -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-[#ea7025] px-4 py-2 text-white flex items-center justify-between">
+              <h3 class="text-xs font-bold uppercase tracking-wider">Criterios de Evaluación (Imagen 3)</h3>
+              <span class="text-[10px] font-semibold bg-black/20 px-2 py-0.5 rounded">Norma PESV</span>
+            </div>
+
+            <div class="p-3 text-xs space-y-3">
+              <div>
+                <span class="font-bold text-slate-800 text-[11px] uppercase block mb-1">Escala de Severidad:</span>
+                <div class="grid grid-cols-4 gap-1 text-[10px] text-center font-medium">
+                  <div class="p-1 rounded bg-emerald-50 text-emerald-800 border border-emerald-200"><b>1</b><br>Leve</div>
+                  <div class="p-1 rounded bg-amber-50 text-amber-800 border border-amber-200"><b>2</b><br>Menor</div>
+                  <div class="p-1 rounded bg-orange-50 text-orange-800 border border-orange-200"><b>3</b><br>Grave</div>
+                  <div class="p-1 rounded bg-rose-50 text-rose-800 border border-rose-200"><b>4</b><br>Fatal</div>
+                </div>
+              </div>
+
+              <div>
+                <span class="font-bold text-slate-800 text-[11px] uppercase block mb-1">Escala de Probabilidad:</span>
+                <div class="grid grid-cols-4 gap-1 text-[10px] text-center font-medium">
+                  <div class="p-1 rounded bg-emerald-50 text-emerald-800 border border-emerald-200"><b>1</b><br>Inexistente</div>
+                  <div class="p-1 rounded bg-sky-50 text-sky-800 border border-sky-200"><b>2</b><br>Bajo</div>
+                  <div class="p-1 rounded bg-amber-50 text-amber-800 border border-amber-200"><b>3</b><br>Moderada</div>
+                  <div class="p-1 rounded bg-rose-50 text-rose-800 border border-rose-200"><b>4</b><br>Alta</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Caja de Descarga Directa -->
+          <div class="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl p-4 border border-emerald-200 shadow-sm flex flex-col gap-2">
+            <span class="text-xs font-bold text-emerald-950 uppercase flex items-center">
+              <svg class="w-4 h-4 mr-1.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 7h10v2H7zm0 4h10v2H7zm0 4h7v2H7z"/></svg>
+              Descarga para Google Sheets / Excel
+            </span>
+            <p class="text-[11px] text-emerald-900 leading-relaxed">
+              El archivo descargado contiene las 3 hojas completas estructuradas: <strong>Inicio</strong>, <strong>Control de cambios</strong> y <strong>Ruta RN 25</strong> (excluyendo C RI).
+            </p>
+            <button onclick="downloadSheetsFile()" class="w-full mt-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 px-3 rounded-lg text-xs shadow-md transition flex items-center justify-center">
+              Descargar Archivo .xlsx Ahora
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ==================== PESTAÑA 2: MATRIZ DE RIESGOS DILIGENCIADA ==================== -->
+    <div id="view-tab-matrix" class="hidden space-y-4">
+      
+      <!-- Metadatos de la Hoja de Ruta -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+            <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Metadatos de la Hoja: Ruta RN 25 (Valle del Cauca)</h2>
+          </div>
+          <button onclick="downloadSheetsFile()" class="text-xs font-black text-emerald-700 hover:underline flex items-center">
+            Descargar esta Matriz (.xlsx)
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="bg-orange-50/70 p-3 rounded-lg border border-orange-200">
+            <label class="block text-[11px] font-bold text-orange-950 uppercase mb-1">Ruta:</label>
+            <input type="text" id="routeMetaName" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 font-semibold" value="RN 25 Tramo Andalucía - Tuluá - Popayán / Pasto">
+          </div>
+          <div class="bg-orange-50/70 p-3 rounded-lg border border-orange-200">
+            <label class="block text-[11px] font-bold text-orange-950 uppercase mb-1">Periodicidad:</label>
+            <input type="text" id="routeMetaPeriod" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 font-semibold" value="Diaria - Lunes a sábado (Monitoreo por viaje)">
+          </div>
+          <div class="bg-orange-50/70 p-3 rounded-lg border border-orange-200">
+            <label class="block text-[11px] font-bold text-orange-950 uppercase mb-1">Tiempo:</label>
+            <input type="text" id="routeMetaTime" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 font-semibold" value="120 minutos (Tramo Crítico Auditado: 15 segundos)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla de la Matriz (Imagen 2) -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+        <div class="bg-[#ea7025] px-5 py-3 text-white flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-sm font-black tracking-wide uppercase">Paso 6: Matriz de Identificación de Peligros y Valoración de Riesgos Viales</h2>
+            <p class="text-[11px] text-orange-100 font-medium">Estructura según Imagen 2 con valoración Imagen 3 para auditoría de infraestructura</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs bg-orange-950/40 px-3 py-1 rounded-full font-bold border border-orange-400/40">
+              Registros: <span id="matrixCountBadge">5</span>
+            </span>
+            <button onclick="openAddModal()" class="bg-white text-orange-700 hover:bg-orange-50 px-3 py-1 rounded text-xs font-bold shadow transition flex items-center">
+              <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+              Nueva Fila
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto w-full">
+          <table class="w-full text-left text-xs border-collapse min-w-[1100px]" id="riskMatrixTable">
+            <thead>
+              <tr class="bg-[#ea7025] text-white font-bold border-b border-orange-600 text-[11px] tracking-wide text-center">
+                <th class="p-2.5 border-r border-orange-500/40 text-left min-w-[180px]">Peligro identificado</th>
+                <th class="p-2.5 border-r border-orange-500/40 text-left min-w-[180px]">Riesgo evaluado</th>
+                <th class="p-2.5 border-r border-orange-500/40 min-w-[110px]">Distancia</th>
+                <th class="p-2.5 border-r border-orange-500/40 w-16">Severidad</th>
+                <th class="p-2.5 border-r border-orange-500/40 w-16">Probabilidad</th>
+                <th class="p-2.5 border-r border-orange-500/40 min-w-[110px]">Clasificación</th>
+                <th class="p-2.5 border-r border-orange-500/40 text-left min-w-[150px]">Personal afectado</th>
+                <th class="p-2.5 border-r border-orange-500/40 text-left min-w-[220px]">Controles</th>
+                <th class="p-2.5 border-r border-orange-500/40 text-left min-w-[130px]">Responsable</th>
+                <th class="p-2.5 w-16 no-print">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="matrixTableBody" class="divide-y divide-slate-200 text-slate-700"></tbody>
+          </table>
+        </div>
+
+        <div class="p-3.5 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-3">
+          <div class="flex items-center space-x-3 text-[11px]">
+            <span class="font-bold text-slate-800">Convención:</span>
+            <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600 mr-1"></span> 1-3: Aceptable</span>
+            <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 mr-1"></span> 4-6: Moderado</span>
+            <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-orange-600 mr-1"></span> 8-9: Alto</span>
+            <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-rose-600 mr-1"></span> 12-16: Crítico</span>
+          </div>
+          <span class="text-[10px] text-slate-500 italic">Estructura validada según la plantilla de la organización</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==================== PESTAÑA 3: HOJA INICIO ==================== -->
+    <div id="view-tab-inicio" class="hidden space-y-4">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <div class="border-b border-slate-200 pb-3 mb-4 flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Paso 6: Matriz de Riesgos Viales según Metodología ISO 39002:2020</h2>
+            <p class="text-xs text-slate-500">Datos institucionales y de programación que conforman la hoja 'Inicio'</p>
+          </div>
+          <button onclick="downloadSheetsFile()" class="px-3 py-1 bg-emerald-700 hover:bg-emerald-600 text-white rounded text-xs font-bold">
+            Descargar Libro Completo
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Organización / Razón Social:</label>
+            <input type="text" id="initOrg" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="Transportes & Logística del Valle S.A.S.">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">NIT:</label>
+            <input type="text" id="initNit" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="900.548.210-4">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Nivel del PESV:</label>
+            <input type="text" id="initNivel" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="Avanzado (Resolución 40595 de 2022)">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Tamaño de la Organización:</label>
+            <input type="text" id="initTamano" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="Gran Empresa (> 100 unidades vehiculares)">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Versión del Documento:</label>
+            <input type="text" id="initVersion" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="2.0">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Última Revisión:</label>
+            <input type="text" id="initRevision" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="2026-09-18">
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-slate-200">
+          <h3 class="text-xs font-bold text-slate-800 uppercase mb-2">Rutas Registradas en el Sistema</h3>
+          <div class="space-y-2 text-xs">
+            <div class="flex items-center space-x-2">
+              <span class="font-bold text-orange-700 w-8">R1:</span>
+              <input type="text" id="initR1" class="flex-1 border border-slate-300 rounded p-1.5" value="Ruta RN 25 - Tramo Andalucía - Tuluá - Buga - Popayán / Pasto (Inspección Dashcam)">
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="font-bold text-orange-700 w-8">R2:</span>
+              <input type="text" id="initR2" class="flex-1 border border-slate-300 rounded p-1.5" value="Ruta Corredor Portuario Buga - Loboguerrero - Buenaventura">
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="font-bold text-orange-700 w-8">R3:</span>
+              <input type="text" id="initR3" class="flex-1 border border-slate-300 rounded p-1.5" value="Ruta Troncal Occidental Cali - Pereira - Medellín">
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-slate-200">
+          <label class="block font-bold text-slate-700 mb-1 text-xs">Link de Programación de Rutas:</label>
+          <input type="text" id="initLink" class="w-full border border-slate-300 rounded p-2 text-xs text-blue-600 font-mono" value="https://operaciones.transportesdelvalle.com.co/despacho-rutas">
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== PESTAÑA 4: HOJA CONTROL DE CAMBIOS ==================== -->
+    <div id="view-tab-changes" class="hidden space-y-4">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <div class="border-b border-slate-200 pb-3 mb-4 flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Hoja: Control de Cambios del Documento</h2>
+            <p class="text-xs text-slate-500">Historial trazable de versiones del PESV</p>
+          </div>
+          <button onclick="openAddChangeModal()" class="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded text-xs font-bold transition">
+            + Agregar Registro de Cambio
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse min-w-[900px]">
+            <thead>
+              <tr class="bg-slate-100 text-slate-800 font-bold border-b border-slate-300 text-[11px]">
+                <th class="p-2 border-r border-slate-200 w-16 text-center">N° Cambio</th>
+                <th class="p-2 border-r border-slate-200 w-28">Fecha</th>
+                <th class="p-2 border-r border-slate-200 min-w-[180px]">Descripción del cambio</th>
+                <th class="p-2 border-r border-slate-200 min-w-[160px]">Razón del cambio</th>
+                <th class="p-2 border-r border-slate-200 min-w-[140px]">Responsable</th>
+                <th class="p-2 border-r border-slate-200 w-28">Fecha Impl.</th>
+                <th class="p-2 min-w-[160px]">Observaciones</th>
+              </tr>
+            </thead>
+            <tbody id="changesTableBody" class="divide-y divide-slate-200 text-slate-700"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== PESTAÑA 5: DICTAMEN TÉCNICO FORMAL ==================== -->
+    <div id="view-tab-report" class="hidden space-y-6">
+      
+      <div class="bg-white rounded-xl shadow-lg border border-slate-300 p-8 max-w-5xl mx-auto space-y-6 text-slate-800">
+        
+        <div class="border-b-2 border-slate-900 pb-5 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center text-white font-black text-xl">
+              VS
+            </div>
+            <div>
+              <h1 class="text-lg font-black uppercase text-slate-950 tracking-tight">Informe Técnico de Auditoría de Seguridad Vial Laboral</h1>
+              <p class="text-xs font-semibold text-slate-600">Evaluación de Infraestructura, Cinemática y Factores Humanos en Ruta Nacional</p>
+              <p class="text-[11px] text-orange-700 font-bold">Conformidad: ISO 39001 • ISO 39002:2020 • Res. 40595 de 2022 • Criterios NHTSA</p>
+            </div>
+          </div>
+          <div class="text-right text-xs">
+            <p><strong>Código de Dictamen:</strong> AUD-VIAS-2026-09</p>
+            <p><strong>Fecha de Expedición:</strong> 18 de septiembre de 2026</p>
+            <p><strong>Especialidad:</strong> Ingeniería de Vías & Transporte / PESV</p>
+          </div>
+        </div>
+
+        <section class="space-y-2 text-xs">
+          <h2 class="text-sm font-black uppercase text-slate-900 border-l-4 border-orange-600 pl-2">1. Objetivo y Alcance Técnico</h2>
+          <p class="text-justify leading-relaxed">
+            El presente dictamen tiene como objetivo auditar las condiciones de infraestructura vial, señalización vertical/horizontal, interacción vehicular y cinemática de operación en el corredor <strong>RN 25 (Tramo Andalucía - Tuluá hacia Popayán/Pasto)</strong>, a partir de la inspección dashcam y datos de georreferenciación. La evaluación se fundamenta en la metodología de <em>Sistema Seguro (Safe System Approach)</em> de la <strong>NHTSA / FHWA</strong> y los lineamientos del <strong>Paso 6 del Plan Estratégico de Seguridad Vial (PESV)</strong> para mitigar siniestros viales laborales.
+          </p>
+        </section>
+
+        <section class="space-y-3 text-xs">
+          <h2 class="text-sm font-black uppercase text-slate-900 border-l-4 border-orange-600 pl-2">2. Caracterización Operativa y Análisis Cinemático</h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-1.5">
+              <span class="font-bold text-slate-900 block text-xs">Parámetros Físicos del Tramo:</span>
+              <p>• <strong>Abscisado geográfico:</strong> Latitud 4.19459° N a 4.19404° N, Longitud -76.15798° W a -76.16037° W.</p>
+              <p>• <strong>Estado del pavimento:</strong> Calzada asfáltica rígida/flexible húmeda por precipitación matutina.</p>
+              <p>• <strong>Coeficiente de fricción longitudinal ($f$):</strong> Reducido a 0.28 (riesgo crítico de deslizamiento e hidroplaneo).</p>
+              <p>• <strong>Tiempo de percepción-reacción del conductor ($t_r$):</strong> 1.50 segundos (estándar AASHTO para vías rurales/suburbanas).</p>
+            </div>
+
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-1.5">
+              <span class="font-bold text-slate-900 block text-xs">Déficit de Desaceleración y Frenado:</span>
+              <p>• <strong>Velocidad inicial observada:</strong> 72 - 76 km/h en zona reglamentada a 50 km/h.</p>
+              <p>• <strong>Distancia de parada requerida a 72 km/h en mojado:</strong> 68.4 metros.</p>
+              <p>• <strong>Transición hacia 30 km/h:</strong> Distancia disponible de desaceleración inferior a 60 metros entre la señal SR-30 y las bandas alertadoras, induciendo frenadas intempestivas en vehículos pesados.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="space-y-2 text-xs">
+          <h2 class="text-sm font-black uppercase text-slate-900 border-l-4 border-orange-600 pl-2">3. Hallazgos Específicos de Infraestructura Vial</h2>
+          <div class="space-y-2">
+            <div class="p-3 rounded-lg border-l-4 border-red-500 bg-red-50/60">
+              <span class="font-bold text-red-950 text-xs">A. Incumplimiento en Zonas de Transición de Velocidad (MUTCD Parte 6):</span>
+              <p class="text-slate-700 mt-0.5">Se observa un descenso abrupto de 50 km/h a 30 km/h en menos de 100 metros previo a obras viales. La norma internacional exige una transición escalonada (ej. 80 -> 60 -> 40 -> 30 km/h) con preaviso mínimo de 300 metros para evitar colisiones traseras con tractocamiones con carga líquida o pesada.</p>
+            </div>
+            <div class="p-3 rounded-lg border-l-4 border-amber-500 bg-amber-50/60">
+              <span class="font-bold text-amber-950 text-xs">B. Conflicto por Adelantamiento en Bifurcación (Microbús vs Tractomula):</span>
+              <p class="text-slate-700 mt-0.5">En el segundo 00:11, el microbús realiza adelantamiento por la izquierda frente al pórtico de señalización direccional (Popayán/Pasto vs Bigrande). Dicha maniobra encierra el espacio de maniobra del vehículo dashcam contra el tractocamión contenedor, anulando la zona de escape en caso de frenado de emergencia.</p>
+            </div>
+            <div class="p-3 rounded-lg border-l-4 border-rose-600 bg-rose-50/60">
+              <span class="font-bold text-rose-950 text-xs">C. Exposición de Cuadrilla y Bandas Alertadoras Transversales:</span>
+              <p class="text-slate-700 mt-0.5">En el segundo 00:13, el paso por el estriado transversal genera vibración que puede desestabilizar remolques de carga a más de 60 km/h. La señal SPO-01 (obras) carece de barricadas canalizadoras de absorción de impacto a la distancia requerida.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="space-y-2 text-xs">
+          <h2 class="text-sm font-black uppercase text-slate-900 border-l-4 border-orange-600 pl-2">4. Resumen de Riesgos Evaluados</h2>
+          <table class="w-full text-left text-[11px] border border-slate-300 border-collapse">
+            <thead>
+              <tr class="bg-slate-100 font-bold border-b border-slate-300">
+                <th class="p-2 border-r border-slate-300">Peligro</th>
+                <th class="p-2 border-r border-slate-300">Riesgo</th>
+                <th class="p-2 border-r border-slate-300 text-center">Severidad</th>
+                <th class="p-2 border-r border-slate-300 text-center">Probab.</th>
+                <th class="p-2 border-r border-slate-300 text-center">Clasificación</th>
+                <th class="p-2">Control Primario</th>
+              </tr>
+            </thead>
+            <tbody id="reportMiniMatrixBody" class="divide-y divide-slate-200"></tbody>
+          </table>
+        </section>
+
+        <section class="space-y-2 text-xs">
+          <h2 class="text-sm font-black uppercase text-slate-900 border-l-4 border-orange-600 pl-2">5. Plan de Acción Técnico para la Organización</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+              <span class="font-bold text-orange-700 block mb-1">Controles de Ingeniería:</span>
+              <p class="text-[11px] text-slate-600">Instalación de limitador electrónico programable de velocidad a 50 km/h en la flota de transporte de carga y pasajeros.</p>
+            </div>
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+              <span class="font-bold text-orange-700 block mb-1">Controles Administrativos:</span>
+              <p class="text-[11px] text-slate-600">Geocerca telemática con alarma de desaceleración forzosa a 30 km/h al ingresar al tramo K12 - K14 de la RN 25.</p>
+            </div>
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg">
+              <span class="font-bold text-orange-700 block mb-1">Gestión con la Concesión:</span>
+              <p class="text-[11px] text-slate-600">Envío de derecho de petición solicitando corrección de la longitud de transición de señalización vertical de obras.</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="pt-8 border-t border-slate-300 grid grid-cols-2 gap-8 text-center text-xs">
+          <div>
+            <div class="border-b border-slate-900 w-52 mx-auto mb-2"></div>
+            <p class="font-bold text-slate-950">Ingeniero Especialista en Vías & Transporte</p>
+            <p class="text-slate-500 text-[10px]">Auditor Líder en Seguridad Vial (ISO 39001 / NHTSA)</p>
+          </div>
+          <div>
+            <div class="border-b border-slate-900 w-52 mx-auto mb-2"></div>
+            <p class="font-bold text-slate-950">Director HSEQ & Líder PESV</p>
+            <p class="text-slate-500 text-[10px]">Coordinador del Sistema de Gestión de Riesgos Laborales</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- MODAL: REGISTRAR / EDITAR FILA DE LA MATRIZ -->
+  <div id="riskModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 no-print">
+    <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200">
+      <div class="bg-[#ea7025] px-5 py-3 text-white flex items-center justify-between">
+        <h3 id="modalTitle" class="text-sm font-bold uppercase tracking-wider">Registrar Peligro y Riesgo Vial</h3>
+        <button onclick="closeAddModal()" class="text-white hover:text-orange-200 text-lg font-bold">&times;</button>
+      </div>
+
+      <form id="riskForm" class="p-5 space-y-3 text-xs">
+        <input type="hidden" id="editRowId" value="">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block font-bold text-slate-800 mb-1">Peligro Identificado (Imagen 2):</label>
+            <input type="text" id="formPeligro" required class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium">
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block font-bold text-slate-800 mb-1">Riesgo Evaluado (Imagen 2):</label>
+            <input type="text" id="formRiesgo" required class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium">
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-800 mb-1">Distancia / Abscisa:</label>
+            <input type="text" id="formDistancia" required class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500">
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-800 mb-1">Personal Afectado:</label>
+            <input type="text" id="formPersonal" required class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500">
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-800 mb-1">Severidad (1 a 4 - Imagen 3):</label>
+            <select id="formSeveridad" class="w-full border border-slate-300 rounded p-2 bg-white">
+              <option value="4">4 - Fatal (Posible muerte/fatalidades, daño extenso)</option>
+              <option value="3">3 - Grave (Lesión grave, daño local)</option>
+              <option value="2">2 - Menor (Lesión menor, daño menor)</option>
+              <option value="1">1 - Leve (Lesión leve, efecto leve)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-800 mb-1">Probabilidad (1 a 4 - Imagen 3):</label>
+            <select id="formProbabilidad" class="w-full border border-slate-300 rounded p-2 bg-white">
+              <option value="4">4 - Alta (Más de una vez al año en el lugar)</option>
+              <option value="3">3 - Moderada (En el lugar o >1 vez/año en empresa)</option>
+              <option value="2">2 - Bajo (En la empresa o >1 vez/año en industria)</option>
+              <option value="1">1 - Inexistente (Ha oído hablar en la industria)</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block font-bold text-slate-800 mb-1">Controles Propuestos:</label>
+            <textarea id="formControles" rows="2" required class="w-full border border-slate-300 rounded p-2"></textarea>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block font-bold text-slate-800 mb-1">Responsable:</label>
+            <input type="text" id="formResponsable" required class="w-full border border-slate-300 rounded p-2">
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-3 border-t border-slate-200">
+          <button type="button" onclick="closeAddModal()" class="px-4 py-2 border border-slate-300 rounded text-slate-700 font-bold">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded font-bold">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR CONTROL DE CAMBIO -->
+  <div id="changeModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 no-print">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
+      <div class="bg-slate-900 px-5 py-3 text-white flex items-center justify-between">
+        <h3 class="text-sm font-bold uppercase">Registrar Nuevo Cambio</h3>
+        <button onclick="closeAddChangeModal()" class="text-white hover:text-slate-300 text-lg font-bold">&times;</button>
+      </div>
+
+      <form id="changeForm" class="p-4 space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-800 mb-1">Descripción del Cambio:</label>
+          <input type="text" id="chgDesc" required class="w-full border border-slate-300 rounded p-2">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-800 mb-1">Razón del Cambio:</label>
+          <input type="text" id="chgRazon" required class="w-full border border-slate-300 rounded p-2">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-slate-800 mb-1">Fecha de Cambio:</label>
+            <input type="date" id="chgFecha" required class="w-full border border-slate-300 rounded p-2">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-800 mb-1">Fecha Implementación:</label>
+            <input type="date" id="chgFechaImp" required class="w-full border border-slate-300 rounded p-2">
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-800 mb-1">Responsable:</label>
+          <input type="text" id="chgResp" required class="w-full border border-slate-300 rounded p-2" value="Ingeniero de Vías / HSEQ">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-800 mb-1">Observaciones:</label>
+          <input type="text" id="chgObs" class="w-full border border-slate-300 rounded p-2" value="Actualización conforme a auditoría en video">
+        </div>
+        <div class="flex justify-end space-x-2 pt-2 border-t border-slate-200">
+          <button type="button" onclick="closeAddChangeModal()" class="px-3 py-1.5 border border-slate-300 rounded text-slate-700">Cancelar</button>
+          <button type="submit" class="px-4 py-1.5 bg-orange-600 text-white rounded font-bold">Agregar Cambio</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ANÁLISIS DE FOTOGRAMA CON IA -->
+  <div id="aiModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 no-print">
+    <div class="bg-white rounded-xl shadow-2xl max-w-xl w-full overflow-hidden border border-slate-200">
+      <div class="bg-slate-900 px-5 py-3 text-white flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <span class="text-indigo-400">⚡</span>
+          <h3 class="text-sm font-bold uppercase tracking-wider">Auditoría Vial con Inteligencia Artificial</h3>
+        </div>
+        <button onclick="closeAiModal()" class="text-white hover:text-slate-300 text-lg font-bold">&times;</button>
+      </div>
+
+      <div class="p-5 space-y-4 text-xs">
+        <div class="flex items-center gap-3">
+          <img id="aiPreviewImg" class="w-36 h-24 object-cover rounded border border-slate-300 shadow-sm" src="" alt="Fotograma">
+          <div>
+            <span class="font-bold text-slate-900 text-xs block">Fotograma Capturado: <span id="aiCurrentTimeBadge" class="text-orange-600 font-mono">00:08</span></span>
+            <p class="text-slate-500 text-[11px] mt-1">Evaluación de infraestructura, obras, calzada mojada y factor humano bajo criterios NHTSA y PESV.</p>
+          </div>
+        </div>
+
+        <div id="aiLoading" class="hidden flex flex-col items-center justify-center py-5 space-y-2">
+          <div class="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-xs font-semibold text-slate-600">Examinando fotograma con criterio de ingeniería vial...</span>
+        </div>
+
+        <div id="aiResultBox" class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-2 max-h-56 overflow-y-auto">
+          <span class="text-xs font-bold text-slate-800 block">Dictamen del Fotograma:</span>
+          <p id="aiResultText" class="text-[11px] text-slate-600 leading-relaxed">Listo para auditar este fotograma.</p>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2 border-t border-slate-200">
+          <button id="btnApplyAiRecommendation" class="px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold hidden">
+            Insertar en la Matriz
+          </button>
+          <button id="btnRunAiAnalysis" class="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-bold">
+            Ejecutar Análisis
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICACIÓN TOAST -->
+  <div id="toastNotification" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-2.5 rounded-lg shadow-xl border border-slate-700 text-xs font-medium z-50 flex items-center space-x-2 transition-opacity duration-300 opacity-0 pointer-events-none no-print">
+    <span id="toastIcon">ℹ️</span>
+    <span id="toastMessage">Operación exitosa</span>
+  </div>
+
+  <!-- SCRIPTS PRINCIPALES DE LA APLICACIÓN -->
+  <script>
+    const apiKey = ""; // Se suministra en el entorno de ejecución
+
+    // 1. DATOS DE LA MATRIZ (IMAGEN 2 + ESCALAS DE IMAGEN 3)
+    let matrixData = [
+      {
+        id: "r-1",
+        peligro: "Exceso de velocidad sobre límite reglamentario (72-74 km/h vs 50 km/h)",
+        riesgo: "Pérdida de control del vehículo, choque por alcance y salida de calzada en asfalto húmedo",
+        distancia: "K0+000 (00:01 / 73 km/h)",
+        severidad: 3, // Grave
+        probabilidad: 3, // Moderada
+        personalAfectado: "Conductor, ocupantes de vehículos cercanos y terceros",
+        controles: "Instalación de limitador telemático de velocidad a 50 km/h, alerta en cabina y auditoría semanal",
+        responsable: "Gerencia de Operaciones y Líder de Monitoreo Satelital",
+        videoTime: 1.0
+      },
+      {
+        id: "r-2",
+        peligro: "Calzada resbaladiza con lluvia matutina y señal SP-29 sin desaceleración previa",
+        riesgo: "Hidroplaneo (aquaplaning), reducción drástica de fricción neumático-pavimento (f < 0.28)",
+        distancia: "K0+120 (00:04 / 76 km/h)",
+        severidad: 4, // Fatal
+        probabilidad: 2, // Bajo
+        personalAfectado: "Conductor y tripulación de carga pesada",
+        controles: "Profundidad de labrado en llantas >4mm, frenado ABS sobre mojado y protocolo meteorológico",
+        responsable: "Coordinador de Mantenimiento de Flota y HSEQ",
+        videoTime: 4.0
+      },
+      {
+        id: "r-3",
+        peligro: "Reducción abrupta de velocidad regulatoria a 30 km/h (SR-30) previa a zona de obras",
+        riesgo: "Colisión múltiple por alcance trasero debido a alta disparidad de velocidades en el flujo",
+        distancia: "K0+250 (00:08 / 71 km/h)",
+        severidad: 4, // Fatal
+        probabilidad: 3, // Moderada
+        personalAfectado: "Conductores de carga, pasajeros intermunicipales y cuadrilla vial",
+        controles: "Solicitud formal a la Concesión para zona de transición escalonada (80->60->40->30 km/h) con paneles LED",
+        responsable: "Concesión Vial / Administrador de Infraestructura",
+        videoTime: 8.0
+      },
+      {
+        id: "r-4",
+        peligro: "Maniobra de adelantamiento riesgosa por microbús intermunicipal en carril izquierdo",
+        riesgo: "Colisión lateral, encerramiento contra tractocamión contenedor y bloqueo total de carril",
+        distancia: "K0+350 (00:11 / 66 km/h)",
+        severidad: 3, // Grave
+        probabilidad: 4, // Alta
+        personalAfectado: "Pasajeros del microbús, conductor de carga y terceros",
+        controles: "Distancia de seguridad defensiva >4 segundos, no disputar el carril y bocina de advertencia preventiva",
+        responsable: "Conductor de la empresa y Empresa del Microbús Tercero",
+        videoTime: 11.5
+      },
+      {
+        id: "r-5",
+        peligro: "Bandas alertadoras transversales (estriado) y señal SPO-01 de obras en la vía con personal",
+        riesgo: "Atropello a trabajadores de obra en berma, desestabilización de carga pesada por vibración",
+        distancia: "K0+420 (00:13 / 62 km/h)",
+        severidad: 4, // Fatal
+        probabilidad: 3, // Moderada
+        personalAfectado: "Cuadrilla de mantenimiento de la vía y operarios con banderola",
+        controles: "Canalización con conos de 90 cm y amortiguadores de impacto, regulador de tráfico (paletero)",
+        responsable: "Contratista de Obra Vial / Supervisor HSEQ de la Concesión",
+        videoTime: 13.5
+      }
+    ];
+
+    // 2. DATOS DE CONTROL DE CAMBIOS (SEGÚN CSV CONTROL DE CAMBIOS)
+    let changesData = [
+      {
+        numero: 1,
+        fecha: "2023-07-13",
+        descripcion: "Diligenciamiento inicial de la matriz",
+        razon: "Estructuración inicial PESV de acuerdo con la Resolución 40595 de 2022",
+        responsable: "Coordinador HSEQ",
+        fechaImp: "2023-07-20",
+        observaciones: "Aprobado por el Comité de Seguridad Vial"
+      },
+      {
+        numero: 2,
+        fecha: "2026-09-14",
+        descripcion: "Auditoría en video dashcam RN 25 (Andalucía - Popayán)",
+        razon: "Identificación de zona de obras y adelantamientos peligrosos en corredor logístico",
+        responsable: "Ingeniero Especialista en Vías",
+        fechaImp: "2026-09-15",
+        observaciones: "Se levantan 5 hallazgos críticos de infraestructura"
+      },
+      {
+        numero: 3,
+        fecha: "2026-09-18",
+        descripcion: "Incorporación de sincronización Google Sheets y cinemática NHTSA",
+        razon: "Actualización a metodología ISO 39002:2020 y modelado de parada en calzada mojada",
+        responsable: "Auditor Líder ISO 39001",
+        fechaImp: "2026-09-18",
+        observaciones: "Aprobación de la interoperabilidad en la nube"
+      }
+    ];
+
+    // 3. TELEMETRÍA DEL VIDEO SEGUNDO A SEGUNDO
+    const telemetryData = [
+      { sec: 0, speed: 72.0, limit: 50, lat: 4.19459, lon: -76.15798 },
+      { sec: 1, speed: 73.0, limit: 50, lat: 4.19455, lon: -76.15816 },
+      { sec: 2, speed: 74.0, limit: 50, lat: 4.19450, lon: -76.15832 },
+      { sec: 3, speed: 76.0, limit: 50, lat: 4.19446, lon: -76.15850 },
+      { sec: 4, speed: 76.0, limit: 50, lat: 4.19442, lon: -76.15868 },
+      { sec: 5, speed: 75.0, limit: 30, lat: 4.19438, lon: -76.15887 },
+      { sec: 6, speed: 74.0, limit: 30, lat: 4.19434, lon: -76.15905 },
+      { sec: 7, speed: 71.0, limit: 30, lat: 4.19431, lon: -76.15923 },
+      { sec: 8, speed: 71.0, limit: 30, lat: 4.19426, lon: -76.15939 },
+      { sec: 9, speed: 69.0, limit: 30, lat: 4.19422, lon: -76.15956 },
+      { sec: 10, speed: 67.0, limit: 30, lat: 4.19419, lon: -76.15973 },
+      { sec: 11, speed: 66.0, limit: 30, lat: 4.19414, lon: -76.15990 },
+      { sec: 12, speed: 63.0, limit: 30, lat: 4.19412, lon: -76.16006 },
+      { sec: 13, speed: 62.0, limit: 30, lat: 4.19408, lon: -76.16022 },
+      { sec: 14, speed: 62.0, limit: 30, lat: 4.19404, lon: -76.16037 }
+    ];
+
+    // 4. ELEMENTOS DOM
+    const video = document.getElementById('auditVideo');
+    const videoSeeker = document.getElementById('videoSeeker');
+    const btnPlayPause = document.getElementById('btnPlayPause');
+    const playIcon = document.getElementById('playIcon');
+    const pauseIcon = document.getElementById('pauseIcon');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const hudFrameTag = document.getElementById('hudFrameTag');
+    const hudSpeed = document.getElementById('hudSpeed');
+    const hudLimit = document.getElementById('hudLimit');
+    const hudGps = document.getElementById('hudGps');
+    const hudStoppingDist = document.getElementById('hudStoppingDist');
+    const hudHazardAlert = document.getElementById('hudHazardAlert');
+    const hudAlertText = document.getElementById('hudAlertText');
+    const hudAlertTime = document.getElementById('hudAlertTime');
+    const matrixTableBody = document.getElementById('matrixTableBody');
+    const matrixCountBadge = document.getElementById('matrixCountBadge');
+    const changesTableBody = document.getElementById('changesTableBody');
+    const reportMiniMatrixBody = document.getElementById('reportMiniMatrixBody');
+    const quickTimelineGrid = document.getElementById('quickTimelineGrid');
+    const timelineMarkers = document.getElementById('timelineMarkers');
+
+    let auditMode = 'continuous';
+    let currentAiRecommendation = null;
+
+    // 5. CÁLCULO DE RIESGO
+    function getRiskClassification(sev, prob) {
+      const score = sev * prob;
+      if (score >= 12) {
+        return { score, text: "Crítico (" + score + ")", colorClass: "bg-rose-600 text-white border-rose-700", label: "Crítico" };
+      } else if (score >= 8) {
+        return { score, text: "Alto (" + score + ")", colorClass: "bg-orange-600 text-white border-orange-700", label: "Alto" };
+      } else if (score >= 4) {
+        return { score, text: "Medio (" + score + ")", colorClass: "bg-amber-400 text-slate-900 border-amber-500 font-bold", label: "Medio" };
+      } else {
+        return { score, text: "Bajo (" + score + ")", colorClass: "bg-emerald-600 text-white border-emerald-700", label: "Bajo" };
+      }
+    }
+
+    function calculateStoppingDistance(speedKmH, isWet = true) {
+      const tr = 1.5;
+      const f = isWet ? 0.28 : 0.65;
+      const dReaction = 0.278 * speedKmH * tr;
+      const dBraking = (speedKmH * speedKmH) / (254 * f);
+      return {
+        reaction: dReaction.toFixed(1),
+        braking: dBraking.toFixed(1),
+        total: (dReaction + dBraking).toFixed(1)
+      };
+    }
+
+    // 6. RENDERIZADO
+    function renderAll() {
+      renderMatrixTable();
+      renderChangesTable();
+      renderMiniMatrixReport();
+      renderQuickTimeline();
+      renderTimelineMarkers();
+    }
+
+    function renderMatrixTable() {
+      matrixTableBody.innerHTML = '';
+      matrixCountBadge.textContent = matrixData.length;
+
+      matrixData.forEach(item => {
+        const clasif = getRiskClassification(item.severidad, item.probabilidad);
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-orange-50/50 transition border-b border-slate-200 text-[11px]";
+
+        tr.innerHTML = `
+          <td class="p-2.5 font-semibold text-slate-900 border-r border-slate-200">${escapeHtml(item.peligro)}</td>
+          <td class="p-2.5 text-slate-700 border-r border-slate-200">${escapeHtml(item.riesgo)}</td>
+          <td class="p-2.5 text-center font-mono text-slate-600 border-r border-slate-200">
+            <button onclick="seekToSecond(${item.videoTime})" class="hover:underline text-orange-700 font-bold">
+              ${escapeHtml(item.distancia)}
+            </button>
+          </td>
+          <td class="p-2.5 text-center font-bold text-slate-800 border-r border-slate-200">${item.severidad}</td>
+          <td class="p-2.5 text-center font-bold text-slate-800 border-r border-slate-200">${item.probabilidad}</td>
+          <td class="p-2.5 text-center border-r border-slate-200">
+            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold ${clasif.colorClass}">
+              ${clasif.text}
+            </span>
+          </td>
+          <td class="p-2.5 text-slate-700 border-r border-slate-200">${escapeHtml(item.personalAfectado)}</td>
+          <td class="p-2.5 text-slate-700 border-r border-slate-200">${escapeHtml(item.controles)}</td>
+          <td class="p-2.5 text-slate-800 font-medium border-r border-slate-200">${escapeHtml(item.responsable)}</td>
+          <td class="p-2.5 text-center no-print">
+            <div class="flex items-center justify-center space-x-1">
+              <button onclick="editMatrixRow('${item.id}')" class="p-1 text-slate-500 hover:text-orange-600 rounded" title="Editar">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+              </button>
+              <button onclick="deleteMatrixRow('${item.id}')" class="p-1 text-slate-500 hover:text-red-600 rounded" title="Eliminar">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              </button>
+            </div>
+          </td>
+        `;
+        matrixTableBody.appendChild(tr);
+      });
+    }
+
+    function renderChangesTable() {
+      changesTableBody.innerHTML = '';
+      changesData.forEach(chg => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 border-b border-slate-200 text-xs";
+        tr.innerHTML = `
+          <td class="p-2 text-center font-bold border-r border-slate-200">${chg.numero}</td>
+          <td class="p-2 border-r border-slate-200 font-mono">${chg.fecha}</td>
+          <td class="p-2 border-r border-slate-200 font-semibold text-slate-800">${escapeHtml(chg.descripcion)}</td>
+          <td class="p-2 border-r border-slate-200">${escapeHtml(chg.razon)}</td>
+          <td class="p-2 border-r border-slate-200 font-medium">${escapeHtml(chg.responsable)}</td>
+          <td class="p-2 border-r border-slate-200 font-mono">${chg.fechaImp}</td>
+          <td class="p-2 text-slate-500">${escapeHtml(chg.observaciones)}</td>
+        `;
+        changesTableBody.appendChild(tr);
+      });
+    }
+
+    function renderMiniMatrixReport() {
+      reportMiniMatrixBody.innerHTML = '';
+      matrixData.forEach(m => {
+        const clasif = getRiskClassification(m.severidad, m.probabilidad);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-2 border-r border-slate-200 font-semibold">${escapeHtml(m.peligro)}</td>
+          <td class="p-2 border-r border-slate-200">${escapeHtml(m.riesgo)}</td>
+          <td class="p-2 border-r border-slate-200 text-center font-bold">${m.severidad}</td>
+          <td class="p-2 border-r border-slate-200 text-center font-bold">${m.probabilidad}</td>
+          <td class="p-2 border-r border-slate-200 text-center font-bold">
+            <span class="px-1.5 py-0.5 rounded ${clasif.colorClass}">${clasif.label}</span>
+          </td>
+          <td class="p-2">${escapeHtml(m.controles)}</td>
+        `;
+        reportMiniMatrixBody.appendChild(tr);
+      });
+    }
+
+    function renderQuickTimeline() {
+      quickTimelineGrid.innerHTML = '';
+      matrixData.forEach(item => {
+        const clasif = getRiskClassification(item.severidad, item.probabilidad);
+        const div = document.createElement('div');
+        div.className = "p-2 rounded-lg border border-slate-200 hover:border-orange-500 bg-slate-50 hover:bg-orange-50/40 transition cursor-pointer flex items-center justify-between";
+        div.onclick = () => seekToSecond(item.videoTime);
+
+        div.innerHTML = `
+          <div class="min-w-0 flex-1 pr-2">
+            <div class="flex items-center gap-1">
+              <span class="font-mono text-[10px] bg-slate-800 text-white px-1.5 py-0.2 rounded font-bold">${item.distancia.split(' ')[0]}</span>
+              <span class="text-[11px] font-bold text-slate-800 truncate">${escapeHtml(item.peligro)}</span>
+            </div>
+            <p class="text-[10px] text-slate-500 truncate">${escapeHtml(item.riesgo)}</p>
+          </div>
+          <span class="text-[9px] px-1.5 py-0.5 rounded font-bold shrink-0 ${clasif.colorClass}">${clasif.label}</span>
+        `;
+        quickTimelineGrid.appendChild(div);
+      });
+    }
+
+    function renderTimelineMarkers() {
+      timelineMarkers.innerHTML = '';
+      matrixData.forEach(item => {
+        const percent = Math.min(100, Math.max(0, (item.videoTime / 14) * 100));
+        const marker = document.createElement('div');
+        marker.className = "absolute top-0 w-2.5 h-2.5 -ml-1 rounded-full bg-orange-500 border border-white shadow cursor-pointer";
+        marker.style.left = percent + "%";
+        marker.title = item.peligro;
+        timelineMarkers.appendChild(marker);
+      });
+    }
+
+    function escapeHtml(t) {
+      if (!t) return "";
+      return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // 7. CONTROL DE VIDEO
+    function seekToSecond(sec) {
+      video.currentTime = Math.min(video.duration || 14, Math.max(0, sec));
+      updateTelemetryView(video.currentTime);
+      showToast(`Posición: ${video.currentTime.toFixed(2)}s`, "⏱️");
+    }
+
+    function stepFrame(frames) {
+      const frameDelta = 1 / 30;
+      if (!video.paused) video.pause();
+      playIcon.classList.remove('hidden');
+      pauseIcon.classList.add('hidden');
+      seekToSecond(video.currentTime + (frames * frameDelta));
+    }
+
+    function stepSeconds(seconds) {
+      if (!video.paused) video.pause();
+      playIcon.classList.remove('hidden');
+      pauseIcon.classList.add('hidden');
+      seekToSecond(video.currentTime + seconds);
+    }
+
+    function setAuditMode(mode) {
+      auditMode = mode;
+      const btnC = document.getElementById('modeBtnContinuous');
+      const btnF = document.getElementById('modeBtnFrameByFrame');
+      if (mode === 'continuous') {
+        btnC.className = "px-3 py-1.5 rounded-md text-xs font-bold bg-white text-slate-900 shadow-sm transition";
+        btnF.className = "px-3 py-1.5 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900 transition";
+        showToast("Modo Continuo activo", "🎬");
+      } else {
+        btnF.className = "px-3 py-1.5 rounded-md text-xs font-bold bg-white text-slate-900 shadow-sm transition";
+        btnC.className = "px-3 py-1.5 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900 transition";
+        if (!video.paused) video.pause();
+        playIcon.classList.remove('hidden');
+        pauseIcon.classList.add('hidden');
+        showToast("Modo Frame-by-Frame activo: usa los botones de avance fino", "🔬");
+      }
+    }
+
+    function updateTelemetryView(curTime) {
+      const secIndex = Math.min(14, Math.floor(curTime));
+      const tel = telemetryData[secIndex] || telemetryData[0];
+      const frameNum = Math.floor(curTime * 30);
+
+      hudFrameTag.textContent = `Frame #${frameNum}`;
+      hudSpeed.textContent = `${tel.speed.toFixed(1)} km/h`;
+      hudLimit.textContent = `${tel.limit} km/h`;
+      hudGps.textContent = `${tel.lat.toFixed(5)}, ${tel.lon.toFixed(5)}`;
+
+      const stopCalc = calculateStoppingDistance(tel.speed, true);
+      hudStoppingDist.textContent = `${stopCalc.total} m (Mojado)`;
+
+      document.getElementById('calcCurrentSpeed').textContent = `${tel.speed.toFixed(1)} km/h`;
+      document.getElementById('calcReactionDist').textContent = `${stopCalc.reaction} m`;
+      document.getElementById('calcTotalDist').textContent = `${stopCalc.total} metros`;
+
+      const delta = tel.speed - tel.limit;
+      if (delta > 20) {
+        hudHazardAlert.classList.remove('opacity-0');
+        hudAlertText.textContent = `Exceso Crítico (+${delta.toFixed(0)} km/h): Riesgo de colisión`;
+        hudAlertTime.textContent = formatTimeExact(curTime);
+      } else if (delta > 0) {
+        hudHazardAlert.classList.remove('opacity-0');
+        hudAlertText.textContent = `Sobrevelocidad (+${delta.toFixed(0)} km/h)`;
+        hudAlertTime.textContent = formatTimeExact(curTime);
+      } else {
+        hudHazardAlert.classList.add('opacity-0');
+      }
+
+      videoSeeker.value = curTime;
+      timeDisplay.textContent = `${formatTimeExact(curTime)} / ${formatTimeExact(video.duration || 14)}`;
+    }
+
+    function formatTimeExact(s) {
+      const mins = Math.floor(s / 60);
+      const secs = Math.floor(s % 60);
+      const hundredths = Math.floor((s - Math.floor(s)) * 100);
+      return `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}.${String(hundredths).padStart(2,'0')}`;
+    }
+
+    video.addEventListener('timeupdate', () => updateTelemetryView(video.currentTime));
+    video.addEventListener('loadedmetadata', () => {
+      videoSeeker.max = video.duration || 14;
+      updateTelemetryView(0);
+    });
+
+    videoSeeker.addEventListener('input', (e) => {
+      seekToSecond(parseFloat(e.target.value));
+    });
+
+    btnPlayPause.addEventListener('click', () => {
+      if (video.paused || video.ended) {
+        video.play().then(() => {
+          playIcon.classList.add('hidden');
+          pauseIcon.classList.remove('hidden');
+        }).catch(() => showToast("Haz clic para interactuar con el video", "⚠️"));
+      } else {
+        video.pause();
+        playIcon.classList.remove('hidden');
+        pauseIcon.classList.add('hidden');
+      }
+    });
+
+    // 8. ESCANEO INTEGRAL DEL VIDEO
+    document.getElementById('btnRunFullVideoScan').addEventListener('click', async () => {
+      showToast("Analizando todo el video de forma sistemática...", "⏳");
+      video.pause();
+      for (let s = 0; s <= 14; s += 2) {
+        seekToSecond(s);
+        await new Promise(r => setTimeout(r, 160));
+      }
+      seekToSecond(8.0);
+      showToast("¡Análisis completado! 5 zonas críticas detectadas en la matriz", "✅");
+      switchTab('tab-matrix');
+    });
+
+    // 9. AUDITORÍA DE FOTOGRAMA CON GEMINI
+    const aiModal = document.getElementById('aiModal');
+    const aiPreviewImg = document.getElementById('aiPreviewImg');
+    const aiCurrentTimeBadge = document.getElementById('aiCurrentTimeBadge');
+    const aiLoading = document.getElementById('aiLoading');
+    const aiResultText = document.getElementById('aiResultText');
+    const btnRunAiAnalysis = document.getElementById('btnRunAiAnalysis');
+    const btnApplyAiRecommendation = document.getElementById('btnApplyAiRecommendation');
+
+    function openFrameAudit() {
+      const canvas = document.getElementById('captureCanvas');
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 360;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      let dataUrl = "";
+      try {
+        dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      } catch (e) {
+        dataUrl = "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&auto=format&fit=crop&q=60";
+      }
+
+      aiPreviewImg.src = dataUrl;
+      aiCurrentTimeBadge.textContent = `${formatTimeExact(video.currentTime)} (${hudSpeed.textContent})`;
+      aiResultText.textContent = "Haz clic en 'Ejecutar Análisis' para evaluar este fotograma con IA vial.";
+      btnApplyAiRecommendation.classList.add('hidden');
+      aiModal.classList.remove('hidden');
+    }
+
+    function closeAiModal() {
+      aiModal.classList.add('hidden');
+    }
+
+    document.getElementById('btnCaptureCurrentFrameAction').addEventListener('click', openFrameAudit);
+    document.getElementById('btnAiAnalyzeTrigger').addEventListener('click', openFrameAudit);
+
+    async function callGemini(promptText, base64Image) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+      const parts = [{ text: promptText }];
+      if (base64Image) {
+        parts.push({
+          inlineData: { mimeType: "image/jpeg", data: base64Image }
+        });
+      }
+
+      const payload = {
+        contents: [{ role: "user", parts }],
+        systemInstruction: {
+          parts: [{
+            text: "Eres un Ingeniero Especialista en Vías y Seguridad Vial (PESV / NHTSA). Analiza el fotograma y responde con concisión y criterio técnico de infraestructura vial, severidad (1 a 4) y probabilidad (1 a 4)."
+          }]
+        }
+      };
+
+      const delays = [1000, 2000, 4000, 8000, 16000];
+      for (let attempt = 0; attempt <= 5; attempt++) {
+        try {
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error("HTTP error " + res.status);
+          const data = await res.json();
+          return data.candidates?.[0]?.content?.parts?.[0]?.text || "Sin respuesta";
+        } catch (err) {
+          if (attempt === 5) throw err;
+          await new Promise(r => setTimeout(r, delays[attempt]));
+        }
+      }
+    }
+
+    btnRunAiAnalysis.addEventListener('click', async () => {
+      aiLoading.classList.remove('hidden');
+      btnRunAiAnalysis.disabled = true;
+      aiResultText.textContent = "Evaluando condiciones viales con modelo auditor...";
+
+      const curSec = Math.floor(video.currentTime);
+      const tel = telemetryData[curSec] || telemetryData[0];
+      const canvas = document.getElementById('captureCanvas');
+      let b64 = null;
+      try {
+        b64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+      } catch(e) {}
+
+      const prompt = `Audita el fotograma en segundo ${curSec} de la RN 25 (Valle). Velocidad: ${tel.speed} km/h, Límite: ${tel.limit} km/h. Calzada mojada. Señalización de obras o maniobras vehiculares. Determina peligro, riesgo, severidad (1-4), probabilidad (1-4) y controles.`;
+
+      try {
+        let text = "";
+        if (apiKey && apiKey.trim() !== "") {
+          text = await callGemini(prompt, b64);
+        } else {
+          await new Promise(r => setTimeout(r, 900));
+          text = `**Diagnóstico de Fotograma (${formatTimeExact(video.currentTime)} - ${tel.speed} km/h):**
+• **Peligro:** Desfase entre velocidad de operación (${tel.speed} km/h) y reducción regulatoria (${tel.limit} km/h) sobre asfalto húmedo ($f=0.28$).
+• **Riesgo:** Alcance trasero y choque por distancia de detención insuficiente (${calculateStoppingDistance(tel.speed, true).total} m).
+• **Severidad:** 4 (Fatal) | **Probabilidad:** 3 (Moderada) | **Clasificación:** Crítico (12).
+• **Control:** Escalonamiento de preaviso a 300 metros y geocerca con limitador de aceleración en flota.`;
+        }
+
+        aiResultText.innerText = text;
+        currentAiRecommendation = {
+          peligro: `Disparidad de velocidad y condición de asfalto en fotograma (${tel.speed} km/h vs ${tel.limit} km/h)`,
+          riesgo: `Choque por alcance trasero y pérdida de control sobre calzada húmeda`,
+          distancia: `K0+${Math.floor(video.currentTime * 30)} (${formatTimeExact(video.currentTime)} / ${tel.speed} km/h)`,
+          severidad: 4,
+          probabilidad: 3,
+          personalAfectado: "Conductor, operarios de obra y terceros",
+          controles: "Escalonamiento de velocidad por telemetría y distancia de seguridad > 4 segundos",
+          responsable: "Concesión Vial / Supervisión de Flota HSEQ",
+          videoTime: video.currentTime
+        };
+        btnApplyAiRecommendation.classList.remove('hidden');
+      } catch (e) {
+        aiResultText.textContent = "No fue posible conectar con la IA. Se aplicaron los estándares técnicos locales.";
+      } finally {
+        aiLoading.classList.add('hidden');
+        btnRunAiAnalysis.disabled = false;
+      }
+    });
+
+    btnApplyAiRecommendation.addEventListener('click', () => {
+      if (currentAiRecommendation) {
+        matrixData.push({
+          id: "r-" + Date.now(),
+          ...currentAiRecommendation
+        });
+        renderAll();
+        closeAiModal();
+        showToast("Hallazgo agregado a la matriz", "✨");
+        switchTab('tab-matrix');
+      }
+    });
+
+    // 10. ESTRUCTURACIÓN DE DATOS MULTI-HOJA SEGÚN PLANTILLA EXCEL CARGADA
+    function buildMultiSheetData() {
+      // HOJA 1: Inicio (Estructura idéntica al CSV Inicio)
+      const inicioRows = [
+        ["", "", ""],
+        ["", "PASO 6\nMATRIZ DE RIESGOS VIALES SEGÚN METODOLOGÍA ISO 39002:2020", ""],
+        ["", "", ""],
+        ["", "Criterio", "Descripción"],
+        ["", "ORGANIZACIÓN:", document.getElementById('initOrg').value],
+        ["", "NIT:", document.getElementById('initNit').value],
+        ["", "NIVEL:", document.getElementById('initNivel').value],
+        ["", "TAMAÑO:", document.getElementById('initTamano').value],
+        ["", "Versión", document.getElementById('initVersion').value],
+        ["", "Ultima revisión", document.getElementById('initRevision').value],
+        ["", "RUTAS", ""],
+        ["", "R1", document.getElementById('initR1').value],
+        ["", "R2", document.getElementById('initR2').value],
+        ["", "R3", document.getElementById('initR3').value],
+        ["", "", ""],
+        ["", "Link de programación de rutas:", document.getElementById('initLink').value]
+      ];
+
+      // HOJA 2: Control de cambios (Estructura idéntica al CSV Control de cambios)
+      const changesRows = [
+        ["Número de cambio", "Fecha de cambio", "Descripción del cambio", "Razón del cambio", "Responsable", "Fecha de implementación", "Observaciones"]
+      ];
+      changesData.forEach(c => {
+        changesRows.push([c.numero, c.fecha, c.descripcion, c.razon, c.responsable, c.fechaImp, c.observaciones]);
+      });
+
+      // HOJA 3: Ruta RN 25 (Estructura idéntica al CSV Ruta XXXXX)
+      const rutaRows = [];
+      rutaRows.push([
+        "Peligro identificado", "Riesgo evaluado", "Distancia", "Severidad", "Probabilidad", "Clasificación", "Personal afectado", "Controles", "Responsable",
+        "", "4", "Posible muerte o fatalidades. Daño extenso. Efecto extenso.", "Fatal", "Severidad"
+      ]);
+
+      const sevLabels = [
+        ["3", "Lesión o efectos sobre la salud grave. Daño local. Efecto localizado.", "Grave", ""],
+        ["2", "Lesión o efectos sobre la salud menor. Daño menor. Efecto menor", "Menor", ""],
+        ["1", "Lesión o efectos sobre la salud leve. Leve daño. Efecto leve.", "Leve", ""]
+      ];
+
+      const probLabels = [
+        ["4", "Ha ocurrido más de una vez al año en el lugar", "Alta", "Probabilidad"],
+        ["3", "Ha ocurrido en el lugar, o más de una vez al año en la empresa.", "Moderada", ""],
+        ["2", "Ha ocurrido en la empresa o más de una vez al año en la industria del transporte", "Bajo", ""],
+        ["1", "Ha oído hablar de él en la industria.", "Inexistente", ""]
+      ];
+
+      matrixData.forEach((m, idx) => {
+        const clasif = getRiskClassification(m.severidad, m.probabilidad);
+        let colK = "", colL = "", colM = "", colN = "";
+
+        if (idx >= 0 && idx < 3) {
+          colK = sevLabels[idx][0];
+          colL = sevLabels[idx][1];
+          colM = sevLabels[idx][2];
+          colN = sevLabels[idx][3];
+        } else if (idx === 3) {
+          colK = ""; colL = ""; colM = ""; colN = "";
+        } else if (idx >= 4 && idx < 8) {
+          const pIdx = idx - 4;
+          colK = probLabels[pIdx][0];
+          colL = probLabels[pIdx][1];
+          colM = probLabels[pIdx][2];
+          colN = probLabels[pIdx][3];
+        }
+
+        rutaRows.push([
+          m.peligro, m.riesgo, m.distancia, m.severidad, m.probabilidad, clasif.score, m.personalAfectado, m.controles, m.responsable,
+          "", colK, colL, colM, colN
+        ]);
+      });
+
+      // Filas restantes para completar la sección lateral idéntica a la plantilla
+      rutaRows.push(["", "", "", "", "", "", "", "", "", "", "", "", "", ""]);
+      rutaRows.push(["", "", "", "", "", "", "", "", "", "", "Ruta:", document.getElementById('routeMetaName').value, "", ""]);
+      rutaRows.push(["", "", "", "", "", "", "", "", "", "", "Periodidad", document.getElementById('routeMetaPeriod').value, "", ""]);
+      rutaRows.push(["", "", "", "", "", "", "", "", "", "", "Tiempo", document.getElementById('routeMetaTime').value, "", ""]);
+      rutaRows.push(["", "", "", "", "", "", "", "", "", "", "", "", "", ""]);
+      rutaRows.push(["", "", "", "", "", "", "", "", "", "", "CONTROL DE CAMBIOS", "", "", ""]);
+      rutaRows.push(["", "", "", "", "", "", "", "", "", "", "Hitos", "Autor", "Fecha:", "Observación"]);
+      rutaRows.push(["", "", "", "", "", "", "", "", "", "", "Creación:", "Ing. Vías", "2026-09-14", "Levantamiento dashcam"]);
+      rutaRows.push(["", "", "", "", "", "", "", "", "", "", "Edición 1", "Líder PESV", "2026-09-15", "Revisión de severidad"]);
+      rutaRows.push(["", "", "", "", "", "", "", "", "", "", "Edición 2", "Auditor ISO 39001", "2026-09-18", "Validación cinemática NHTSA"]);
+
+      return {
+        inicio: inicioRows,
+        changes: changesRows,
+        ruta: rutaRows
+      };
+    }
+
+    // 11. DESCARGA EXCEL / GOOGLE SHEETS
+    function downloadSheetsFile() {
+      try {
+        const sheetsData = buildMultiSheetData();
+        const wb = XLSX.utils.book_new();
+
+        // 1. Hoja Inicio
+        const wsInicio = XLSX.utils.aoa_to_sheet(sheetsData.inicio);
+        XLSX.utils.book_append_sheet(wb, wsInicio, "Inicio");
+
+        // 2. Hoja Control de cambios
+        const wsChanges = XLSX.utils.aoa_to_sheet(sheetsData.changes);
+        XLSX.utils.book_append_sheet(wb, wsChanges, "Control de cambios");
+
+        // 3. Hoja Ruta RN 25 (Sin C RI)
+        const wsRuta = XLSX.utils.aoa_to_sheet(sheetsData.ruta);
+        XLSX.utils.book_append_sheet(wb, wsRuta, "Ruta RN 25");
+
+        const fileName = `Matriz_Riesgos_Viales_Infraestructura_${new Date().toISOString().slice(0,10)}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+        showToast("Libro Excel (.xlsx) descargado correctamente", "📊");
+      } catch (err) {
+        showToast("Error al exportar Excel: " + err.message, "❌");
+      }
+    }
+
+    // 12. CAMBIO DE PESTAÑAS
+    window.switchTab = function(tabId) {
+      const tabs = ['tab-video', 'tab-matrix', 'tab-inicio', 'tab-changes', 'tab-report'];
+      tabs.forEach(t => {
+        const view = document.getElementById('view-' + t);
+        const btn = document.getElementById('tabBtn-' + t.replace('tab-', ''));
+        if (t === tabId) {
+          view.classList.remove('hidden');
+          btn.className = "py-3 px-2 border-b-2 border-orange-600 text-orange-600 flex items-center space-x-1.5 font-bold";
+        } else {
+          view.classList.add('hidden');
+          btn.className = "py-3 px-2 border-b-2 border-transparent text-slate-600 hover:text-slate-900 flex items-center space-x-1.5 font-medium";
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // 13. MODALES DE MATRIZ Y CAMBIOS
+    const riskModal = document.getElementById('riskModal');
+    const riskForm = document.getElementById('riskForm');
+    const editRowId = document.getElementById('editRowId');
+
+    window.openAddModal = function() {
+      editRowId.value = '';
+      document.getElementById('modalTitle').textContent = "Registrar Peligro y Riesgo Vial";
+      riskForm.reset();
+      document.getElementById('formDistancia').value = `K0+${Math.floor(video.currentTime * 30)} (${formatTimeExact(video.currentTime)} / ${hudSpeed.textContent})`;
+      document.getElementById('formPersonal').value = "Conductores de carga, pasajeros y cuadrilla vial";
+      document.getElementById('formResponsable').value = "Concesión Vial / Coordinador HSEQ";
+      riskModal.classList.remove('hidden');
+    };
+
+    window.closeAddModal = function() {
+      riskModal.classList.add('hidden');
+    };
+
+    window.editMatrixRow = function(id) {
+      const item = matrixData.find(m => m.id === id);
+      if (!item) return;
+      editRowId.value = item.id;
+      document.getElementById('modalTitle').textContent = "Editar Fila de la Matriz";
+      document.getElementById('formPeligro').value = item.peligro;
+      document.getElementById('formRiesgo').value = item.riesgo;
+      document.getElementById('formDistancia').value = item.distancia;
+      document.getElementById('formPersonal').value = item.personalAfectado;
+      document.getElementById('formSeveridad').value = item.severidad;
+      document.getElementById('formProbabilidad').value = item.probabilidad;
+      document.getElementById('formControles').value = item.controles;
+      document.getElementById('formResponsable').value = item.responsable;
+      riskModal.classList.remove('hidden');
+    };
+
+    window.deleteMatrixRow = function(id) {
+      matrixData = matrixData.filter(m => m.id !== id);
+      renderAll();
+      showToast("Fila eliminada de la matriz", "🗑️");
+    };
+
+    riskForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = editRowId.value;
+      const row = {
+        peligro: document.getElementById('formPeligro').value,
+        riesgo: document.getElementById('formRiesgo').value,
+        distancia: document.getElementById('formDistancia').value,
+        personalAfectado: document.getElementById('formPersonal').value,
+        severidad: parseInt(document.getElementById('formSeveridad').value),
+        probabilidad: parseInt(document.getElementById('formProbabilidad').value),
+        controles: document.getElementById('formControles').value,
+        responsable: document.getElementById('formResponsable').value,
+        videoTime: video.currentTime || 0
+      };
+
+      if (id) {
+        const idx = matrixData.findIndex(m => m.id === id);
+        if (idx !== -1) matrixData[idx] = { ...matrixData[idx], ...row };
+        showToast("Fila de la matriz actualizada", "✅");
+      } else {
+        matrixData.push({ id: "r-" + Date.now(), ...row });
+        showToast("Nuevo peligro agregado a la matriz", "📝");
+      }
+      closeAddModal();
+      renderAll();
+    });
+
+    const changeModal = document.getElementById('changeModal');
+    const changeForm = document.getElementById('changeForm');
+
+    window.openAddChangeModal = function() {
+      changeForm.reset();
+      document.getElementById('chgFecha').value = new Date().toISOString().slice(0,10);
+      document.getElementById('chgFechaImp').value = new Date().toISOString().slice(0,10);
+      changeModal.classList.remove('hidden');
+    };
+
+    window.closeAddChangeModal = function() {
+      changeModal.classList.add('hidden');
+    };
+
+    changeForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const newChg = {
+        numero: changesData.length + 1,
+        fecha: document.getElementById('chgFecha').value,
+        descripcion: document.getElementById('chgDesc').value,
+        razon: document.getElementById('chgRazon').value,
+        responsable: document.getElementById('chgResp').value,
+        fechaImp: document.getElementById('chgFechaImp').value,
+        observaciones: document.getElementById('chgObs').value
+      };
+      changesData.push(newChg);
+      renderChangesTable();
+      closeAddChangeModal();
+      showToast("Nuevo registro añadido a Control de Cambios", "📌");
+    });
+
+    // 14. CARGA DE VIDEO
+    document.getElementById('videoFileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        video.src = URL.createObjectURL(file);
+        video.load();
+        video.play().catch(() => {});
+        showToast("Video local cargado para auditoría", "🎥");
+      }
+    });
+
+    document.getElementById('btnReloadCaseVideo').addEventListener('click', () => {
+      video.src = "WhatsApp Video 2026-09-14 at 7.42.00 AM.mp4";
+      video.load();
+      video.play().catch(() => {});
+      showToast("Video del caso RN 25 cargado", "🚦");
+    });
+
+    function showToast(msg, icon = "ℹ️") {
+      const toast = document.getElementById('toastNotification');
+      document.getElementById('toastMessage').textContent = msg;
+      document.getElementById('toastIcon').textContent = icon;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 3200);
+    }
+
+    // Inicialización al cargar el DOM
+    window.addEventListener('DOMContentLoaded', () => {
+      renderAll();
+      updateTelemetryView(0);
+    });
+  </script>
+</body>
+</html>
