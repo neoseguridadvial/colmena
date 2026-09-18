@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VíaSegura AI - Auditoría Vial & Matriz de Riesgos (ISO 39002 / PESV / NHTSA)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SheetJS para generar y descargar directamente el archivo Excel / Google Sheets (.xlsx) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#ea580c',
+              orangeDark: '#c2410c',
+              navy: '#0f172a',
+              slate: '#1e293b',
+              sheets: '#0f9d58'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    @media print {
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+      body { background: white !important; color: black !important; font-size: 11pt; }
+      table { page-break-inside: auto; }
+      tr { page-break-inside: avoid; page-break-after: auto; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col font-sans">
+
+  <!-- BARRA SUPERIOR DE ACCIÓN DIRECTA -->
+  <header class="bg-slate-950 text-white shadow-xl border-b border-slate-800 sticky top-0 z-40 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Identificación del Sistema -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-orange-600 flex items-center justify-center shadow-lg shadow-orange-600/40 shrink-0">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-black tracking-tight text-white">VíaSegura AI</h1>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30">PESV • ISO 39002</span>
+          </div>
+          <p class="text-xs text-slate-400">Inspección de Infraestructura & Riesgos Laborales (NHTSA / AASHTO)</p>
+        </div>
+      </div>
+
+      <!-- BOTONES DE DESCARGA DIRECTA DE SHEETS / EXCEL -->
+      <div class="flex items-center flex-wrap gap-2">
+        
+        <!-- BOTÓN PRINCIPAL: DESCARGAR ARCHIVO GOOGLE SHEETS / EXCEL -->
+        <button id="btnDirectDownloadSheets" onclick="downloadSheetsFile()" class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 transition shadow-lg shadow-green-900/30 border border-green-400/40 transform hover:-translate-y-0.5">
+          <svg class="w-4 h-4 mr-2 text-white" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 7h10v2H7zm0 4h10v2H7zm0 4h7v2H7z"/>
+          </svg>
+          Descargar para Google Sheets (.xlsx)
+        </button>
+
+        <!-- ABRIR DIRECTO EN GOOGLE SHEETS -->
+        <a href="https://sheets.new" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-3 py-2 rounded-xl text-xs font-bold text-slate-200 bg-slate-800 hover:bg-slate-700 hover:text-white transition border border-slate-700 shadow-sm" title="Abre Google Sheets en una nueva pestaña para importar el archivo">
+          <svg class="w-3.5 h-3.5 mr-1.5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+          </svg>
+          Abrir sheets.new
+        </a>
+
+        <!-- INFORME TÉCNICO PDF -->
+        <button onclick="switchTab('tab-report'); setTimeout(() => window.print(), 300);" class="inline-flex items-center px-3 py-2 rounded-xl text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 transition shadow-sm">
+          <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+          </svg>
+          PDF Informe
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- PESTAÑAS DE NAVEGACIÓN DE LA APLICACIÓN -->
+  <nav class="bg-white border-b border-slate-200 shadow-sm no-print sticky top-[57px] z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-2 sm:space-x-6 overflow-x-auto text-xs font-bold text-slate-600">
+      <button onclick="switchTab('tab-video')" id="tabBtn-video" class="py-3 px-2 border-b-2 border-orange-600 text-orange-600 flex items-center space-x-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+        <span>1. Video & Auditoría (Completo / Fotograma)</span>
+      </button>
+      <button onclick="switchTab('tab-matrix')" id="tabBtn-matrix" class="py-3 px-2 border-b-2 border-transparent hover:text-slate-900 flex items-center space-x-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+        <span>2. Hoja Ruta RN 25 (Matriz 9 Columnas)</span>
+      </button>
+      <button onclick="switchTab('tab-inicio')" id="tabBtn-inicio" class="py-3 px-2 border-b-2 border-transparent hover:text-slate-900 flex items-center space-x-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+        <span>3. Hoja Inicio (ISO 39002:2020)</span>
+      </button>
+      <button onclick="switchTab('tab-changes')" id="tabBtn-changes" class="py-3 px-2 border-b-2 border-transparent hover:text-slate-900 flex items-center space-x-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <span>4. Hoja Control de Cambios</span>
+      </button>
+      <button onclick="switchTab('tab-report')" id="tabBtn-report" class="py-3 px-2 border-b-2 border-transparent hover:text-slate-900 flex items-center space-x-1.5">
+        <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        <span>5. Dictamen Técnico de Ingeniería</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 w-full flex-grow flex flex-col gap-5">
+
+    <!-- ==================== PESTAÑA 1: VIDEO Y ANÁLISIS DUAL ==================== -->
+    <div id="view-tab-video" class="space-y-4">
+
+      <!-- Barra de Modalidad de Análisis -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3.5 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center space-x-3">
+          <span class="text-xs font-black text-slate-800 uppercase tracking-wider">Modo de Auditoría:</span>
+          <div class="inline-flex rounded-lg bg-slate-100 p-1 border border-slate-200">
+            <button id="modeBtnContinuous" onclick="setAuditMode('continuous')" class="px-3 py-1.5 rounded-md text-xs font-bold bg-white text-slate-900 shadow-sm transition">
+              🎬 Análisis Continuo del Video
+            </button>
+            <button id="modeBtnFrameByFrame" onclick="setAuditMode('frame')" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900 transition">
+              🔬 Revisión Fotograma por Fotograma
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button id="btnRunFullVideoScan" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition shadow">
+            <svg class="w-4 h-4 mr-1.5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Analizar Todo el Video Automáticamente
+          </button>
+          <button id="btnCaptureCurrentFrameAction" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 transition shadow">
+            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+            </svg>
+            Auditar Fotograma Actual
+          </button>
+        </div>
+      </div>
+
+      <!-- Cuadrícula: Reproductor de Video y Telemetría -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        
+        <!-- Video + HUD (7 columnas) -->
+        <div class="lg:col-span-7 flex flex-col gap-3">
+          <div class="bg-slate-950 rounded-xl overflow-hidden shadow-lg border border-slate-800 flex flex-col">
+            
+            <div class="px-4 py-2 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-xs">
+              <div class="flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                <span class="font-bold text-slate-200">Dashcam • RN 25 (Valle del Cauca)</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <label class="cursor-pointer px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] font-semibold text-slate-300 transition">
+                  Cargar Video Local
+                  <input type="file" id="videoFileInput" accept="video/mp4,video/webm" class="hidden">
+                </label>
+                <button id="btnReloadCaseVideo" class="px-2 py-1 rounded bg-orange-600/30 hover:bg-orange-600/50 text-[11px] font-semibold text-orange-300 transition border border-orange-500/30">
+                  Video del Caso
+                </button>
+              </div>
+            </div>
+
+            <!-- Video HUD -->
+            <div class="relative bg-black aspect-video flex items-center justify-center overflow-hidden select-none">
+              <video id="auditVideo" class="w-full h-full object-contain" playsinline preload="metadata">
+                <source src="WhatsApp Video 2026-09-14 at 7.42.00 AM.mp4" type="video/mp4">
+              </video>
+
+              <canvas id="captureCanvas" class="hidden"></canvas>
+
+              <!-- HUD de Telemetría Dinámica -->
+              <div class="absolute top-2 left-2 bg-slate-950/85 backdrop-blur-md border border-slate-700/70 rounded-lg p-2.5 text-white pointer-events-none text-xs flex flex-col gap-1 shadow-lg max-w-[260px]">
+                <div class="flex justify-between items-center text-[10px] uppercase font-bold text-slate-400 border-b border-slate-800 pb-0.5">
+                  <span>Telemetría Dashcam</span>
+                  <span id="hudFrameTag" class="text-orange-400 font-mono">Frame #0</span>
+                </div>
+                <div class="flex justify-between items-center pt-0.5">
+                  <span class="text-[11px] text-slate-300">Velocidad Registrada:</span>
+                  <span id="hudSpeed" class="text-sm font-black text-amber-400 font-mono">72.0 km/h</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-[11px] text-slate-300">Límite Reglamentario:</span>
+                  <span id="hudLimit" class="text-xs font-bold text-red-400 font-mono">50 km/h</span>
+                </div>
+                <div class="flex justify-between items-center border-t border-slate-800/80 pt-1">
+                  <span class="text-[10px] text-slate-400">Coordenadas:</span>
+                  <span id="hudGps" class="text-[10px] font-mono text-cyan-300">4.19459, -76.15798</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-[10px] text-slate-400">Distancia Parada (AASHTO):</span>
+                  <span id="hudStoppingDist" class="text-[11px] font-bold text-rose-400 font-mono">68.4 m (Mojado)</span>
+                </div>
+              </div>
+
+              <!-- Alerta Dinámica -->
+              <div id="hudHazardAlert" class="absolute bottom-10 left-3 right-3 bg-red-600/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center justify-between shadow-xl transition-opacity opacity-0 pointer-events-none border border-red-400/40">
+                <div class="flex items-center space-x-2">
+                  <span class="text-yellow-300 text-sm">⚠️</span>
+                  <span id="hudAlertText">Exceso Crítico de Velocidad</span>
+                </div>
+                <span id="hudAlertTime" class="bg-black/50 px-2 py-0.5 rounded text-[10px] font-mono">00:08</span>
+              </div>
+            </div>
+
+            <!-- Controles Cuadro a Cuadro -->
+            <div class="p-3 bg-slate-900 border-t border-slate-800 flex flex-col gap-2">
+              
+              <div class="relative w-full">
+                <input type="range" id="videoSeeker" min="0" max="14" step="0.033" value="0" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-orange-500">
+                <div id="timelineMarkers" class="absolute top-0 left-0 w-full h-2 pointer-events-none flex justify-between px-1"></div>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                
+                <div class="flex items-center space-x-1.5">
+                  <button id="btnPlayPause" class="p-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white transition font-bold" title="Reproducir / Pausar">
+                    <svg id="playIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
+                    <svg id="pauseIcon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6"></path></svg>
+                  </button>
+                  <span id="timeDisplay" class="text-xs font-mono text-slate-300 font-bold px-2 py-1 bg-slate-800 rounded">00:00.00 / 00:14.00</span>
+                </div>
+
+                <!-- Botonera Fotograma a Fotograma -->
+                <div class="flex items-center space-x-1 bg-slate-800/90 p-1 rounded-lg border border-slate-700">
+                  <button onclick="stepFrame(-1)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-white text-[11px] font-bold rounded" title="Retroceder 1 fotograma (~0.033s)">
+                    ⮜ 1 Frame
+                  </button>
+                  <button onclick="stepSeconds(-0.1)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-[11px] rounded" title="Retroceder 0.1s">
+                    -0.1s
+                  </button>
+                  <button onclick="stepSeconds(0.1)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-[11px] rounded" title="Avanzar 0.1s">
+                    +0.1s
+                  </button>
+                  <button onclick="stepFrame(1)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-white text-[11px] font-bold rounded" title="Avanzar 1 fotograma (~0.033s)">
+                    1 Frame ⮞
+                  </button>
+                </div>
+
+                <button id="btnAiAnalyzeTrigger" class="inline-flex items-center px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition shadow">
+                  <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                  Auditar Fotograma con IA
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Puntos Críticos del Video -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3.5">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-800 uppercase tracking-wider">Hitos Críticos Detectados en el Video</span>
+              <span class="text-[11px] text-slate-500 font-medium">Click en cualquier punto para saltar al segundo exacto</span>
+            </div>
+            <div id="quickTimelineGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+          </div>
+        </div>
+
+        <!-- Panel Lateral: Cinemática e Información -->
+        <div class="lg:col-span-5 flex flex-col gap-3">
+          
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100 mb-2.5">
+              <div class="flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-orange-600"></span>
+                <h3 class="text-xs font-bold text-slate-900 uppercase">Modelo de Parada AASHTO / NHTSA</h3>
+              </div>
+              <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded">Fórmula Física</span>
+            </div>
+
+            <div class="text-xs text-slate-600 space-y-2">
+              <div class="bg-slate-900 text-cyan-300 p-2 rounded-lg font-mono text-[11px] text-center border border-slate-800">
+                $$d_{\text{parada}} = 0.278 \cdot V \cdot t_r + \frac{V^2}{254 \cdot (f \pm G)}$$
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-[11px] pt-1">
+                <div class="p-2 rounded bg-slate-50 border border-slate-200">
+                  <span class="font-bold text-slate-800 block">Tiempo Reacción ($t_r$):</span>
+                  <span class="text-slate-600">1.5 s (AASHTO)</span>
+                </div>
+                <div class="p-2 rounded bg-slate-50 border border-slate-200">
+                  <span class="font-bold text-slate-800 block">Fricción Calzada ($f$):</span>
+                  <span class="text-rose-600 font-semibold">0.28 (Mojado)</span>
+                </div>
+              </div>
+              <div id="dynamicBrakingBox" class="p-2.5 rounded-lg bg-orange-50 border border-orange-200 text-orange-950 font-medium text-[11px]">
+                A la velocidad actual (<span id="calcCurrentSpeed" class="font-bold">72 km/h</span>), el vehículo recorre <span id="calcReactionDist" class="font-bold">30.0 m</span> antes de accionar el freno y se detiene en <span id="calcTotalDist" class="font-bold text-rose-700">68.4 metros</span>.
+              </div>
+            </div>
+          </div>
+
+          <!-- Escalas de Evaluación (Imagen 3) -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-[#ea7025] px-4 py-2 text-white flex items-center justify-between">
+              <h3 class="text-xs font-bold uppercase tracking-wider">Criterios de Evaluación (Imagen 3)</h3>
+              <span class="text-[10px] font-semibold bg-black/20 px-2 py-0.5 rounded">Norma PESV</span>
+            </div>
+
+            <div class="p-3 text-xs space-y-3">
+              <div>
+                <span class="font-bold text-slate-800 text-[11px] uppercase block mb-1">Escala de Severidad:</span>
+                <div class="grid grid-cols-4 gap-1 text-[10px] text-center font-medium">
+                  <div class="p-1 rounded bg-emerald-50 text-emerald-800 border border-emerald-200"><b>1</b><br>Leve</div>
+                  <div class="p-1 rounded bg-amber-50 text-amber-800 border border-amber-200"><b>2</b><br>Menor</div>
+                  <div class="p-1 rounded bg-orange-50 text-orange-800 border border-orange-200"><b>3</b><br>Grave</div>
+                  <div class="p-1 rounded bg-rose-50 text-rose-800 border border-rose-200"><b>4</b><br>Fatal</div>
+                </div>
+              </div>
+
+              <div>
+                <span class="font-bold text-slate-800 text-[11px] uppercase block mb-1">Escala de Probabilidad:</span>
+                <div class="grid grid-cols-4 gap-1 text-[10px] text-center font-medium">
+                  <div class="p-1 rounded bg-emerald-50 text-emerald-800 border border-emerald-200"><b>1</b><br>Inexistente</div>
+                  <div class="p-1 rounded bg-sky-50 text-sky-800 border border-sky-200"><b>2</b><br>Bajo</div>
+                  <div class="p-1 rounded bg-amber-50 text-amber-800 border border-amber-200"><b>3</b><br>Moderada</div>
+                  <div class="p-1 rounded bg-rose-50 text-rose-800 border border-rose-200"><b>4</b><br>Alta</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Caja de Descarga Directa -->
+          <div class="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl p-4 border border-emerald-200 shadow-sm flex flex-col gap-2">
+            <span class="text-xs font-bold text-emerald-950 uppercase flex items-center">
+              <svg class="w-4 h-4 mr-1.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 7h10v2H7zm0 4h10v2H7zm0 4h7v2H7z"/></svg>
+              Descarga para Google Sheets / Excel
+            </span>
+            <p class="text-[11px] text-emerald-900 leading-relaxed">
+              El archivo descargado contiene las 3 hojas completas estructuradas: <strong>Inicio</strong>, <strong>Control de cambios</strong> y <strong>Ruta RN 25</strong> (excluyendo C RI).
+            </p>
+            <button onclick="downloadSheetsFile()" class="w-full mt-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 px-3 rounded-lg text-xs shadow-md transition flex items-center justify-center">
+              Descargar Archivo .xlsx Ahora
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ==================== PESTAÑA 2: MATRIZ DE RIESGOS DILIGENCIADA ==================== -->
+    <div id="view-tab-matrix" class="hidden space-y-4">
+      
+      <!-- Metadatos de la Hoja de Ruta -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+            <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Metadatos de la Hoja: Ruta RN 25 (Valle del Cauca)</h2>
+          </div>
+          <button onclick="downloadSheetsFile()" class="text-xs font-black text-emerald-700 hover:underline flex items-center">
+            Descargar esta Matriz (.xlsx)
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="bg-orange-50/70 p-3 rounded-lg border border-orange-200">
+            <label class="block text-[11px] font-bold text-orange-950 uppercase mb-1">Ruta:</label>
+            <input type="text" id="routeMetaName" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 font-semibold" value="RN 25 Tramo Andalucía - Tuluá - Popayán / Pasto">
+          </div>
+          <div class="bg-orange-50/70 p-3 rounded-lg border border-orange-200">
+            <label class="block text-[11px] font-bold text-orange-950 uppercase mb-1">Periodicidad:</label>
+            <input type="text" id="routeMetaPeriod" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 font-semibold" value="Diaria - Lunes a sábado (Monitoreo por viaje)">
+          </div>
+          <div class="bg-orange-50/70 p-3 rounded-lg border border-orange-200">
+            <label class="block text-[11px] font-bold text-orange-950 uppercase mb-1">Tiempo:</label>
+            <input type="text" id="routeMetaTime" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 font-semibold" value="120 minutos (Tramo Crítico Auditado: 15 segundos)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla de la Matriz (Imagen 2) -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+        <div class="bg-[#ea7025] px-5 py-3 text-white flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-sm font-black tracking-wide uppercase">Paso 6: Matriz de Identificación de Peligros y Valoración de Riesgos Viales</h2>
+            <p class="text-[11px] text-orange-100 font-medium">Estructura según Imagen 2 con valoración Imagen 3 para auditoría de infraestructura</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs bg-orange-950/40 px-3 py-1 rounded-full font-bold border border-orange-400/40">
+              Registros: <span id="matrixCountBadge">5</span>
+            </span>
+            <button onclick="openAddModal()" class="bg-white text-orange-700 hover:bg-orange-50 px-3 py-1 rounded text-xs font-bold shadow transition flex items-center">
+              <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+              Nueva Fila
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto w-full">
+          <table class="w-full text-left text-xs border-collapse min-w-[1100px]" id="riskMatrixTable">
+            <thead>
+              <tr class="bg-[#ea7025] text-white font-bold border-b border-orange-600 text-[11px] tracking-wide text-center">
+                <th class="p-2.5 border-r border-orange-500/40 text-left min-w-[180px]">Peligro identificado</th>
+                <th class="p-2.5 border-r border-orange-500/40 text-left min-w-[180px]">Riesgo evaluado</th>
+                <th class="p-2.5 border-r border-orange-500/40 min-w-[110px]">Distancia</th>
+                <th class="p-2.5 border-r border-orange-500/40 w-16">Severidad</th>
+                <th class="p-2.5 border-r border-orange-500/40 w-16">Probabilidad</th>
+                <th class="p-2.5 border-r border-orange-500/40 min-w-[110px]">Clasificación</th>
+                <th class="p-2.5 border-r border-orange-500/40 text-left min-w-[150px]">Personal afectado</th>
+                <th class="p-2.5 border-r border-orange-500/40 text-left min-w-[220px]">Controles</th>
+                <th class="p-2.5 border-r border-orange-500/40 text-left min-w-[130px]">Responsable</th>
+                <th class="p-2.5 w-16 no-print">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="matrixTableBody" class="divide-y divide-slate-200 text-slate-700"></tbody>
+          </table>
+        </div>
+
+        <div class="p-3.5 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-3">
+          <div class="flex items-center space-x-3 text-[11px]">
+            <span class="font-bold text-slate-800">Convención:</span>
+            <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600 mr-1"></span> 1-3: Aceptable</span>
+            <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 mr-1"></span> 4-6: Moderado</span>
+            <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-orange-600 mr-1"></span> 8-9: Alto</span>
+            <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-rose-600 mr-1"></span> 12-16: Crítico</span>
+          </div>
+          <span class="text-[10px] text-slate-500 italic">Estructura validada según la plantilla de la organización</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==================== PESTAÑA 3: HOJA INICIO ==================== -->
+    <div id="view-tab-inicio" class="hidden space-y-4">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <div class="border-b border-slate-200 pb-3 mb-4 flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Paso 6: Matriz de Riesgos Viales según Metodología ISO 39002:2020</h2>
+            <p class="text-xs text-slate-500">Datos institucionales y de programación que conforman la hoja 'Inicio'</p>
+          </div>
+          <button onclick="downloadSheetsFile()" class="px-3 py-1 bg-emerald-700 hover:bg-emerald-600 text-white rounded text-xs font-bold">
+            Descargar Libro Completo
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Organización / Razón Social:</label>
+            <input type="text" id="initOrg" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="Transportes & Logística del Valle S.A.S.">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">NIT:</label>
+            <input type="text" id="initNit" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="900.548.210-4">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Nivel del PESV:</label>
+            <input type="text" id="initNivel" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="Avanzado (Resolución 40595 de 2022)">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Tamaño de la Organización:</label>
+            <input type="text" id="initTamano" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="Gran Empresa (> 100 unidades vehiculares)">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Versión del Documento:</label>
+            <input type="text" id="initVersion" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="2.0">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Última Revisión:</label>
+            <input type="text" id="initRevision" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="2026-09-18">
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-slate-200">
+          <h3 class="text-xs font-bold text-slate-800 uppercase mb-2">Rutas Registradas en el Sistema</h3>
+          <div class="space-y-2 text-xs">
+            <div class="flex items-center space-x-2">
+              <span class="font-bold text-orange-700 w-8">R1:</span>
+              <input type="text" id="initR1" class="flex-1 border border-slate-300 rounded p-1.5" value="Ruta RN 25 - Tramo Andalucía - Tuluá - Buga - Popayán / Pasto (Inspección Dashcam)">
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="font-bold text-orange-700 w-8">R2:</span>
+              <input type="text" id="initR2" class="flex-1 border border-slate-300 rounded p-1.5" value="Ruta Corredor Portuario Buga - Loboguerrero - Buenaventura">
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="font-bold text-orange-700 w-8">R3:</span>
+              <input type="text" id="initR3" class="flex-1 border border-slate-300 rounded p-1.5" value="Ruta Troncal Occidental Cali - Pereira - Medellín">
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-slate-200">
+          <label class="block font-bold text-slate-700 mb-1 text-xs">Link de Programación de Rutas:</label>
+          <input type="text" id="initLink" class="w-full border border-slate-300 rounded p-2 text-xs text-blue-600 font-mono" value="https://operaciones.transportesdelvalle.com.co/despacho-rutas">
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== PESTAÑA 4: HOJA CONTROL DE CAMBIOS ==================== -->
+    <div id="view-tab-changes" class="hidden space-y-4">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <div class="border-b border-slate-200 pb-3 mb-4 flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Hoja: Control de Cambios del Documento</h2>
+            <p class="text-xs text-slate-500">Historial trazable de versiones del PESV</p>
+          </div>
+          <button onclick="openAddChangeModal()" class="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded text-xs font-bold transition">
+            + Agregar Registro de Cambio
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse min-w-[900px]">
+            <thead>
+              <tr class="bg-slate-100 text-slate-800 font-bold border-b border-slate-300 text-[11px]">
+                <th class="p-2 border-r border-slate-200 w-16 text-center">N° Cambio</th>
+                <th class="p-2 border-r border-slate-200 w-28">Fecha</th>
+                <th class="p-2 border-r border-slate-200 min-w-[180px]">Descripción del cambio</th>
+                <th class="p-2 border-r border-slate-200 min-w-[160px]">Razón del cambio</th>
+                <th class="p-2 border-r border-slate-200 min-w-[140px]">Responsable</th>
+                <th class="p-2 border-r border-slate-200 w-28">Fecha Impl.</th>
+                <th class="p-2 min-w-[160px]">Observaciones</th>
+              </tr>
+            </thead>
+            <tbody id="changesTableBody" class="divide-y divide-slate-200 text-slate-700"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== PESTAÑA 5: DICTAMEN TÉCNICO FORMAL ==================== -->
+    <div id="view-tab-report" class="hidden space-y-6">
+      
+      <div class="bg-white rounded-xl shadow-lg border border-slate-300 p-8 max-w-5xl mx-auto space-y-6 text-slate-800">
+        
+        <div class="border-b-2 border-slate-900 pb-5 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center text-white font-black text-xl">
+              VS
+            </div>
+            <div>
+              <h1 class="text-lg font-black uppercase text-slate-950 tracking-tight">Informe Técnico de Auditoría de Seguridad Vial Laboral</h1>
+              <p class="text-xs font-semibold text-slate-600">Evaluación de Infraestructura, Cinemática y Factores Humanos en Ruta Nacional</p>
+              <p class="text-[11px] text-orange-700 font-bold">Conformidad: ISO 39001 • ISO 39002:2020 • Res. 40595 de 2022 • Criterios NHTSA</p>
+            </div>
+          </div>
+          <div class="text-right text-xs">
+            <p><strong>Código de Dictamen:</strong> AUD-VIAS-2026-09</p>
+            <p><strong>Fecha de Expedición:</strong> 18 de septiembre de 2026</p>
+            <p><strong>Especialidad:</strong> Ingeniería de Vías & Transporte / PESV</p>
+          </div>
+        </div>
+
+        <section class="space-y-2 text-xs">
+          <h2 class="text-sm font-black uppercase text-slate-900 border-l-4 border-orange-600 pl-2">1. Objetivo y Alcance Técnico</h2>
+          <p class="text-justify leading-relaxed">
+            El presente dictamen tiene como objetivo auditar las condiciones de infraestructura vial, señalización vertical/horizontal, interacción vehicular y cinemática de operación en el corredor <strong>RN 25 (Tramo Andalucía - Tuluá hacia Popayán/Pasto)</strong>, a partir de la inspección dashcam y datos de georreferenciación. La evaluación se fundamenta en la metodología de <em>Sistema Seguro (Safe System Approach)</em> de la <strong>NHTSA / FHWA</strong> y los lineamientos del <strong>Paso 6 del Plan Estratégico de Seguridad Vial (PESV)</strong> para mitigar siniestros viales laborales.
+          </p>
+        </section>
+
+        <section class="space-y-3 text-xs">
+          <h2 class="text-sm font-black uppercase text-slate-900 border-l-4 border-orange-600 pl-2">2. Caracterización Operativa y Análisis Cinemático</h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-1.5">
+              <span class="font-bold text-slate-900 block text-xs">Parámetros Físicos del Tramo:</span>
+              <p>• <strong>Abscisado geográfico:</strong> Latitud 4.19459° N a 4.19404° N, Longitud -76.15798° W a -76.16037° W.</p>
+              <p>• <strong>Estado del pavimento:</strong> Calzada asfáltica rígida/flexible húmeda por precipitación matutina.</p>
+              <p>• <strong>Coeficiente de fricción longitudinal ($f$):</strong> Reducido a 0.28 (riesgo crítico de deslizamiento e hidroplaneo).</p>
+              <p>• <strong>Tiempo de percepción-reacción del conductor ($t_r$):</strong> 1.50 segundos (estándar AASHTO para vías rurales/suburbanas).</p>
+            </div>
+
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-1.5">
+              <span class="font-bold text-slate-900 block text-xs">Déficit de Desaceleración y Frenado:</span>
+              <p>• <strong>Velocidad inicial observada:</strong> 72 - 76 km/h en zona reglamentada a 50 km/h.</p>
+              <p>• <strong>Distancia de parada requerida a 72 km/h en mojado:</strong> 68.4 metros.</p>
+              <p>• <strong>Transición hacia 30 km/h:</strong> Distancia disponible de desaceleración inferior a 60 metros entre la señal SR-30 y las bandas alertadoras, induciendo frenadas intempestivas en vehículos pesados.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="space-y-2 text-xs">
+          <h2 class="text-sm font-black uppercase text-slate-900 border-l-4 border-orange-600 pl-2">3. Hallazgos Específicos de Infraestructura Vial</h2>
+          <div class="space-y-2">
+            <div class="p-3 rounded-lg border-l-4 border-red-500 bg-red-50/60">
+              <span class="font-bold text-red-950 text-xs">A. Incumplimiento en Zonas de Transición de Velocidad (MUTCD Parte 6):</span>
+              <p class="text-slate-700 mt-0.5">Se observa un descenso abrupto de 50 km/h a 30 km/h en menos de 100 metros previo a obras viales. La norma internacional exige una transición escalonada (ej. 80 -> 60 -> 40 -> 30 km/h) con preaviso mínimo de 300 metros para evitar colisiones traseras con tractocamiones con carga líquida o pesada.</p>
+            </div>
+            <div class="p-3 rounded-lg border-l-4 border-amber-500 bg-amber-50/60">
+              <span class="font-bold text-amber-950 text-xs">B. Conf
