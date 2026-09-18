@@ -1,596 +1,1679 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VíaSegura AI - Auditoría Vial & Matriz de Riesgos (ISO 39002 / PESV / NHTSA)</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- SheetJS para generar y descargar directamente el archivo Excel / Google Sheets (.xlsx) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              orange: '#ea580c',
-              orangeDark: '#c2410c',
-              navy: '#0f172a',
-              slate: '#1e293b',
-              sheets: '#0f9d58'
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matriz de Riesgos Viales - Res. 40595 de 2022</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        pesv: {
+                            critical: '#ef4444',
+                            moderate: '#f97316',
+                            low: '#10b981',
+                            blue: '#1e40af',
+                            dark: '#0f172a'
+                        }
+                    }
+                }
             }
-          }
         }
-      }
-    }
-  </script>
-  <style>
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    @media print {
-      .no-print { display: none !important; }
-      .print-only { display: block !important; }
-      body { background: white !important; color: black !important; font-size: 11pt; }
-      table { page-break-inside: auto; }
-      tr { page-break-inside: avoid; page-break-after: auto; }
-    }
-  </style>
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col font-sans">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
 
-  <!-- BARRA SUPERIOR DE ACCIÓN DIRECTA -->
-  <header class="bg-slate-950 text-white shadow-xl border-b border-slate-800 sticky top-0 z-40 no-print">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
-      
-      <!-- Identificación del Sistema -->
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-orange-600 flex items-center justify-center shadow-lg shadow-orange-600/40 shrink-0">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
-          </svg>
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-blue-700 text-white p-2.5 rounded-xl shadow-md flex items-center justify-center">
+                        <i class="fa-solid fa-shield-halved text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">Matriz de Riesgos Viales</h1>
+                        <p class="text-[11px] sm:text-xs text-slate-500 font-medium">Resolución 40595 de 2022 - PESV Colombia</p>
+                    </div>
+                </div>
+                <!-- Navigation Tabs -->
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                    <button onclick="switchTab('matriz')" id="tab-btn-matriz" class="tab-btn px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
+                        <i class="fa-solid fa-table-list mr-1.5"></i> Matriz
+                    </button>
+                    <button onclick="switchTab('parametrizacion')" id="tab-btn-parametrizacion" class="tab-btn px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:bg-slate-100">
+                        <i class="fa-solid fa-sliders mr-1.5"></i> Parámetros
+                    </button>
+                    <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:bg-slate-100">
+                        <i class="fa-solid fa-chart-pie mr-1.5"></i> Análisis 3×3
+                    </button>
+                </div>
+            </div>
         </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-base font-black tracking-tight text-white">VíaSegura AI</h1>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30">PESV • ISO 39002</span>
-          </div>
-          <p class="text-xs text-slate-400">Inspección de Infraestructura & Riesgos Laborales (NHTSA / AASHTO)</p>
-        </div>
-      </div>
+    </header>
 
-      <!-- BOTONES DE DESCARGA DIRECTA DE SHEETS / EXCEL -->
-      <div class="flex items-center flex-wrap gap-2">
-        
-        <!-- BOTÓN PRINCIPAL: DESCARGAR ARCHIVO GOOGLE SHEETS / EXCEL -->
-        <button id="btnDirectDownloadSheets" onclick="downloadSheetsFile()" class="inline-flex items-center px-4 py-2 rounded-xl text-xs font-black text-white bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 transition shadow-lg shadow-green-900/30 border border-green-400/40 transform hover:-translate-y-0.5">
-          <svg class="w-4 h-4 mr-2 text-white" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 7h10v2H7zm0 4h10v2H7zm0 4h7v2H7z"/>
-          </svg>
-          Descargar para Google Sheets (.xlsx)
-        </button>
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-        <!-- ABRIR DIRECTO EN GOOGLE SHEETS -->
-        <a href="https://sheets.new" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-3 py-2 rounded-xl text-xs font-bold text-slate-200 bg-slate-800 hover:bg-slate-700 hover:text-white transition border border-slate-700 shadow-sm" title="Abre Google Sheets en una nueva pestaña para importar el archivo">
-          <svg class="w-3.5 h-3.5 mr-1.5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-          </svg>
-          Abrir sheets.new
-        </a>
-
-        <!-- INFORME TÉCNICO PDF -->
-        <button onclick="switchTab('tab-report'); setTimeout(() => window.print(), 300);" class="inline-flex items-center px-3 py-2 rounded-xl text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 transition shadow-sm">
-          <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
-          </svg>
-          PDF Informe
-        </button>
-
-      </div>
-    </div>
-  </header>
-
-  <!-- PESTAÑAS DE NAVEGACIÓN DE LA APLICACIÓN -->
-  <nav class="bg-white border-b border-slate-200 shadow-sm no-print sticky top-[57px] z-30">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-2 sm:space-x-6 overflow-x-auto text-xs font-bold text-slate-600">
-      <button onclick="switchTab('tab-video')" id="tabBtn-video" class="py-3 px-2 border-b-2 border-orange-600 text-orange-600 flex items-center space-x-1.5">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-        <span>1. Video & Auditoría (Completo / Fotograma)</span>
-      </button>
-      <button onclick="switchTab('tab-matrix')" id="tabBtn-matrix" class="py-3 px-2 border-b-2 border-transparent hover:text-slate-900 flex items-center space-x-1.5">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-        <span>2. Hoja Ruta RN 25 (Matriz 9 Columnas)</span>
-      </button>
-      <button onclick="switchTab('tab-inicio')" id="tabBtn-inicio" class="py-3 px-2 border-b-2 border-transparent hover:text-slate-900 flex items-center space-x-1.5">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-        <span>3. Hoja Inicio (ISO 39002:2020)</span>
-      </button>
-      <button onclick="switchTab('tab-changes')" id="tabBtn-changes" class="py-3 px-2 border-b-2 border-transparent hover:text-slate-900 flex items-center space-x-1.5">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        <span>4. Hoja Control de Cambios</span>
-      </button>
-      <button onclick="switchTab('tab-report')" id="tabBtn-report" class="py-3 px-2 border-b-2 border-transparent hover:text-slate-900 flex items-center space-x-1.5">
-        <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-        <span>5. Dictamen Técnico de Ingeniería</span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- CONTENEDOR PRINCIPAL -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 w-full flex-grow flex flex-col gap-5">
-
-    <!-- ==================== PESTAÑA 1: VIDEO Y ANÁLISIS DUAL ==================== -->
-    <div id="view-tab-video" class="space-y-4">
-
-      <!-- Barra de Modalidad de Análisis -->
-      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3.5 flex flex-wrap items-center justify-between gap-3">
-        <div class="flex items-center space-x-3">
-          <span class="text-xs font-black text-slate-800 uppercase tracking-wider">Modo de Auditoría:</span>
-          <div class="inline-flex rounded-lg bg-slate-100 p-1 border border-slate-200">
-            <button id="modeBtnContinuous" onclick="setAuditMode('continuous')" class="px-3 py-1.5 rounded-md text-xs font-bold bg-white text-slate-900 shadow-sm transition">
-              🎬 Análisis Continuo del Video
-            </button>
-            <button id="modeBtnFrameByFrame" onclick="setAuditMode('frame')" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900 transition">
-              🔬 Revisión Fotograma por Fotograma
-            </button>
-          </div>
-        </div>
-
-        <div class="flex items-center space-x-2">
-          <button id="btnRunFullVideoScan" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition shadow">
-            <svg class="w-4 h-4 mr-1.5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-            </svg>
-            Analizar Todo el Video Automáticamente
-          </button>
-          <button id="btnCaptureCurrentFrameAction" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-orange-600 hover:bg-orange-700 transition shadow">
-            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-            </svg>
-            Auditar Fotograma Actual
-          </button>
-        </div>
-      </div>
-
-      <!-- Cuadrícula: Reproductor de Video y Telemetría -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        
-        <!-- Video + HUD (7 columnas) -->
-        <div class="lg:col-span-7 flex flex-col gap-3">
-          <div class="bg-slate-950 rounded-xl overflow-hidden shadow-lg border border-slate-800 flex flex-col">
-            
-            <div class="px-4 py-2 bg-slate-900 border-b border-slate-800 flex items-center justify-between text-xs">
-              <div class="flex items-center space-x-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
-                <span class="font-bold text-slate-200">Dashcam • RN 25 (Valle del Cauca)</span>
-              </div>
-              <div class="flex items-center space-x-2">
-                <label class="cursor-pointer px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] font-semibold text-slate-300 transition">
-                  Cargar Video Local
-                  <input type="file" id="videoFileInput" accept="video/mp4,video/webm" class="hidden">
-                </label>
-                <button id="btnReloadCaseVideo" class="px-2 py-1 rounded bg-orange-600/30 hover:bg-orange-600/50 text-[11px] font-semibold text-orange-300 transition border border-orange-500/30">
-                  Video del Caso
-                </button>
-              </div>
+        <!-- TAB 1: MATRIZ VIEW -->
+        <section id="tab-matriz" class="space-y-6">
+            <!-- Quick KPI Summary Header -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer hover:border-slate-300 transition" onclick="filterByRiskLevel('Todos')">
+                    <div>
+                        <p class="text-xs uppercase tracking-wider text-slate-500 font-semibold">Total Peligros</p>
+                        <h3 id="stat-total" class="text-2xl font-black text-slate-800">0</h3>
+                    </div>
+                    <div class="p-3 bg-slate-100 rounded-lg text-slate-600"><i class="fa-solid fa-list-check"></i></div>
+                </div>
+                <div class="bg-red-50 p-4 rounded-xl border border-red-200 shadow-sm flex items-center justify-between cursor-pointer hover:bg-red-100 transition" onclick="filterByRiskLevel('Crítico')">
+                    <div>
+                        <p class="text-xs uppercase tracking-wider text-red-700 font-semibold">Riesgo Crítico (I)</p>
+                        <h3 id="stat-criticos" class="text-2xl font-black text-red-600">0</h3>
+                    </div>
+                    <div class="p-3 bg-red-200/60 rounded-lg text-red-700"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                </div>
+                <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 shadow-sm flex items-center justify-between cursor-pointer hover:bg-amber-100 transition" onclick="filterByRiskLevel('Moderado')">
+                    <div>
+                        <p class="text-xs uppercase tracking-wider text-amber-800 font-semibold">Moderado (II)</p>
+                        <h3 id="stat-moderados" class="text-2xl font-black text-amber-600">0</h3>
+                    </div>
+                    <div class="p-3 bg-amber-200/60 rounded-lg text-amber-700"><i class="fa-solid fa-shield-virus"></i></div>
+                </div>
+                <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 shadow-sm flex items-center justify-between cursor-pointer hover:bg-emerald-100 transition" onclick="filterByRiskLevel('Bajo')">
+                    <div>
+                        <p class="text-xs uppercase tracking-wider text-emerald-800 font-semibold">Bajo (III)</p>
+                        <h3 id="stat-bajos" class="text-2xl font-black text-emerald-600">0</h3>
+                    </div>
+                    <div class="p-3 bg-emerald-200/60 rounded-lg text-emerald-700"><i class="fa-solid fa-circle-check"></i></div>
+                </div>
             </div>
 
-            <!-- Video HUD -->
-            <div class="relative bg-black aspect-video flex items-center justify-center overflow-hidden select-none">
-              <video id="auditVideo" class="w-full h-full object-contain" playsinline preload="metadata">
-                <source src="WhatsApp Video 2026-09-14 at 7.42.00 AM.mp4" type="video/mp4">
-              </video>
-
-              <canvas id="captureCanvas" class="hidden"></canvas>
-
-              <!-- HUD de Telemetría Dinámica -->
-              <div class="absolute top-2 left-2 bg-slate-950/85 backdrop-blur-md border border-slate-700/70 rounded-lg p-2.5 text-white pointer-events-none text-xs flex flex-col gap-1 shadow-lg max-w-[260px]">
-                <div class="flex justify-between items-center text-[10px] uppercase font-bold text-slate-400 border-b border-slate-800 pb-0.5">
-                  <span>Telemetría Dashcam</span>
-                  <span id="hudFrameTag" class="text-orange-400 font-mono">Frame #0</span>
+            <!-- Action Bar and Filters -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center">
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="openModalRegistro()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2.5 rounded-lg shadow-sm flex items-center gap-2 transition active:scale-95 text-sm">
+                        <i class="fa-solid fa-plus"></i> Nuevo Registro
+                    </button>
+                    <!-- Quick Toggle for Prioritizing Critical Hazards -->
+                    <button id="btn-toggle-critical" onclick="toggleFilterOnlyCritical()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-3.5 py-2.5 rounded-lg border border-slate-200 flex items-center gap-2 transition text-sm">
+                        <i class="fa-solid fa-fire text-red-500"></i>
+                        <span>Solo Peligros Críticos</span>
+                    </button>
+                    <button onclick="exportToCSV()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-3.5 py-2.5 rounded-lg border border-slate-200 flex items-center gap-2 transition text-sm">
+                        <i class="fa-solid fa-file-csv text-emerald-600"></i> Exportar CSV
+                    </button>
                 </div>
-                <div class="flex justify-between items-center pt-0.5">
-                  <span class="text-[11px] text-slate-300">Velocidad Registrada:</span>
-                  <span id="hudSpeed" class="text-sm font-black text-amber-400 font-mono">72.0 km/h</span>
+                <!-- Search & Filter Fields -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
+                    <select id="filter-sede" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-700 focus:ring-2 focus:ring-blue-500 outline-none text-xs sm:text-sm">
+                        <option value="">Todas las Sedes</option>
+                    </select>
+                    <select id="filter-rol" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-700 focus:ring-2 focus:ring-blue-500 outline-none text-xs sm:text-sm">
+                        <option value="">Todos los Roles</option>
+                    </select>
+                    <div class="relative">
+                        <input type="text" id="search-input" onkeyup="applyFilters()" placeholder="Buscar peligro, cargo..." class="w-full bg-slate-50 border border-slate-300 rounded-lg pl-8 pr-3 py-2 text-slate-700 focus:ring-2 focus:ring-blue-500 outline-none text-xs sm:text-sm">
+                        <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-3 text-slate-400 text-xs"></i>
+                    </div>
                 </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-[11px] text-slate-300">Límite Reglamentario:</span>
-                  <span id="hudLimit" class="text-xs font-bold text-red-400 font-mono">50 km/h</span>
-                </div>
-                <div class="flex justify-between items-center border-t border-slate-800/80 pt-1">
-                  <span class="text-[10px] text-slate-400">Coordenadas:</span>
-                  <span id="hudGps" class="text-[10px] font-mono text-cyan-300">4.19459, -76.15798</span>
-                </div>
-                <div class="flex justify-between items-center">
-                  <span class="text-[10px] text-slate-400">Distancia Parada (AASHTO):</span>
-                  <span id="hudStoppingDist" class="text-[11px] font-bold text-rose-400 font-mono">68.4 m (Mojado)</span>
-                </div>
-              </div>
-
-              <!-- Alerta Dinámica -->
-              <div id="hudHazardAlert" class="absolute bottom-10 left-3 right-3 bg-red-600/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center justify-between shadow-xl transition-opacity opacity-0 pointer-events-none border border-red-400/40">
-                <div class="flex items-center space-x-2">
-                  <span class="text-yellow-300 text-sm">⚠️</span>
-                  <span id="hudAlertText">Exceso Crítico de Velocidad</span>
-                </div>
-                <span id="hudAlertTime" class="bg-black/50 px-2 py-0.5 rounded text-[10px] font-mono">00:08</span>
-              </div>
             </div>
 
-            <!-- Controles Cuadro a Cuadro -->
-            <div class="p-3 bg-slate-900 border-t border-slate-800 flex flex-col gap-2">
-              
-              <div class="relative w-full">
-                <input type="range" id="videoSeeker" min="0" max="14" step="0.033" value="0" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-orange-500">
-                <div id="timelineMarkers" class="absolute top-0 left-0 w-full h-2 pointer-events-none flex justify-between px-1"></div>
-              </div>
+            <!-- Matrix Table Container -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left text-xs border-collapse min-w-[1280px]">
+                        <thead>
+                            <tr class="bg-slate-800 text-white font-semibold divide-x divide-slate-700 text-[11px] uppercase tracking-wider">
+                                <th class="p-3 w-12 text-center">#</th>
+                                <th class="p-3">Sede</th>
+                                <th class="p-3">Área / Proceso</th>
+                                <th class="p-3">Cargo</th>
+                                <th class="p-3 text-center">N° Exp.</th>
+                                <th class="p-3">Rol Tránsito</th>
+                                <th class="p-3">Factor</th>
+                                <th class="p-3 min-w-[220px]">Peligro</th>
+                                <th class="p-3 min-w-[180px]">Riesgo</th>
+                                <th class="p-3 text-center">Exposición</th>
+                                <th class="p-3 text-center">Probabilidad</th>
+                                <th class="p-3 text-center">Nivel Riesgo (NR)</th>
+                                <th class="p-3 text-center">Interpretación</th>
+                                <th class="p-3 min-w-[200px]">Medida</th>
+                                <th class="p-3 min-w-[200px]">Control</th>
+                                <th class="p-3">Responsable</th>
+                                <th class="p-3 text-center w-24">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matriz-tbody" class="divide-y divide-slate-200 font-normal">
+                            <!-- Rows dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Table Footer / Empty State -->
+                <div id="empty-state" class="hidden p-12 text-center flex flex-col items-center justify-center">
+                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 text-2xl mb-3">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+                    <h4 class="text-base font-semibold text-slate-700">No hay registros que coincidan</h4>
+                    <p class="text-xs text-slate-500 mt-1 max-w-sm">Prueba ajustando los filtros o registra un nuevo peligro vial con el botón "Nuevo Registro".</p>
+                </div>
+            </div>
+        </section>
 
-              <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+        <!-- TAB 2: PARAMETRIZACION VIEW -->
+        <section id="tab-parametrizacion" class="hidden space-y-6">
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
+                <i class="fa-solid fa-circle-info text-blue-600 mt-0.5 text-lg"></i>
+                <div class="text-xs sm:text-sm text-blue-900 leading-relaxed">
+                    <span class="font-semibold">Parametrización del Sistema PESV (Res. 40595 de 2022):</span>
+                    Configura aquí las listas maestras de Sedes, Áreas/Procesos, Cargos, Roles en el tránsito y el catálogo de Peligros clasificados por factores (Críticos, Dirección y Logística, Entorno, Vehículo, Humano). Todos los cambios se reflejan inmediatamente en el formulario de la matriz.
+                </div>
+            </div>
+
+            <!-- Parameters Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Sedes Card -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-building text-blue-600"></i> Sedes
+                        </h3>
+                        <span id="badge-count-sedes" class="text-xs bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="input-new-sede" placeholder="Nueva sede..." class="flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <button onclick="addParam('sedes', 'input-new-sede')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                    <ul id="list-sedes" class="space-y-1.5 max-h-52 overflow-y-auto custom-scrollbar flex-1 pr-1"></ul>
+                </div>
+
+                <!-- Procesos / Áreas Card -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-diagram-project text-indigo-600"></i> Áreas / Procesos
+                        </h3>
+                        <span id="badge-count-procesos" class="text-xs bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="input-new-proceso" placeholder="Nuevo proceso..." class="flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <button onclick="addParam('procesos', 'input-new-proceso')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                    <ul id="list-procesos" class="space-y-1.5 max-h-52 overflow-y-auto custom-scrollbar flex-1 pr-1"></ul>
+                </div>
+
+                <!-- Cargos Card -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-id-card-clip text-emerald-600"></i> Cargos
+                        </h3>
+                        <span id="badge-count-cargos" class="text-xs bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="input-new-cargo" placeholder="Nuevo cargo..." class="flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
+                        <button onclick="addParam('cargos', 'input-new-cargo')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                    <ul id="list-cargos" class="space-y-1.5 max-h-52 overflow-y-auto custom-scrollbar flex-1 pr-1"></ul>
+                </div>
+
+                <!-- Rol en el Tránsito Card -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-traffic-light text-amber-600"></i> Rol en el Tránsito
+                        </h3>
+                        <span id="badge-count-roles" class="text-xs bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="input-new-rol" placeholder="Nuevo rol..." class="flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-500 outline-none">
+                        <button onclick="addParam('roles', 'input-new-rol')" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                    <ul id="list-roles" class="space-y-1.5 max-h-52 overflow-y-auto custom-scrollbar flex-1 pr-1"></ul>
+                </div>
+
+                <!-- Componentes PESV Card -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-cube text-purple-600"></i> Componentes PESV
+                        </h3>
+                        <span id="badge-count-componentes" class="text-xs bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="input-new-componente" placeholder="Nuevo componente..." class="flex-1 text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 outline-none">
+                        <button onclick="addParam('componentes', 'input-new-componente')" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                    <ul id="list-componentes" class="space-y-1.5 max-h-52 overflow-y-auto custom-scrollbar flex-1 pr-1"></ul>
+                </div>
+
+                <!-- Reset Defaults Card -->
+                <div class="bg-gradient-to-br from-slate-800 to-slate-900 text-white p-5 rounded-xl border border-slate-700 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-white flex items-center gap-2 mb-2 text-sm">
+                            <i class="fa-solid fa-database text-yellow-400"></i> Catálogo Maestro Res. 40595
+                        </h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Restaura todas las listas maestras predeterminadas (Factores Críticos, Entorno, Vehículo, Humano, Dirección, Roles y Cargos oficiales).
+                        </p>
+                    </div>
+                    <button onclick="confirmResetDefaults()" class="mt-4 bg-slate-700 hover:bg-slate-600 text-xs font-semibold py-2 px-4 rounded-lg border border-slate-600 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i> Restablecer Valores Estándar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Factor & Hazard Master Management Section -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 border-b border-slate-100 pb-3">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-triangle-exclamation text-red-600"></i> Personalización de los Peligros según el CEA
+                        </h3>
+                        <p class="text-xs text-slate-500">Los peligros clasificados bajo el factor "Críticos" se marcan automáticamente como prioritarios.</p>
+                    </div>
+                </div>
+
+                <!-- Add Hazard to Factor Form -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                    <div class="sm:col-span-3">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Factor Asociado</label>
+                        <select id="param-hazard-factor" class="w-full text-xs sm:text-sm bg-white border border-slate-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="Críticos">⚠️ Críticos (Prioritarios)</option>
+                            <option value="Dirección_y_Logística">Dirección y Logística</option>
+                            <option value="Entorno">Entorno</option>
+                            <option value="Vehículo">Vehículo</option>
+                            <option value="Humano">Humano</option>
+                        </select>
+                    </div>
+                    <div class="sm:col-span-7">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Nombre del Peligro</label>
+                        <input type="text" id="param-hazard-name" placeholder="Ej: Conducción en condiciones de baja visibilidad..." class="w-full text-xs sm:text-sm bg-white border border-slate-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <button onclick="addCustomHazard()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold py-2 px-3 rounded-lg transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Agregar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hazards Categorized View -->
+                <div id="hazards-catalog-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Dynamic hazards per factor -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: DASHBOARD & HEATMAP VIEW -->
+        <section id="tab-dashboard" class="hidden space-y-6">
+            <!-- Heatmap Matrix Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Risk Matrix 3x3 Heatmap -->
+                <div class="lg:col-span-7 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">Valores de la Matriz de Caracterización - Cálculo del Riesgo</h3>
+                            <p class="text-xs text-slate-500">Resolución 40595 de 2022 (Exposición × Probabilidad)</p>
+                        </div>
+                    </div>
+
+                    <!-- Reference guide tables directly from official resolution -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5 text-xs">
+                        <div class="bg-amber-50/80 border border-amber-200 rounded-lg p-3">
+                            <h5 class="font-bold text-amber-900 mb-1.5 flex items-center gap-1.5 text-xs">
+                                <i class="fa-regular fa-clock text-amber-700"></i> Escala de Exposición
+                            </h5>
+                            <ul class="space-y-1 text-slate-700 text-[11px]">
+                                <li><strong class="text-slate-900">3 (Frecuente):</strong> Más de 6 horas al día</li>
+                                <li><strong class="text-slate-900">2 (Ocasional):</strong> Entre 3 y 6 horas al día</li>
+                                <li><strong class="text-slate-900">1 (Esporádica):</strong> Menor de 3 horas al día</li>
+                            </ul>
+                        </div>
+                        <div class="bg-blue-50/80 border border-blue-200 rounded-lg p-3">
+                            <h5 class="font-bold text-blue-900 mb-1.5 flex items-center gap-1.5 text-xs">
+                                <i class="fa-solid fa-shield-halved text-blue-700"></i> Escala de Probabilidad
+                            </h5>
+                            <ul class="space-y-1 text-slate-700 text-[11px]">
+                                <li><strong class="text-slate-900">3 (Muy probable):</strong> No se tienen establecidos controles eficaces</li>
+                                <li><strong class="text-slate-900">2 (Poco probable):</strong> Se tienen controles, pero su eficacia es baja</li>
+                                <li><strong class="text-slate-900">1 (No es probable):</strong> Se tienen controles eficaces</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 3x3 Matrix Grid -->
+                    <div class="overflow-x-auto">
+                        <div class="min-w-[460px]">
+                            <!-- Header labels for Probabilidad -->
+                            <div class="grid grid-cols-4 gap-2 mb-2 text-center text-xs font-bold text-slate-600">
+                                <div class="text-[10px] uppercase tracking-wider text-slate-400 flex items-center justify-center">Nivel de Exposición \ Probabilidad</div>
+                                <div class="bg-blue-50 text-blue-800 py-1.5 rounded border border-blue-100">1: No es probable</div>
+                                <div class="bg-blue-50 text-blue-800 py-1.5 rounded border border-blue-100">2: Poco probable</div>
+                                <div class="bg-blue-50 text-blue-800 py-1.5 rounded border border-blue-100">3: Muy probable</div>
+                            </div>
+
+                            <!-- Row 3: Frecuente -->
+                            <div class="grid grid-cols-4 gap-2 mb-2 text-center text-xs items-stretch">
+                                <div class="bg-slate-100 flex flex-col items-center justify-center font-bold text-slate-700 p-2 rounded">
+                                    <span>Frecuente (3)</span>
+                                    <span class="text-[10px] font-normal text-slate-500">&gt; 6 hrs/día</span>
+                                </div>
+                                <div class="p-3 rounded-xl border bg-amber-500/20 border-amber-400 text-amber-900 font-bold flex flex-col justify-center items-center">
+                                    <span class="text-base font-black">3</span>
+                                    <span class="text-[10px] uppercase font-semibold">Moderado (II)</span>
+                                    <span id="heat-count-3-1" class="text-[10px] bg-white/80 px-2 py-0.5 rounded-full mt-1 border border-amber-300">0 casos</span>
+                                </div>
+                                <div class="p-3 rounded-xl border bg-red-600/20 border-red-500 text-red-900 font-bold flex flex-col justify-center items-center">
+                                    <span class="text-base font-black">6</span>
+                                    <span class="text-[10px] uppercase font-semibold">Crítico (I)</span>
+                                    <span id="heat-count-3-2" class="text-[10px] bg-white/80 px-2 py-0.5 rounded-full mt-1 border border-red-300">0 casos</span>
+                                </div>
+                                <div class="p-3 rounded-xl border bg-red-600/30 border-red-600 text-red-900 font-bold flex flex-col justify-center items-center">
+                                    <span class="text-base font-black">9</span>
+                                    <span class="text-[10px] uppercase font-semibold">Crítico (I)</span>
+                                    <span id="heat-count-3-3" class="text-[10px] bg-white/80 px-2 py-0.5 rounded-full mt-1 border border-red-400">0 casos</span>
+                                </div>
+                            </div>
+
+                            <!-- Row 2: Ocasional -->
+                            <div class="grid grid-cols-4 gap-2 mb-2 text-center text-xs items-stretch">
+                                <div class="bg-slate-100 flex flex-col items-center justify-center font-bold text-slate-700 p-2 rounded">
+                                    <span>Ocasional (2)</span>
+                                    <span class="text-[10px] font-normal text-slate-500">3 a 6 hrs/día</span>
+                                </div>
+                                <div class="p-3 rounded-xl border bg-emerald-500/20 border-emerald-400 text-emerald-900 font-bold flex flex-col justify-center items-center">
+                                    <span class="text-base font-black">2</span>
+                                    <span class="text-[10px] uppercase font-semibold">Bajo (III)</span>
+                                    <span id="heat-count-2-1" class="text-[10px] bg-white/80 px-2 py-0.5 rounded-full mt-1 border border-emerald-300">0 casos</span>
+                                </div>
+                                <div class="p-3 rounded-xl border bg-amber-500/20 border-amber-400 text-amber-900 font-bold flex flex-col justify-center items-center">
+                                    <span class="text-base font-black">4</span>
+                                    <span class="text-[10px] uppercase font-semibold">Moderado (II)</span>
+                                    <span id="heat-count-2-2" class="text-[10px] bg-white/80 px-2 py-0.5 rounded-full mt-1 border border-amber-300">0 casos</span>
+                                </div>
+                                <div class="p-3 rounded-xl border bg-red-600/20 border-red-500 text-red-900 font-bold flex flex-col justify-center items-center">
+                                    <span class="text-base font-black">6</span>
+                                    <span class="text-[10px] uppercase font-semibold">Crítico (I)</span>
+                                    <span id="heat-count-2-3" class="text-[10px] bg-white/80 px-2 py-0.5 rounded-full mt-1 border border-red-300">0 casos</span>
+                                </div>
+                            </div>
+
+                            <!-- Row 1: Esporádica -->
+                            <div class="grid grid-cols-4 gap-2 text-center text-xs items-stretch">
+                                <div class="bg-slate-100 flex flex-col items-center justify-center font-bold text-slate-700 p-2 rounded">
+                                    <span>Esporádica (1)</span>
+                                    <span class="text-[10px] font-normal text-slate-500">&lt; 3 hrs/día</span>
+                                </div>
+                                <div class="p-3 rounded-xl border bg-emerald-500/20 border-emerald-400 text-emerald-900 font-bold flex flex-col justify-center items-center">
+                                    <span class="text-base font-black">1</span>
+                                    <span class="text-[10px] uppercase font-semibold">Bajo (III)</span>
+                                    <span id="heat-count-1-1" class="text-[10px] bg-white/80 px-2 py-0.5 rounded-full mt-1 border border-emerald-300">0 casos</span>
+                                </div>
+                                <div class="p-3 rounded-xl border bg-emerald-500/20 border-emerald-400 text-emerald-900 font-bold flex flex-col justify-center items-center">
+                                    <span class="text-base font-black">2</span>
+                                    <span class="text-[10px] uppercase font-semibold">Bajo (III)</span>
+                                    <span id="heat-count-1-2" class="text-[10px] bg-white/80 px-2 py-0.5 rounded-full mt-1 border border-emerald-300">0 casos</span>
+                                </div>
+                                <div class="p-3 rounded-xl border bg-amber-500/20 border-amber-400 text-amber-900 font-bold flex flex-col justify-center items-center">
+                                    <span class="text-base font-black">3</span>
+                                    <span class="text-[10px] uppercase font-semibold">Moderado (II)</span>
+                                    <span id="heat-count-1-3" class="text-[10px] bg-white/80 px-2 py-0.5 rounded-full mt-1 border border-amber-300">0 casos</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interpretation & Guidance Card -->
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center justify-between">
+                            <span>Nivel de Riesgo y Control Asociado</span>
+                            <span class="text-[11px] font-semibold text-slate-500">Res. 40595</span>
+                        </h4>
+                        <div class="space-y-3 text-xs">
+                            <div class="p-3 bg-red-50 border-l-4 border-red-600 rounded-r-lg">
+                                <div class="flex justify-between items-center font-bold text-red-900">
+                                    <span>Crítico (I)</span>
+                                    <span class="bg-red-600 text-white px-2 py-0.5 rounded font-black text-xs">NR: 6 A 9</span>
+                                </div>
+                                <p class="text-red-800 font-semibold mt-1">CONTROL OBLIGATORIO:</p>
+                                <p class="text-red-700 text-[11px]">Eliminar o Evitar la fuente que lo ocasiona</p>
+                            </div>
+                            <div class="p-3 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg">
+                                <div class="flex justify-between items-center font-bold text-amber-900">
+                                    <span>Moderado (II)</span>
+                                    <span class="bg-amber-500 text-white px-2 py-0.5 rounded font-black text-xs">NR: 3 A 4</span>
+                                </div>
+                                <p class="text-amber-800 font-semibold mt-1">CONTROL OBLIGATORIO:</p>
+                                <p class="text-amber-700 text-[11px]">Modificar los factores de exposición y probabilidad</p>
+                            </div>
+                            <div class="p-3 bg-emerald-50 border-l-4 border-emerald-600 rounded-r-lg">
+                                <div class="flex justify-between items-center font-bold text-emerald-900">
+                                    <span>Bajo (III)</span>
+                                    <span class="bg-emerald-600 text-white px-2 py-0.5 rounded font-black text-xs">NR: 1 A 2</span>
+                                </div>
+                                <p class="text-emerald-800 font-semibold mt-1">CONTROL OBLIGATORIO:</p>
+                                <p class="text-emerald-700 text-[11px]">Aceptar los factores de exposición y probabilidad</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Role Breakdown -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <h4 class="font-bold text-slate-800 text-sm mb-3">Distribución por Rol en el Tránsito</h4>
+                        <div id="breakdown-roles" class="space-y-2 text-xs">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL: REGISTRAR / EDITAR PELIGRO EN MATRIZ -->
+    <div id="modal-registro" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col border border-slate-200">
+            <!-- Modal Header -->
+            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-600 text-white p-2 rounded-lg"><i class="fa-solid fa-clipboard-check"></i></div>
+                    <div>
+                        <h3 id="modal-title" class="font-bold text-slate-900 text-lg">Nuevo Peligro Vial</h3>
+                        <p class="text-xs text-slate-500">Valida los datos y previene duplicidad según la Res. 40595</p>
+                    </div>
+                </div>
+                <button onclick="closeModalRegistro()" class="text-slate-400 hover:text-slate-700 p-2 text-lg rounded-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Modal Body Form -->
+            <div class="p-6 overflow-y-auto custom-scrollbar flex-1 space-y-6">
+                <!-- Duplicate Alert Banner -->
+                <div id="duplicate-warning" class="hidden p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 text-xs flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-base text-red-600"></i>
+                    <span><strong>Atención:</strong> Ya existe un registro idéntico con la misma Sede, Cargo, Rol y Peligro. Evita duplicados según el lineamiento.</span>
+                </div>
+
+                <!-- Section 1: Ubicación y Cargo -->
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-blue-700 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-map-location-dot"></i> 1. Identificación Organizacional
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Sede <span class="text-red-500">*</span></label>
+                            <select id="form-sede" onchange="checkDuplicateRegistration()" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Área / Proceso <span class="text-red-500">*</span></label>
+                            <select id="form-proceso" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Cargo <span class="text-red-500">*</span></label>
+                            <select id="form-cargo" onchange="checkDuplicateRegistration()" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Rol en el Tránsito y Factor -->
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-blue-700 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-person-walking"></i> 2. Rol y Clasificación del Peligro
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Rol en el Tránsito <span class="text-red-500">*</span></label>
+                            <select id="form-rol" onchange="checkDuplicateRegistration()" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Número de Personas Expuestas</label>
+                            <input type="number" id="form-expuestos" min="1" value="1" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Factor de Riesgo</label>
+                            <select id="form-factor" onchange="handleFactorChange()" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+                                <option value="Críticos">⚠️ Críticos</option>
+                                <option value="Entorno">Entorno</option>
+                                <option value="Vehículo">Vehículo</option>
+                                <option value="Humano">Humano</option>
+                                <option value="Dirección_y_Logística">Dirección y Logística</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Peligro Identificado <span class="text-red-500">*</span></label>
+                            <select id="form-peligro" onchange="handlePeligroSelection()" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+                                <!-- Dynamic options based on factor -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Riesgo / Evento Vial Asociado</label>
+                            <input type="text" id="form-riesgo" placeholder="Ej: Choque, volcamiento, atropello, lesión..." class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Evaluación y Nivel de Riesgo -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-blue-700 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-calculator"></i> 3. Valoración del Riesgo Vial (Exposición × Probabilidad - Res. 40595)
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">
+                                Nivel de Exposición (E)
+                            </label>
+                            <select id="form-exposicion" onchange="calculateRiskScore()" class="w-full text-xs sm:text-sm bg-white border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+                                <option value="3">3 - Frecuente (Más de 6 horas al día)</option>
+                                <option value="2">2 - Ocasional (Entre 3 y 6 horas al día)</option>
+                                <option value="1">1 - Esporádica (Menor de 3 horas al día)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">
+                                Nivel de Probabilidad (P)
+                            </label>
+                            <select id="form-probabilidad" onchange="calculateRiskScore()" class="w-full text-xs sm:text-sm bg-white border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500 font-medium">
+                                <option value="3">3 - Muy probable (No se tienen establecidos controles eficaces)</option>
+                                <option value="2">2 - Poco probable (Se tienen controles, pero su eficacia es baja)</option>
+                                <option value="1">1 - No es probable (Se tienen controles eficaces)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Calculated Result Banner -->
+                    <div id="risk-result-box" class="p-3.5 rounded-xl border flex flex-col sm:flex-row justify-between items-center gap-3 bg-red-50 border-red-200 text-red-900 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div id="risk-badge-icon" class="w-10 h-10 rounded-full flex items-center justify-center font-black text-lg bg-red-600 text-white shadow-sm">9</div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold uppercase">Nivel de Riesgo (NR = E × P):</span>
+                                    <span id="risk-score-text" class="text-xs font-extrabold bg-red-200 px-2 py-0.5 rounded">Crítico (I)</span>
+                                </div>
+                                <p id="risk-measure-text" class="text-xs text-red-800 mt-0.5 font-medium">Eliminar o Evitar la fuente que lo ocasiona</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[11px] font-semibold text-slate-500 bg-white/80 px-2.5 py-1 rounded-md border border-slate-200 block">Cálculo Automático</span>
+                            <span id="risk-formula-text" class="text-[10px] text-slate-400 mt-0.5 block">NR = 3 × 3 = 9</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Medidas y Controles -->
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-blue-700 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check"></i> 4. Control Propuesto y Responsable
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Control Propuesto</label>
+                            <input type="text" id="form-control" placeholder="Ej: Telemetría GPS, limitador de velocidad, exámenes..." class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">¿Quién realiza el control? (Responsable)</label>
+                            <input type="text" id="form-responsable" value="Líder del PESV" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer Buttons -->
+            <div class="p-4 border-t border-slate-200 bg-slate-50 rounded-b-2xl flex justify-between items-center">
+                <button type="button" onclick="closeModalRegistro()" class="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 font-medium">Cancelar</button>
+                <div class="flex items-center gap-2">
+                    <button id="btn-save-record" type="button" onclick="saveRecord()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-sm transition active:scale-95 flex items-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Registro
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CONFIRMATION / DELETE -->
+    <div id="modal-confirm" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-slate-200 text-center">
+            <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto text-xl mb-3">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h4 id="confirm-title" class="font-bold text-slate-900 text-base mb-1">Confirmar acción</h4>
+            <p id="confirm-message" class="text-xs text-slate-500 mb-5 leading-relaxed">¿Estás seguro de continuar?</p>
+            <div class="flex gap-2">
+                <button onclick="closeConfirmModal(false)" class="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-xs sm:text-sm text-slate-700 hover:bg-slate-50 font-medium">Cancelar</button>
+                <button onclick="closeConfirmModal(true)" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-red-700">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const defaultCatalogs = {
+            sedes: ["Administrativa", "Operación", "Principal", "Norte", "Sur"],
+            procesos: ["Dirección", "Operativa", "Administrativa", "In itinere", "Todas", "Apoyo"],
+            cargos: [
+                "Nivel Directo",
+                "Director Operativo",
+                "Asistente Administrativa",
+                "Operador bus padrón",
+                "Servicio general",
+                "Asesores",
+                "Gerente-Asesores",
+                "Conductor de reparto",
+                "Mensajero",
+                "Todos"
+            ],
+            roles: [
+                "Peatón",
+                "Ciclista",
+                "Motociclista",
+                "Conductor",
+                "Pasajero",
+                "Pasajero Transporte Público",
+                "Operador montacarga"
+            ],
+            componentes: [
+                "Institucional",
+                "Humano",
+                "Vehículos",
+                "Infraestructura",
+                "Atención a víctimas"
+            ],
+            hazardsCatalog: {
+                "Críticos": [
+                    "Conducción bajo efectos de alcohol y SPA",
+                    "Cruce con ciclistas",
+                    "Cruce con peatones (Uso de zonas peatonales)",
+                    "Distracciones (uso de celular)",
+                    "Exceso de velocidad",
+                    "Fatiga",
+                    "Mal o no uso de casco",
+                    "No uso del cinturón de seguridad"
+                ],
+                "Dirección_y_Logística": [
+                    "Desplazamientos en horario nocturno (De las 18:00 a las 22:00 horas)",
+                    "Gestión de la flota de vehículos de empresa: criterios de compra y mantenimiento",
+                    "Protocolos de comunicación durante los desplazamientos"
+                ],
+                "Entorno": [
+                    "Cambia de materiales en la calzada",
+                    "Cambios de temperatura",
+                    "Cambios en las condiciones de la ruta",
+                    "Claridad de la vía",
+                    "Compartir vía con usuarios vulnerables",
+                    "Condiciones meteorológicas desfavorables",
+                    "Congestión del tránsito",
+                    "Conocimiento de la ruta",
+                    "Conocimiento de la vía",
+                    "Continuidad en la vía",
+                    "Deficiente contención en zonas laterales",
+                    "Demarcación vial confusa",
+                    "Incorrecta iluminación",
+                    "Intersección con vías que tengan prelación (vulnerables)",
+                    "Neblina",
+                    "Obras en la vía",
+                    "Vía de doble sentido vehicular en la misma calzada"
+                ],
+                "Vehículo": [
+                    "Falla mecánica",
+                    "Vehículo sin frenos ABS",
+                    "Vehículo sin sistemas ADA",
+                    "Ausencia o inadecuado alistamiento preoperacional"
+                ],
+                "Humano": [
+                    "Baja percepción al riesgo",
+                    "Conducción bajo los efectos de medicamentos",
+                    "Estrés",
+                    "Exceso de confianza por pericia",
+                    "Falta de soporte ante posibles incidencias",
+                    "Género",
+                    "Inestabilidad laboral",
+                    "Nivel de atención continuada en la conducción",
+                    "Nivel socioeconómico",
+                    "Posturas sedentarias",
+                    "Remuneración en función de la productividad",
+                    "Sueño"
+                ]
+            }
+        };
+
+        // Application State
+        let appState = {
+            catalogs: JSON.parse(JSON.stringify(defaultCatalogs)),
+            records: [
+                {
+                    id: 1,
+                    sede: "Administrativa",
+                    proceso: "Dirección",
+                    cargo: "Nivel Directo",
+                    expuestos: 1,
+                    rol: "Conductor",
+                    factor: "Críticos",
+                    peligro: "Conducción bajo efectos de alcohol y SPA",
+                    riesgo: "Accidente de tránsito con fatalidad o lesiones severas",
+                    exposicion: 3,
+                    probabilidad: 2,
+                    nr: 6,
+                    interpretacion: "Crítico",
+                    nivelRomano: "I",
+                    medida: "Eliminar o Evitar la fuente que lo ocasiona",
+                    control: "Política de Cero Tolerancia a Alcohol y SPA con pruebas periódicas aleatorias",
+                    responsable: "Líder del PESV"
+                },
+                {
+                    id: 2,
+                    sede: "Operación",
+                    proceso: "Operativa",
+                    cargo: "Operador bus padrón",
+                    expuestos: 15,
+                    rol: "Conductor",
+                    factor: "Críticos",
+                    peligro: "Exceso de velocidad",
+                    riesgo: "Colisión frontal o volcamiento",
+                    exposicion: 3,
+                    probabilidad: 3,
+                    nr: 9,
+                    interpretacion: "Crítico",
+                    nivelRomano: "I",
+                    medida: "Eliminar o Evitar la fuente que lo ocasiona",
+                    control: "Gobernador electrónico a 60 km/h y telemetría GPS con alarma en cabina",
+                    responsable: "Líder del PESV / Jefe de Operaciones"
+                },
+                {
+                    id: 3,
+                    sede: "Administrativa",
+                    proceso: "Administrativa",
+                    cargo: "Asistente Administrativa",
+                    expuestos: 3,
+                    rol: "Peatón",
+                    factor: "Entorno",
+                    peligro: "Cruce con peatones (Uso de zonas peatonales)",
+                    riesgo: "Atropello en vía pública",
+                    exposicion: 2,
+                    probabilidad: 2,
+                    nr: 4,
+                    interpretacion: "Moderado",
+                    nivelRomano: "II",
+                    medida: "Modificar los factores de exposición y probabilidad",
+                    control: "Capacitación en autocuidado como peatón y rutas seguras peatonales",
+                    responsable: "Líder del PESV"
+                },
+                {
+                    id: 4,
+                    sede: "Operación",
+                    proceso: "Operativa",
+                    cargo: "Mensajero",
+                    expuestos: 2,
+                    rol: "Motociclista",
+                    factor: "Críticos",
+                    peligro: "Mal o no uso de casco",
+                    riesgo: "Trauma craneoencefálico en caso de siniestro",
+                    exposicion: 3,
+                    probabilidad: 2,
+                    nr: 6,
+                    interpretacion: "Crítico",
+                    nivelRomano: "I",
+                    medida: "Eliminar o Evitar la fuente que lo ocasiona",
+                    control: "Dotación de cascos certificados bajo norma técnica y verificación previa",
+                    responsable: "Coordinador de Seguridad Vial"
+                },
+                {
+                    id: 5,
+                    sede: "Administrativa",
+                    proceso: "Apoyo",
+                    cargo: "Servicio general",
+                    expuestos: 4,
+                    rol: "Pasajero Transporte Público",
+                    factor: "Humano",
+                    peligro: "Posturas sedentarias",
+                    riesgo: "Fatiga postural durante el trayecto",
+                    exposicion: 1,
+                    probabilidad: 2,
+                    nr: 2,
+                    interpretacion: "Bajo",
+                    nivelRomano: "III",
+                    medida: "Aceptar los factores de exposición y probabilidad",
+                    control: "Promoción de pausas activas y ejercicios de autocuidado",
+                    responsable: "Comité de Seguridad Vial"
+                }
+            ],
+            editingId: null,
+            filterOnlyCritical: false,
+            filterLevel: 'Todos'
+        };
+
+        let confirmActionCallback = null;
+
+        function evaluateRisk(exp, prob) {
+            const e = parseInt(exp, 10);
+            const p = parseInt(prob, 10);
+            const nr = e * p;
+
+            let interpretacion = "Bajo";
+            let nivelRomano = "III";
+            let medida = "Aceptar los factores de exposición y probabilidad";
+            let bgClass = "bg-emerald-50 text-emerald-900 border-emerald-200";
+            let badgeClass = "bg-emerald-600 text-white";
+
+            // Resolution 40595 exact thresholds:
+            // Crítico (I): 6 A 9 -> Eliminar o Evitar la fuente que lo ocasiona
+            // Moderado (II): 3 A 4 -> Modificar los factores de exposición y probabilidad
+            // Bajo (III): 1 A 2 -> Aceptar los factores de exposición y probabilidad
+            if (nr >= 6) {
+                interpretacion = "Crítico";
+                nivelRomano = "I";
+                medida = "Eliminar o Evitar la fuente que lo ocasiona";
+                bgClass = "bg-red-50 text-red-900 border-red-200";
+                badgeClass = "bg-red-600 text-white";
+            } else if (nr >= 3) {
+                interpretacion = "Moderado";
+                nivelRomano = "II";
+                medida = "Modificar los factores de exposición y probabilidad";
+                bgClass = "bg-amber-50 text-amber-900 border-amber-200";
+                badgeClass = "bg-amber-600 text-white";
+            } else {
+                interpretacion = "Bajo";
+                nivelRomano = "III";
+                medida = "Aceptar los factores de exposición y probabilidad";
+                bgClass = "bg-emerald-50 text-emerald-900 border-emerald-200";
+                badgeClass = "bg-emerald-600 text-white";
+            }
+
+            return { nr, interpretacion, nivelRomano, medida, bgClass, badgeClass, e, p };
+        }
+
+        function calculateRiskScore() {
+            const expSelect = document.getElementById('form-exposicion');
+            const probSelect = document.getElementById('form-probabilidad');
+            if (!expSelect || !probSelect) return;
+
+            const exp = expSelect.value;
+            const prob = probSelect.value;
+            const evalResult = evaluateRisk(exp, prob);
+
+            const resultBox = document.getElementById('risk-result-box');
+            const badgeIcon = document.getElementById('risk-badge-icon');
+            const scoreText = document.getElementById('risk-score-text');
+            const measureText = document.getElementById('risk-measure-text');
+            const formulaText = document.getElementById('risk-formula-text');
+
+            if (badgeIcon) badgeIcon.innerText = evalResult.nr;
+            if (scoreText) scoreText.innerText = `${evalResult.interpretacion} (${evalResult.nivelRomano})`;
+            if (measureText) measureText.innerText = evalResult.medida;
+            if (formulaText) formulaText.innerText = `NR = ${evalResult.e} × ${evalResult.p} = ${evalResult.nr}`;
+
+            if (resultBox) {
+                resultBox.className = `p-3.5 rounded-xl border flex flex-col sm:flex-row justify-between items-center gap-3 transition-colors ${evalResult.bgClass}`;
+            }
+            if (badgeIcon) {
+                badgeIcon.className = `w-10 h-10 rounded-full flex items-center justify-center font-black text-lg ${evalResult.badgeClass} shadow-sm`;
+            }
+        }
+
+        function switchTab(tabId) {
+            const tabs = ['matriz', 'parametrizacion', 'dashboard'];
+            tabs.forEach(t => {
+                const section = document.getElementById(`tab-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (!section || !btn) return;
+
+                if (t === tabId) {
+                    section.classList.remove('hidden');
+                    btn.className = 'tab-btn px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-blue-50 text-blue-700 border border-blue-200 shadow-sm';
+                } else {
+                    section.classList.add('hidden');
+                    btn.className = 'tab-btn px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:bg-slate-100';
+                }
+            });
+
+            if (tabId === 'dashboard') {
+                updateDashboard();
+            } else if (tabId === 'parametrizacion') {
+                renderParametersView();
+            } else if (tabId === 'matriz') {
+                renderMatrix();
+            }
+        }
+
+        function renderMatrix() {
+            const tbody = document.getElementById('matriz-tbody');
+            const emptyState = document.getElementById('empty-state');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+
+            const sedeFilter = document.getElementById('filter-sede') ? document.getElementById('filter-sede').value : '';
+            const rolFilter = document.getElementById('filter-rol') ? document.getElementById('filter-rol').value : '';
+            const searchVal = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase().trim() : '';
+
+            // Clone and prioritize Critical Hazards (NR 6 to 9 or factor "Críticos" first)
+            let filtered = [...appState.records].sort((a, b) => {
+                const aIsCrit = (a.factor === 'Críticos' || a.nr >= 6) ? 1 : 0;
+                const bIsCrit = (b.factor === 'Críticos' || b.nr >= 6) ? 1 : 0;
+                if (bIsCrit !== aIsCrit) return bIsCrit - aIsCrit;
+                return b.nr - a.nr;
+            });
+
+            if (appState.filterOnlyCritical) {
+                filtered = filtered.filter(r => r.factor === 'Críticos' || r.interpretacion === 'Crítico');
+            }
+
+            if (appState.filterLevel && appState.filterLevel !== 'Todos') {
+                filtered = filtered.filter(r => r.interpretacion === appState.filterLevel);
+            }
+
+            if (sedeFilter) {
+                filtered = filtered.filter(r => r.sede === sedeFilter);
+            }
+
+            if (rolFilter) {
+                filtered = filtered.filter(r => r.rol === rolFilter);
+            }
+
+            if (searchVal) {
+                filtered = filtered.filter(r => 
+                    (r.peligro && r.peligro.toLowerCase().includes(searchVal)) ||
+                    (r.cargo && r.cargo.toLowerCase().includes(searchVal)) ||
+                    (r.proceso && r.proceso.toLowerCase().includes(searchVal)) ||
+                    (r.control && r.control.toLowerCase().includes(searchVal))
+                );
+            }
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+
+                filtered.forEach((r, idx) => {
+                    const tr = document.createElement('tr');
+                    const isCritical = r.interpretacion === 'Crítico' || r.factor === 'Críticos';
+                    tr.className = `hover:bg-slate-50/80 transition-colors ${isCritical ? 'bg-red-50/20' : ''}`;
+
+                    let badgeColor = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                    if (r.interpretacion === 'Crítico') badgeColor = 'bg-red-100 text-red-800 border-red-200 font-bold';
+                    else if (r.interpretacion === 'Moderado') badgeColor = 'bg-amber-100 text-amber-800 border-amber-200 font-semibold';
+
+                    tr.innerHTML = `
+                        <td class="p-3 text-center text-slate-400 font-mono">${idx + 1}</td>
+                        <td class="p-3 font-semibold text-slate-800">${escapeHTML(r.sede)}</td>
+                        <td class="p-3 text-slate-600">${escapeHTML(r.proceso)}</td>
+                        <td class="p-3 text-slate-700 font-medium">${escapeHTML(r.cargo)}</td>
+                        <td class="p-3 text-center text-slate-600">${r.expuestos || 1}</td>
+                        <td class="p-3">
+                            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px]">
+                                <i class="fa-solid ${getRoleIcon(r.rol)} text-slate-500"></i> ${escapeHTML(r.rol)}
+                            </span>
+                        </td>
+                        <td class="p-3">
+                            <span class="text-[11px] font-semibold ${r.factor === 'Críticos' ? 'text-red-600 font-bold' : 'text-slate-600'}">
+                                ${r.factor === 'Críticos' ? '⚠️ Críticos' : escapeHTML(r.factor)}
+                            </span>
+                        </td>
+                        <td class="p-3 font-medium text-slate-900">${escapeHTML(r.peligro)}</td>
+                        <td class="p-3 text-slate-600">${escapeHTML(r.riesgo || 'Accidente de tránsito')}</td>
+                        <td class="p-3 text-center font-bold text-slate-700">${r.exposicion}</td>
+                        <td class="p-3 text-center font-bold text-slate-700">${r.probabilidad}</td>
+                        <td class="p-3 text-center">
+                            <span class="inline-block w-7 h-7 leading-7 text-center rounded-full font-black text-xs ${r.nr >= 6 ? 'bg-red-600 text-white' : r.nr >= 3 ? 'bg-amber-500 text-white' : 'bg-emerald-600 text-white'} shadow-sm">
+                                ${r.nr}
+                            </span>
+                        </td>
+                        <td class="p-3 text-center">
+                            <span class="px-2.5 py-1 rounded-md text-[11px] border ${badgeColor}">
+                                ${escapeHTML(r.interpretacion)} (${escapeHTML(r.nivelRomano)})
+                            </span>
+                        </td>
+                        <td class="p-3 text-[11px] font-medium ${r.nr >= 6 ? 'text-red-700' : r.nr >= 3 ? 'text-amber-700' : 'text-emerald-700'}">${escapeHTML(r.medida)}</td>
+                        <td class="p-3 text-slate-600 text-[11px]">${escapeHTML(r.control || '')}</td>
+                        <td class="p-3 text-slate-600 text-[11px] whitespace-nowrap">${escapeHTML(r.responsable || 'Líder del PESV')}</td>
+                        <td class="p-3 text-center whitespace-nowrap">
+                            <button onclick="editRecord(${r.id})" class="text-blue-600 hover:text-blue-800 p-1.5 rounded hover:bg-blue-50 transition" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="confirmDeleteRecord(${r.id})" class="text-red-600 hover:text-red-800 p-1.5 rounded hover:bg-red-50 transition" title="Eliminar"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            updateTopCounters();
+        }
+
+        function getRoleIcon(rol) {
+            switch (rol) {
+                case 'Conductor': return 'fa-car';
+                case 'Motociclista': return 'fa-motorcycle';
+                case 'Ciclista': return 'fa-bicycle';
+                case 'Peatón': return 'fa-person-walking';
+                case 'Pasajero':
+                case 'Pasajero Transporte Público': return 'fa-bus';
+                case 'Operador montacarga': return 'fa-dolly';
+                default: return 'fa-user';
+            }
+        }
+
+        function updateTopCounters() {
+            const total = appState.records.length;
+            const criticos = appState.records.filter(r => r.interpretacion === 'Crítico' || r.factor === 'Críticos').length;
+            const moderados = appState.records.filter(r => r.interpretacion === 'Moderado' && r.factor !== 'Críticos').length;
+            const bajos = appState.records.filter(r => r.interpretacion === 'Bajo' && r.factor !== 'Críticos').length;
+
+            const elTotal = document.getElementById('stat-total');
+            const elCrit = document.getElementById('stat-criticos');
+            const elMod = document.getElementById('stat-moderados');
+            const elBaj = document.getElementById('stat-bajos');
+
+            if (elTotal) elTotal.innerText = total;
+            if (elCrit) elCrit.innerText = criticos;
+            if (elMod) elMod.innerText = moderados;
+            if (elBaj) elBaj.innerText = bajos;
+        }
+
+        function filterByRiskLevel(level) {
+            appState.filterLevel = level;
+            if (level === 'Crítico') {
+                appState.filterOnlyCritical = true;
+            } else if (level === 'Todos') {
+                appState.filterOnlyCritical = false;
+                appState.filterLevel = 'Todos';
+            } else {
+                appState.filterOnlyCritical = false;
+            }
+            updateCriticalToggleButton();
+            applyFilters();
+        }
+
+        function toggleFilterOnlyCritical() {
+            appState.filterOnlyCritical = !appState.filterOnlyCritical;
+            if (!appState.filterOnlyCritical && appState.filterLevel === 'Crítico') {
+                appState.filterLevel = 'Todos';
+            }
+            updateCriticalToggleButton();
+            renderMatrix();
+        }
+
+        function updateCriticalToggleButton() {
+            const btn = document.getElementById('btn-toggle-critical');
+            if (!btn) return;
+            if (appState.filterOnlyCritical) {
+                btn.className = 'bg-red-600 hover:bg-red-700 text-white font-medium px-3.5 py-2.5 rounded-lg border border-red-700 flex items-center gap-2 transition text-sm shadow-sm';
+            } else {
+                btn.className = 'bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-3.5 py-2.5 rounded-lg border border-slate-200 flex items-center gap-2 transition text-sm';
+            }
+        }
+
+        function applyFilters() {
+            renderMatrix();
+        }
+
+        function checkDuplicateRegistration(excludeId = null) {
+            const sede = document.getElementById('form-sede') ? document.getElementById('form-sede').value : '';
+            const cargo = document.getElementById('form-cargo') ? document.getElementById('form-cargo').value : '';
+            const rol = document.getElementById('form-rol') ? document.getElementById('form-rol').value : '';
+            const peligro = document.getElementById('form-peligro') ? document.getElementById('form-peligro').value : '';
+            const warningBanner = document.getElementById('duplicate-warning');
+            const saveBtn = document.getElementById('btn-save-record');
+
+            if (!sede || !cargo || !rol || !peligro) {
+                if (warningBanner) warningBanner.classList.add('hidden');
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+                return false;
+            }
+
+            const currentId = excludeId !== null ? excludeId : appState.editingId;
+
+            const isDuplicate = appState.records.some(record => {
+                if (currentId && record.id === currentId) return false;
+                return record.sede === sede &&
+                       record.cargo === cargo &&
+                       record.rol === rol &&
+                       record.peligro === peligro;
+            });
+
+            if (isDuplicate) {
+                if (warningBanner) warningBanner.classList.remove('hidden');
+                if (saveBtn) {
+                    saveBtn.disabled = true;
+                    saveBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+                return true;
+            } else {
+                if (warningBanner) warningBanner.classList.add('hidden');
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+                return false;
+            }
+        }
+
+        function handleFactorChange() {
+            const factorSelect = document.getElementById('form-factor');
+            const peligroSelect = document.getElementById('form-peligro');
+            if (!factorSelect || !peligroSelect) return;
+
+            const factor = factorSelect.value;
+            const hazards = appState.catalogs.hazardsCatalog[factor] || [];
+
+            peligroSelect.innerHTML = hazards.map(h => `<option value="${escapeHTML(h)}">${escapeHTML(h)}</option>`).join('');
+            if (hazards.length === 0) {
+                peligroSelect.innerHTML = '<option value="">(No hay peligros registrados en este factor)</option>';
+            }
+
+            if (factor === 'Críticos') {
+                const expEl = document.getElementById('form-exposicion');
+                const probEl = document.getElementById('form-probabilidad');
+                if (expEl) expEl.value = '3';
+                if (probEl) probEl.value = '2';
+            }
+
+            calculateRiskScore();
+            checkDuplicateRegistration(appState.editingId);
+        }
+
+        function handlePeligroSelection() {
+            checkDuplicateRegistration(appState.editingId);
+        }
+
+        function openModalRegistro(editRecordId = null) {
+            appState.editingId = editRecordId;
+            populateModalSelects();
+
+            const modalTitle = document.getElementById('modal-title');
+            const duplicateWarning = document.getElementById('duplicate-warning');
+            if (duplicateWarning) duplicateWarning.classList.add('hidden');
+
+            if (editRecordId) {
+                const item = appState.records.find(r => r.id === editRecordId);
+                if (!item) return;
+
+                if (modalTitle) modalTitle.innerText = `Editar Registro #${item.id}`;
+                document.getElementById('form-sede').value = item.sede;
+                document.getElementById('form-proceso').value = item.proceso;
+                document.getElementById('form-cargo').value = item.cargo;
+                document.getElementById('form-rol').value = item.rol;
+                document.getElementById('form-expuestos').value = item.expuestos || 1;
+                document.getElementById('form-factor').value = item.factor;
                 
-                <div class="flex items-center space-x-1.5">
-                  <button id="btnPlayPause" class="p-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white transition font-bold" title="Reproducir / Pausar">
-                    <svg id="playIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path></svg>
-                    <svg id="pauseIcon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6"></path></svg>
-                  </button>
-                  <span id="timeDisplay" class="text-xs font-mono text-slate-300 font-bold px-2 py-1 bg-slate-800 rounded">00:00.00 / 00:14.00</span>
-                </div>
+                handleFactorChange();
+                document.getElementById('form-peligro').value = item.peligro;
+                document.getElementById('form-riesgo').value = item.riesgo || '';
+                document.getElementById('form-exposicion').value = item.exposicion;
+                document.getElementById('form-probabilidad').value = item.probabilidad;
+                document.getElementById('form-control').value = item.control || '';
+                document.getElementById('form-responsable').value = item.responsable || 'Líder del PESV';
+            } else {
+                if (modalTitle) modalTitle.innerText = 'Nuevo Peligro Vial (PESV)';
+                document.getElementById('form-factor').value = 'Críticos';
+                handleFactorChange();
+                document.getElementById('form-riesgo').value = '';
+                document.getElementById('form-control').value = '';
+                document.getElementById('form-expuestos').value = 1;
+                document.getElementById('form-responsable').value = 'Líder del PESV';
+            }
 
-                <!-- Botonera Fotograma a Fotograma -->
-                <div class="flex items-center space-x-1 bg-slate-800/90 p-1 rounded-lg border border-slate-700">
-                  <button onclick="stepFrame(-1)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-white text-[11px] font-bold rounded" title="Retroceder 1 fotograma (~0.033s)">
-                    ⮜ 1 Frame
-                  </button>
-                  <button onclick="stepSeconds(-0.1)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-[11px] rounded" title="Retroceder 0.1s">
-                    -0.1s
-                  </button>
-                  <button onclick="stepSeconds(0.1)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 text-[11px] rounded" title="Avanzar 0.1s">
-                    +0.1s
-                  </button>
-                  <button onclick="stepFrame(1)" class="px-2 py-1 bg-slate-700 hover:bg-slate-600 text-white text-[11px] font-bold rounded" title="Avanzar 1 fotograma (~0.033s)">
-                    1 Frame ⮞
-                  </button>
-                </div>
+            calculateRiskScore();
+            const modal = document.getElementById('modal-registro');
+            if (modal) modal.classList.remove('hidden');
+        }
 
-                <button id="btnAiAnalyzeTrigger" class="inline-flex items-center px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition shadow">
-                  <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                  Auditar Fotograma con IA
-                </button>
-              </div>
-            </div>
+        function closeModalRegistro() {
+            const modal = document.getElementById('modal-registro');
+            if (modal) modal.classList.add('hidden');
+            appState.editingId = null;
+        }
 
-          </div>
+        function saveRecord() {
+            const isDup = checkDuplicateRegistration(appState.editingId);
+            if (isDup) {
+                showToast("No se puede guardar: Este peligro vial ya está registrado para la misma sede, cargo y rol.", "warning");
+                return;
+            }
 
-          <!-- Puntos Críticos del Video -->
-          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3.5">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-slate-800 uppercase tracking-wider">Hitos Críticos Detectados en el Video</span>
-              <span class="text-[11px] text-slate-500 font-medium">Click en cualquier punto para saltar al segundo exacto</span>
-            </div>
-            <div id="quickTimelineGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
-          </div>
-        </div>
+            const sede = document.getElementById('form-sede').value;
+            const proceso = document.getElementById('form-proceso').value;
+            const cargo = document.getElementById('form-cargo').value;
+            const rol = document.getElementById('form-rol').value;
+            const expuestos = parseInt(document.getElementById('form-expuestos').value, 10) || 1;
+            const factor = document.getElementById('form-factor').value;
+            const peligro = document.getElementById('form-peligro').value;
+            const riesgo = document.getElementById('form-riesgo').value.trim() || 'Accidente de tránsito';
+            const exposicion = parseInt(document.getElementById('form-exposicion').value, 10);
+            const probabilidad = parseInt(document.getElementById('form-probabilidad').value, 10);
+            const control = document.getElementById('form-control').value.trim() || 'Monitoreo e inducción periódica';
+            const responsable = document.getElementById('form-responsable').value.trim() || 'Líder del PESV';
 
-        <!-- Panel Lateral: Cinemática e Información -->
-        <div class="lg:col-span-5 flex flex-col gap-3">
-          
-          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-            <div class="flex items-center justify-between pb-2 border-b border-slate-100 mb-2.5">
-              <div class="flex items-center space-x-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-orange-600"></span>
-                <h3 class="text-xs font-bold text-slate-900 uppercase">Modelo de Parada AASHTO / NHTSA</h3>
-              </div>
-              <span class="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded">Fórmula Física</span>
-            </div>
+            if (!peligro) {
+                showToast("Por favor selecciona o define un peligro vial.", "warning");
+                return;
+            }
 
-            <div class="text-xs text-slate-600 space-y-2">
-              <div class="bg-slate-900 text-cyan-300 p-2 rounded-lg font-mono text-[11px] text-center border border-slate-800">
-                $$d_{\text{parada}} = 0.278 \cdot V \cdot t_r + \frac{V^2}{254 \cdot (f \pm G)}$$
-              </div>
-              <div class="grid grid-cols-2 gap-2 text-[11px] pt-1">
-                <div class="p-2 rounded bg-slate-50 border border-slate-200">
-                  <span class="font-bold text-slate-800 block">Tiempo Reacción ($t_r$):</span>
-                  <span class="text-slate-600">1.5 s (AASHTO)</span>
-                </div>
-                <div class="p-2 rounded bg-slate-50 border border-slate-200">
-                  <span class="font-bold text-slate-800 block">Fricción Calzada ($f$):</span>
-                  <span class="text-rose-600 font-semibold">0.28 (Mojado)</span>
-                </div>
-              </div>
-              <div id="dynamicBrakingBox" class="p-2.5 rounded-lg bg-orange-50 border border-orange-200 text-orange-950 font-medium text-[11px]">
-                A la velocidad actual (<span id="calcCurrentSpeed" class="font-bold">72 km/h</span>), el vehículo recorre <span id="calcReactionDist" class="font-bold">30.0 m</span> antes de accionar el freno y se detiene en <span id="calcTotalDist" class="font-bold text-rose-700">68.4 metros</span>.
-              </div>
-            </div>
-          </div>
+            const evalRisk = evaluateRisk(exposicion, probabilidad);
 
-          <!-- Escalas de Evaluación (Imagen 3) -->
-          <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="bg-[#ea7025] px-4 py-2 text-white flex items-center justify-between">
-              <h3 class="text-xs font-bold uppercase tracking-wider">Criterios de Evaluación (Imagen 3)</h3>
-              <span class="text-[10px] font-semibold bg-black/20 px-2 py-0.5 rounded">Norma PESV</span>
-            </div>
+            if (appState.editingId) {
+                const index = appState.records.findIndex(r => r.id === appState.editingId);
+                if (index !== -1) {
+                    appState.records[index] = {
+                        id: appState.editingId,
+                        sede,
+                        proceso,
+                        cargo,
+                        expuestos,
+                        rol,
+                        factor,
+                        peligro,
+                        riesgo,
+                        exposicion,
+                        probabilidad,
+                        nr: evalRisk.nr,
+                        interpretacion: evalRisk.interpretacion,
+                        nivelRomano: evalRisk.nivelRomano,
+                        medida: evalRisk.medida,
+                        control,
+                        responsable
+                    };
+                    showToast("Registro de peligro actualizado con éxito.");
+                }
+            } else {
+                const newId = appState.records.length > 0 ? Math.max(...appState.records.map(r => r.id)) + 1 : 1;
+                appState.records.push({
+                    id: newId,
+                    sede,
+                    proceso,
+                    cargo,
+                    expuestos,
+                    rol,
+                    factor,
+                    peligro,
+                    riesgo,
+                    exposicion,
+                    probabilidad,
+                    nr: evalRisk.nr,
+                    interpretacion: evalRisk.interpretacion,
+                    nivelRomano: evalRisk.nivelRomano,
+                    medida: evalRisk.medida,
+                    control,
+                    responsable
+                });
+                showToast("Nuevo peligro agregado a la matriz exitosamente.");
+            }
 
-            <div class="p-3 text-xs space-y-3">
-              <div>
-                <span class="font-bold text-slate-800 text-[11px] uppercase block mb-1">Escala de Severidad:</span>
-                <div class="grid grid-cols-4 gap-1 text-[10px] text-center font-medium">
-                  <div class="p-1 rounded bg-emerald-50 text-emerald-800 border border-emerald-200"><b>1</b><br>Leve</div>
-                  <div class="p-1 rounded bg-amber-50 text-amber-800 border border-amber-200"><b>2</b><br>Menor</div>
-                  <div class="p-1 rounded bg-orange-50 text-orange-800 border border-orange-200"><b>3</b><br>Grave</div>
-                  <div class="p-1 rounded bg-rose-50 text-rose-800 border border-rose-200"><b>4</b><br>Fatal</div>
-                </div>
-              </div>
+            closeModalRegistro();
+            renderMatrix();
+        }
 
-              <div>
-                <span class="font-bold text-slate-800 text-[11px] uppercase block mb-1">Escala de Probabilidad:</span>
-                <div class="grid grid-cols-4 gap-1 text-[10px] text-center font-medium">
-                  <div class="p-1 rounded bg-emerald-50 text-emerald-800 border border-emerald-200"><b>1</b><br>Inexistente</div>
-                  <div class="p-1 rounded bg-sky-50 text-sky-800 border border-sky-200"><b>2</b><br>Bajo</div>
-                  <div class="p-1 rounded bg-amber-50 text-amber-800 border border-amber-200"><b>3</b><br>Moderada</div>
-                  <div class="p-1 rounded bg-rose-50 text-rose-800 border border-rose-200"><b>4</b><br>Alta</div>
-                </div>
-              </div>
-            </div>
-          </div>
+        function editRecord(id) {
+            openModalRegistro(id);
+        }
 
-          <!-- Caja de Descarga Directa -->
-          <div class="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl p-4 border border-emerald-200 shadow-sm flex flex-col gap-2">
-            <span class="text-xs font-bold text-emerald-950 uppercase flex items-center">
-              <svg class="w-4 h-4 mr-1.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 7h10v2H7zm0 4h10v2H7zm0 4h7v2H7z"/></svg>
-              Descarga para Google Sheets / Excel
-            </span>
-            <p class="text-[11px] text-emerald-900 leading-relaxed">
-              El archivo descargado contiene las 3 hojas completas estructuradas: <strong>Inicio</strong>, <strong>Control de cambios</strong> y <strong>Ruta RN 25</strong> (excluyendo C RI).
-            </p>
-            <button onclick="downloadSheetsFile()" class="w-full mt-1 bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 px-3 rounded-lg text-xs shadow-md transition flex items-center justify-center">
-              Descargar Archivo .xlsx Ahora
-            </button>
-          </div>
+        function confirmDeleteRecord(id) {
+            const item = appState.records.find(r => r.id === id);
+            if (!item) return;
 
-        </div>
+            document.getElementById('confirm-title').innerText = 'Eliminar Peligro';
+            document.getElementById('confirm-message').innerText = `¿Deseas eliminar el peligro "${item.peligro}" para el cargo "${item.cargo}"?`;
+            
+            confirmActionCallback = () => {
+                appState.records = appState.records.filter(r => r.id !== id);
+                renderMatrix();
+                showToast("Registro eliminado de la matriz.", "info");
+            };
 
-      </div>
+            const confirmModal = document.getElementById('modal-confirm');
+            if (confirmModal) confirmModal.classList.remove('hidden');
+        }
 
-    </div>
+        function closeConfirmModal(accepted) {
+            const confirmModal = document.getElementById('modal-confirm');
+            if (confirmModal) confirmModal.classList.add('hidden');
+            if (accepted && typeof confirmActionCallback === 'function') {
+                confirmActionCallback();
+            }
+            confirmActionCallback = null;
+        }
 
-    <!-- ==================== PESTAÑA 2: MATRIZ DE RIESGOS DILIGENCIADA ==================== -->
-    <div id="view-tab-matrix" class="hidden space-y-4">
-      
-      <!-- Metadatos de la Hoja de Ruta -->
-      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
-          <div class="flex items-center gap-2">
-            <span class="w-3 h-3 rounded-full bg-orange-500"></span>
-            <h2 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Metadatos de la Hoja: Ruta RN 25 (Valle del Cauca)</h2>
-          </div>
-          <button onclick="downloadSheetsFile()" class="text-xs font-black text-emerald-700 hover:underline flex items-center">
-            Descargar esta Matriz (.xlsx)
-          </button>
-        </div>
+        function populateModalSelects() {
+            const fillSelect = (id, items) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.innerHTML = items.map(i => `<option value="${escapeHTML(i)}">${escapeHTML(i)}</option>`).join('');
+            };
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div class="bg-orange-50/70 p-3 rounded-lg border border-orange-200">
-            <label class="block text-[11px] font-bold text-orange-950 uppercase mb-1">Ruta:</label>
-            <input type="text" id="routeMetaName" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 font-semibold" value="RN 25 Tramo Andalucía - Tuluá - Popayán / Pasto">
-          </div>
-          <div class="bg-orange-50/70 p-3 rounded-lg border border-orange-200">
-            <label class="block text-[11px] font-bold text-orange-950 uppercase mb-1">Periodicidad:</label>
-            <input type="text" id="routeMetaPeriod" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 font-semibold" value="Diaria - Lunes a sábado (Monitoreo por viaje)">
-          </div>
-          <div class="bg-orange-50/70 p-3 rounded-lg border border-orange-200">
-            <label class="block text-[11px] font-bold text-orange-950 uppercase mb-1">Tiempo:</label>
-            <input type="text" id="routeMetaTime" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1 text-xs text-slate-800 font-semibold" value="120 minutos (Tramo Crítico Auditado: 15 segundos)">
-          </div>
-        </div>
-      </div>
+            fillSelect('form-sede', appState.catalogs.sedes);
+            fillSelect('form-proceso', appState.catalogs.procesos);
+            fillSelect('form-cargo', appState.catalogs.cargos);
+            fillSelect('form-rol', appState.catalogs.roles);
 
-      <!-- Tabla de la Matriz (Imagen 2) -->
-      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-        <div class="bg-[#ea7025] px-5 py-3 text-white flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 class="text-sm font-black tracking-wide uppercase">Paso 6: Matriz de Identificación de Peligros y Valoración de Riesgos Viales</h2>
-            <p class="text-[11px] text-orange-100 font-medium">Estructura según Imagen 2 con valoración Imagen 3 para auditoría de infraestructura</p>
-          </div>
-          <div class="flex items-center space-x-2">
-            <span class="text-xs bg-orange-950/40 px-3 py-1 rounded-full font-bold border border-orange-400/40">
-              Registros: <span id="matrixCountBadge">5</span>
-            </span>
-            <button onclick="openAddModal()" class="bg-white text-orange-700 hover:bg-orange-50 px-3 py-1 rounded text-xs font-bold shadow transition flex items-center">
-              <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-              Nueva Fila
-            </button>
-          </div>
-        </div>
+            const filterSede = document.getElementById('filter-sede');
+            if (filterSede) {
+                const currentFilterSede = filterSede.value;
+                filterSede.innerHTML = '<option value="">Todas las Sedes</option>' + 
+                    appState.catalogs.sedes.map(s => `<option value="${escapeHTML(s)}">${escapeHTML(s)}</option>`).join('');
+                filterSede.value = currentFilterSede;
+            }
 
-        <div class="overflow-x-auto w-full">
-          <table class="w-full text-left text-xs border-collapse min-w-[1100px]" id="riskMatrixTable">
-            <thead>
-              <tr class="bg-[#ea7025] text-white font-bold border-b border-orange-600 text-[11px] tracking-wide text-center">
-                <th class="p-2.5 border-r border-orange-500/40 text-left min-w-[180px]">Peligro identificado</th>
-                <th class="p-2.5 border-r border-orange-500/40 text-left min-w-[180px]">Riesgo evaluado</th>
-                <th class="p-2.5 border-r border-orange-500/40 min-w-[110px]">Distancia</th>
-                <th class="p-2.5 border-r border-orange-500/40 w-16">Severidad</th>
-                <th class="p-2.5 border-r border-orange-500/40 w-16">Probabilidad</th>
-                <th class="p-2.5 border-r border-orange-500/40 min-w-[110px]">Clasificación</th>
-                <th class="p-2.5 border-r border-orange-500/40 text-left min-w-[150px]">Personal afectado</th>
-                <th class="p-2.5 border-r border-orange-500/40 text-left min-w-[220px]">Controles</th>
-                <th class="p-2.5 border-r border-orange-500/40 text-left min-w-[130px]">Responsable</th>
-                <th class="p-2.5 w-16 no-print">Acción</th>
-              </tr>
-            </thead>
-            <tbody id="matrixTableBody" class="divide-y divide-slate-200 text-slate-700"></tbody>
-          </table>
-        </div>
+            const filterRol = document.getElementById('filter-rol');
+            if (filterRol) {
+                const currentFilterRol = filterRol.value;
+                filterRol.innerHTML = '<option value="">Todos los Roles</option>' + 
+                    appState.catalogs.roles.map(r => `<option value="${escapeHTML(r)}">${escapeHTML(r)}</option>`).join('');
+                filterRol.value = currentFilterRol;
+            }
+        }
 
-        <div class="p-3.5 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-3">
-          <div class="flex items-center space-x-3 text-[11px]">
-            <span class="font-bold text-slate-800">Convención:</span>
-            <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600 mr-1"></span> 1-3: Aceptable</span>
-            <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-amber-500 mr-1"></span> 4-6: Moderado</span>
-            <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-orange-600 mr-1"></span> 8-9: Alto</span>
-            <span class="inline-flex items-center"><span class="w-2.5 h-2.5 rounded-full bg-rose-600 mr-1"></span> 12-16: Crítico</span>
-          </div>
-          <span class="text-[10px] text-slate-500 italic">Estructura validada según la plantilla de la organización</span>
-        </div>
-      </div>
+        function renderParametersView() {
+            const renderList = (containerId, badgeId, items, paramType) => {
+                const container = document.getElementById(containerId);
+                const badge = document.getElementById(badgeId);
+                if (!container) return;
+                container.innerHTML = '';
+                if (badge) badge.innerText = items.length;
 
-    </div>
+                items.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-100 transition';
+                    li.innerHTML = `
+                        <span class="truncate pr-2">${escapeHTML(item)}</span>
+                        <button onclick="removeParam('${paramType}', ${index})" class="text-slate-400 hover:text-red-600 transition p-1" title="Eliminar">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    `;
+                    container.appendChild(li);
+                });
+            };
 
-    <!-- ==================== PESTAÑA 3: HOJA INICIO ==================== -->
-    <div id="view-tab-inicio" class="hidden space-y-4">
-      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-        <div class="border-b border-slate-200 pb-3 mb-4 flex items-center justify-between">
-          <div>
-            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Paso 6: Matriz de Riesgos Viales según Metodología ISO 39002:2020</h2>
-            <p class="text-xs text-slate-500">Datos institucionales y de programación que conforman la hoja 'Inicio'</p>
-          </div>
-          <button onclick="downloadSheetsFile()" class="px-3 py-1 bg-emerald-700 hover:bg-emerald-600 text-white rounded text-xs font-bold">
-            Descargar Libro Completo
-          </button>
-        </div>
+            renderList('list-sedes', 'badge-count-sedes', appState.catalogs.sedes, 'sedes');
+            renderList('list-procesos', 'badge-count-procesos', appState.catalogs.procesos, 'procesos');
+            renderList('list-cargos', 'badge-count-cargos', appState.catalogs.cargos, 'cargos');
+            renderList('list-roles', 'badge-count-roles', appState.catalogs.roles, 'roles');
+            renderList('list-componentes', 'badge-count-componentes', appState.catalogs.componentes, 'componentes');
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Organización / Razón Social:</label>
-            <input type="text" id="initOrg" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="Transportes & Logística del Valle S.A.S.">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">NIT:</label>
-            <input type="text" id="initNit" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="900.548.210-4">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Nivel del PESV:</label>
-            <input type="text" id="initNivel" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="Avanzado (Resolución 40595 de 2022)">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Tamaño de la Organización:</label>
-            <input type="text" id="initTamano" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="Gran Empresa (> 100 unidades vehiculares)">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Versión del Documento:</label>
-            <input type="text" id="initVersion" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="2.0">
-          </div>
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Última Revisión:</label>
-            <input type="text" id="initRevision" class="w-full border border-slate-300 rounded p-2 focus:ring-1 focus:ring-orange-500 font-medium" value="2026-09-18">
-          </div>
-        </div>
+            renderHazardsCatalog();
+            populateModalSelects();
+        }
 
-        <div class="mt-4 pt-4 border-t border-slate-200">
-          <h3 class="text-xs font-bold text-slate-800 uppercase mb-2">Rutas Registradas en el Sistema</h3>
-          <div class="space-y-2 text-xs">
-            <div class="flex items-center space-x-2">
-              <span class="font-bold text-orange-700 w-8">R1:</span>
-              <input type="text" id="initR1" class="flex-1 border border-slate-300 rounded p-1.5" value="Ruta RN 25 - Tramo Andalucía - Tuluá - Buga - Popayán / Pasto (Inspección Dashcam)">
-            </div>
-            <div class="flex items-center space-x-2">
-              <span class="font-bold text-orange-700 w-8">R2:</span>
-              <input type="text" id="initR2" class="flex-1 border border-slate-300 rounded p-1.5" value="Ruta Corredor Portuario Buga - Loboguerrero - Buenaventura">
-            </div>
-            <div class="flex items-center space-x-2">
-              <span class="font-bold text-orange-700 w-8">R3:</span>
-              <input type="text" id="initR3" class="flex-1 border border-slate-300 rounded p-1.5" value="Ruta Troncal Occidental Cali - Pereira - Medellín">
-            </div>
-          </div>
-        </div>
+        function addParam(type, inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            const val = input.value.trim();
+            if (!val) return;
 
-        <div class="mt-4 pt-4 border-t border-slate-200">
-          <label class="block font-bold text-slate-700 mb-1 text-xs">Link de Programación de Rutas:</label>
-          <input type="text" id="initLink" class="w-full border border-slate-300 rounded p-2 text-xs text-blue-600 font-mono" value="https://operaciones.transportesdelvalle.com.co/despacho-rutas">
-        </div>
-      </div>
-    </div>
+            if (appState.catalogs[type].includes(val)) {
+                showToast("Este elemento ya existe en la lista.", "warning");
+                return;
+            }
 
-    <!-- ==================== PESTAÑA 4: HOJA CONTROL DE CAMBIOS ==================== -->
-    <div id="view-tab-changes" class="hidden space-y-4">
-      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-        <div class="border-b border-slate-200 pb-3 mb-4 flex items-center justify-between">
-          <div>
-            <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Hoja: Control de Cambios del Documento</h2>
-            <p class="text-xs text-slate-500">Historial trazable de versiones del PESV</p>
-          </div>
-          <button onclick="openAddChangeModal()" class="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded text-xs font-bold transition">
-            + Agregar Registro de Cambio
-          </button>
-        </div>
+            appState.catalogs[type].push(val);
+            input.value = '';
+            renderParametersView();
+            showToast("Elemento agregado a los parámetros.");
+        }
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs border-collapse min-w-[900px]">
-            <thead>
-              <tr class="bg-slate-100 text-slate-800 font-bold border-b border-slate-300 text-[11px]">
-                <th class="p-2 border-r border-slate-200 w-16 text-center">N° Cambio</th>
-                <th class="p-2 border-r border-slate-200 w-28">Fecha</th>
-                <th class="p-2 border-r border-slate-200 min-w-[180px]">Descripción del cambio</th>
-                <th class="p-2 border-r border-slate-200 min-w-[160px]">Razón del cambio</th>
-                <th class="p-2 border-r border-slate-200 min-w-[140px]">Responsable</th>
-                <th class="p-2 border-r border-slate-200 w-28">Fecha Impl.</th>
-                <th class="p-2 min-w-[160px]">Observaciones</th>
-              </tr>
-            </thead>
-            <tbody id="changesTableBody" class="divide-y divide-slate-200 text-slate-700"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+        function removeParam(type, index) {
+            const item = appState.catalogs[type][index];
+            appState.catalogs[type].splice(index, 1);
+            renderParametersView();
+            showToast(`"${item}" eliminado.`);
+        }
 
-    <!-- ==================== PESTAÑA 5: DICTAMEN TÉCNICO FORMAL ==================== -->
-    <div id="view-tab-report" class="hidden space-y-6">
-      
-      <div class="bg-white rounded-xl shadow-lg border border-slate-300 p-8 max-w-5xl mx-auto space-y-6 text-slate-800">
-        
-        <div class="border-b-2 border-slate-900 pb-5 flex flex-wrap items-center justify-between gap-4">
-          <div class="flex items-center space-x-3">
-            <div class="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center text-white font-black text-xl">
-              VS
-            </div>
-            <div>
-              <h1 class="text-lg font-black uppercase text-slate-950 tracking-tight">Informe Técnico de Auditoría de Seguridad Vial Laboral</h1>
-              <p class="text-xs font-semibold text-slate-600">Evaluación de Infraestructura, Cinemática y Factores Humanos en Ruta Nacional</p>
-              <p class="text-[11px] text-orange-700 font-bold">Conformidad: ISO 39001 • ISO 39002:2020 • Res. 40595 de 2022 • Criterios NHTSA</p>
-            </div>
-          </div>
-          <div class="text-right text-xs">
-            <p><strong>Código de Dictamen:</strong> AUD-VIAS-2026-09</p>
-            <p><strong>Fecha de Expedición:</strong> 18 de septiembre de 2026</p>
-            <p><strong>Especialidad:</strong> Ingeniería de Vías & Transporte / PESV</p>
-          </div>
-        </div>
+        function renderHazardsCatalog() {
+            const grid = document.getElementById('hazards-catalog-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
 
-        <section class="space-y-2 text-xs">
-          <h2 class="text-sm font-black uppercase text-slate-900 border-l-4 border-orange-600 pl-2">1. Objetivo y Alcance Técnico</h2>
-          <p class="text-justify leading-relaxed">
-            El presente dictamen tiene como objetivo auditar las condiciones de infraestructura vial, señalización vertical/horizontal, interacción vehicular y cinemática de operación en el corredor <strong>RN 25 (Tramo Andalucía - Tuluá hacia Popayán/Pasto)</strong>, a partir de la inspección dashcam y datos de georreferenciación. La evaluación se fundamenta en la metodología de <em>Sistema Seguro (Safe System Approach)</em> de la <strong>NHTSA / FHWA</strong> y los lineamientos del <strong>Paso 6 del Plan Estratégico de Seguridad Vial (PESV)</strong> para mitigar siniestros viales laborales.
-          </p>
-        </section>
+            const factorTitles = {
+                "Críticos": { name: "Peligros Críticos (Prioritarios)", color: "border-red-500 text-red-700 bg-red-50", badge: "bg-red-600 text-white" },
+                "Dirección_y_Logística": { name: "Dirección y Logística", color: "border-blue-500 text-blue-700 bg-blue-50", badge: "bg-blue-600 text-white" },
+                "Entorno": { name: "Entorno", color: "border-emerald-500 text-emerald-700 bg-emerald-50", badge: "bg-emerald-600 text-white" },
+                "Vehículo": { name: "Vehículo", color: "border-amber-500 text-amber-700 bg-amber-50", badge: "bg-amber-600 text-white" },
+                "Humano": { name: "Humano", color: "border-purple-500 text-purple-700 bg-purple-50", badge: "bg-purple-600 text-white" }
+            };
 
-        <section class="space-y-3 text-xs">
-          <h2 class="text-sm font-black uppercase text-slate-900 border-l-4 border-orange-600 pl-2">2. Caracterización Operativa y Análisis Cinemático</h2>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-1.5">
-              <span class="font-bold text-slate-900 block text-xs">Parámetros Físicos del Tramo:</span>
-              <p>• <strong>Abscisado geográfico:</strong> Latitud 4.19459° N a 4.19404° N, Longitud -76.15798° W a -76.16037° W.</p>
-              <p>• <strong>Estado del pavimento:</strong> Calzada asfáltica rígida/flexible húmeda por precipitación matutina.</p>
-              <p>• <strong>Coeficiente de fricción longitudinal ($f$):</strong> Reducido a 0.28 (riesgo crítico de deslizamiento e hidroplaneo).</p>
-              <p>• <strong>Tiempo de percepción-reacción del conductor ($t_r$):</strong> 1.50 segundos (estándar AASHTO para vías rurales/suburbanas).</p>
-            </div>
+            for (const factorKey in appState.catalogs.hazardsCatalog) {
+                const list = appState.catalogs.hazardsCatalog[factorKey];
+                const conf = factorTitles[factorKey] || { name: factorKey, color: "border-slate-500 text-slate-700 bg-slate-50", badge: "bg-slate-600 text-white" };
 
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-1.5">
-              <span class="font-bold text-slate-900 block text-xs">Déficit de Desaceleración y Frenado:</span>
-              <p>• <strong>Velocidad inicial observada:</strong> 72 - 76 km/h en zona reglamentada a 50 km/h.</p>
-              <p>• <strong>Distancia de parada requerida a 72 km/h en mojado:</strong> 68.4 metros.</p>
-              <p>• <strong>Transición hacia 30 km/h:</strong> Distancia disponible de desaceleración inferior a 60 metros entre la señal SR-30 y las bandas alertadoras, induciendo frenadas intempestivas en vehículos pesados.</p>
-            </div>
-          </div>
-        </section>
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-xl border ${conf.color} bg-white shadow-sm flex flex-col`;
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-2 pb-1 border-b border-slate-100">
+                        <span class="text-xs font-black uppercase tracking-wider">${conf.name}</span>
+                        <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ${conf.badge}">${list.length}</span>
+                    </div>
+                    <ul class="space-y-1 max-h-48 overflow-y-auto custom-scrollbar flex-1 pr-1 text-xs">
+                        ${list.map((hazard, hIdx) => `
+                            <li class="flex items-center justify-between p-1.5 rounded hover:bg-slate-50 text-slate-700">
+                                <span class="truncate pr-1">• ${escapeHTML(hazard)}</span>
+                                <button onclick="removeHazardFromCatalog('${factorKey}', ${hIdx})" class="text-slate-300 hover:text-red-500 text-xs p-0.5" title="Eliminar">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                grid.appendChild(card);
+            }
+        }
 
-        <section class="space-y-2 text-xs">
-          <h2 class="text-sm font-black uppercase text-slate-900 border-l-4 border-orange-600 pl-2">3. Hallazgos Específicos de Infraestructura Vial</h2>
-          <div class="space-y-2">
-            <div class="p-3 rounded-lg border-l-4 border-red-500 bg-red-50/60">
-              <span class="font-bold text-red-950 text-xs">A. Incumplimiento en Zonas de Transición de Velocidad (MUTCD Parte 6):</span>
-              <p class="text-slate-700 mt-0.5">Se observa un descenso abrupto de 50 km/h a 30 km/h en menos de 100 metros previo a obras viales. La norma internacional exige una transición escalonada (ej. 80 -> 60 -> 40 -> 30 km/h) con preaviso mínimo de 300 metros para evitar colisiones traseras con tractocamiones con carga líquida o pesada.</p>
-            </div>
-            <div class="p-3 rounded-lg border-l-4 border-amber-500 bg-amber-50/60">
-              <span class="font-bold text-amber-950 text-xs">B. Conf
+        function addCustomHazard() {
+            const factorEl = document.getElementById('param-hazard-factor');
+            const input = document.getElementById('param-hazard-name');
+            if (!factorEl || !input) return;
+
+            const factor = factorEl.value;
+            const name = input.value.trim();
+
+            if (!name) {
+                showToast("Escribe el nombre del peligro.", "warning");
+                return;
+            }
+
+            if (!appState.catalogs.hazardsCatalog[factor]) {
+                appState.catalogs.hazardsCatalog[factor] = [];
+            }
+
+            if (appState.catalogs.hazardsCatalog[factor].includes(name)) {
+                showToast("Este peligro ya existe en el factor seleccionado.", "warning");
+                return;
+            }
+
+            appState.catalogs.hazardsCatalog[factor].push(name);
+            input.value = '';
+            renderHazardsCatalog();
+            showToast("Peligro agregado al catálogo.");
+        }
+
+        function removeHazardFromCatalog(factorKey, index) {
+            appState.catalogs.hazardsCatalog[factorKey].splice(index, 1);
+            renderHazardsCatalog();
+            showToast("Peligro removido del catálogo.", "info");
+        }
+
+        function confirmResetDefaults() {
+            document.getElementById('confirm-title').innerText = 'Restablecer Catálogo Maestro';
+            document.getElementById('confirm-message').innerText = '¿Deseas restaurar todas las listas maestras predeterminadas según la Resolución 40595?';
+            
+            confirmActionCallback = () => {
+                appState.catalogs = JSON.parse(JSON.stringify(defaultCatalogs));
+                renderParametersView();
+                showToast("Catálogo restablecido a valores estándar.");
+            };
+
+            const confirmModal = document.getElementById('modal-confirm');
+            if (confirmModal) confirmModal.classList.remove('hidden');
+        }
+
+        function updateDashboard() {
+            const matrixCounts = {
+                "3-1": 0, "3-2": 0, "3-3": 0,
+                "2-1": 0, "2-2": 0, "2-3": 0,
+                "1-1": 0, "1-2": 0, "1-3": 0
+            };
+
+            const roleCounts = {};
+
+            appState.records.forEach(r => {
+                const key = `${r.exposicion}-${r.probabilidad}`;
+                if (matrixCounts[key] !== undefined) {
+                    matrixCounts[key]++;
+                }
+                roleCounts[r.rol] = (roleCounts[r.rol] || 0) + 1;
+            });
+
+            for (const key in matrixCounts) {
+                const el = document.getElementById(`heat-count-${key}`);
+                if (el) {
+                    el.innerText = `${matrixCounts[key]} casos`;
+                }
+            }
+
+            const roleContainer = document.getElementById('breakdown-roles');
+            if (roleContainer) {
+                roleContainer.innerHTML = '';
+                const total = appState.records.length || 1;
+
+                for (const rol in roleCounts) {
+                    const count = roleCounts[rol];
+                    const pct = Math.round((count / total) * 100);
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'flex flex-col gap-1';
+                    itemDiv.innerHTML = `
+                        <div class="flex justify-between font-medium text-slate-700">
+                            <span><i class="fa-solid ${getRoleIcon(rol)} mr-1 text-slate-400"></i> ${escapeHTML(rol)}</span>
+                            <span class="font-bold">${count} (${pct}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                            <div class="bg-blue-600 h-full rounded-full" style="width: ${pct}%"></div>
+                        </div>
+                    `;
+                    roleContainer.appendChild(itemDiv);
+                }
+            }
+        }
+
+        function exportToCSV() {
+            if (appState.records.length === 0) {
+                showToast("No hay datos en la matriz para exportar.", "warning");
+                return;
+            }
+
+            const headers = [
+                "ID", "Sede", "Área_Proceso", "Cargo", "Num_Expuestos", "Rol_Tránsito", 
+                "Factor", "Peligro", "Riesgo", "Exposición", "Probabilidad", 
+                "Nivel_Riesgo_NR", "Interpretación", "Nivel", "Medida_Intervención", 
+                "Control_Propuesto", "Responsable"
+            ];
+
+            const rows = appState.records.map(r => [
+                r.id,
+                `"${(r.sede || '').replace(/"/g, '""')}"`,
+                `"${(r.proceso || '').replace(/"/g, '""')}"`,
+                `"${(r.cargo || '').replace(/"/g, '""')}"`,
+                r.expuestos || 1,
+                `"${(r.rol || '').replace(/"/g, '""')}"`,
+                `"${(r.factor || '').replace(/"/g, '""')}"`,
+                `"${(r.peligro || '').replace(/"/g, '""')}"`,
+                `"${(r.riesgo || '').replace(/"/g, '""')}"`,
+                r.exposicion,
+                r.probabilidad,
+                r.nr,
+                `"${(r.interpretacion || '').replace(/"/g, '""')}"`,
+                `"${(r.nivelRomano || '').replace(/"/g, '""')}"`,
+                `"${(r.medida || '').replace(/"/g, '""')}"`,
+                `"${(r.control || '').replace(/"/g, '""')}"`,
+                `"${(r.responsable || '').replace(/"/g, '""')}"`
+            ]);
+
+            const csvContent = "\uFEFF" + [headers.join(";"), ...rows.map(e => e.join(";"))].join("\r\n");
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Matriz_Riesgos_Viales_Res40595_${new Date().toISOString().slice(0, 10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Matriz exportada exitosamente en formato CSV / Excel.");
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            let icon = 'fa-circle-check text-emerald-500';
+            let bg = 'bg-white border-slate-200 text-slate-800';
+
+            if (type === 'warning') {
+                icon = 'fa-triangle-exclamation text-amber-500';
+                bg = 'bg-amber-50 border-amber-200 text-amber-900';
+            } else if (type === 'info') {
+                icon = 'fa-circle-info text-blue-500';
+                bg = 'bg-blue-50 border-blue-200 text-blue-900';
+            }
+
+            toast.className = `flex items-center gap-2.5 px-4 py-3 rounded-xl border shadow-lg text-xs font-medium ${bg} pointer-events-auto transition-all transform duration-200`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-sm"></i> <span>${escapeHTML(message)}</span>`;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-x-4');
+                setTimeout(() => toast.remove(), 250);
+            }, 3000);
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        window.onload = function() {
+            renderParametersView();
+            renderMatrix();
+            calculateRiskScore();
+        };
+    </script>
+</body>
+</html>
